@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>算子广场 · 医疗数据处理平台</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+                   'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      color: #262626;
+      background: #f0f2f5;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; outline: none; }
+    input  { font-family: inherit; outline: none; border: none; }
+
+    /* ─── App Shell ────────────────────────────────── */
+    #app { height: 100vh; display: flex; flex-direction: column; }
+
+    /* ─── Header ───────────────────────────────────── */
+    .header {
+      height: 60px;
+      background: #001529;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 20px;
+      flex-shrink: 0;
+      z-index: 200;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #1677ff, #36cfc9);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-divider {
+      width: 1px; height: 24px;
+      background: rgba(255,255,255,0.15);
+    }
+    .logo-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      font-weight: 400;
+    }
+    /* search box */
+    .header-search {
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+    .header-search input {
+      width: 100%;
+      height: 36px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 0 40px 0 16px;
+      color: #fff;
+      font-size: 13px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .header-search input::placeholder { color: rgba(255,255,255,0.35); }
+    .header-search input:focus {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.35);
+    }
+    .search-icon {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.35);
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .header-stats {
+      margin-left: auto;
+      display: flex;
+      gap: 24px;
+      flex-shrink: 0;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 20px;
+      font-weight: 700;
+      color: #40a9ff;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 2px;
+    }
+
+    /* ─── Banner ────────────────────────────────────── */
+    .banner {
+      background: linear-gradient(120deg, #0f3460 0%, #1677ff 50%, #06b6d4 100%);
+      padding: 18px 24px 16px;
+      flex-shrink: 0;
+    }
+    .banner-inner {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .banner-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .banner-desc  { font-size: 12px; color: rgba(255,255,255,0.72); }
+    .banner-chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .banner-chip {
+      padding: 3px 12px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .banner-chip:hover   { background: rgba(255,255,255,0.22); }
+    .banner-chip.active  { background: rgba(255,255,255,0.3); font-weight: 600; }
+    .banner-right {
+      flex-shrink: 0;
+      display: flex;
+      gap: 16px;
+    }
+    .banner-badge {
+      background: rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 8px 14px;
+      text-align: center;
+    }
+    .badge-num   { font-size: 22px; font-weight: 700; color: #fff; }
+    .badge-label { font-size: 11px; color: rgba(255,255,255,0.65); }
+
+    /* ─── Main Layout ───────────────────────────────── */
+    .main-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ─── Sidebar ───────────────────────────────────── */
+    .sidebar {
+      width: 240px;
+      background: #fff;
+      border-right: 1px solid #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    /* mode switch */
+    .mode-switch {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .mode-hint { font-size: 11px; color: #8c8c8c; margin-bottom: 8px; }
+    .mode-tabs {
+      display: flex;
+      background: #f5f5f5;
+      border-radius: 6px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .mode-tab {
+      flex: 1;
+      text-align: center;
+      padding: 6px 4px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.18s;
+      color: #595959;
+      font-weight: 500;
+      background: transparent;
+    }
+    .mode-tab.active {
+      background: #fff;
+      color: #1677ff;
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    /* category list */
+    .sidebar-scroll { flex: 1; overflow-y: auto; }
+    .sidebar-section { padding: 10px 16px 4px; font-size: 11px; color: #8c8c8c; font-weight: 500; }
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .cat-item:hover  { background: #f5f7ff; }
+    .cat-item.active { background: #e8f4ff; border-left-color: #1677ff; }
+    .cat-icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .cat-label {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+      color: #262626;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cat-item.active .cat-label { color: #1677ff; }
+    .cat-count {
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: #f5f5f5;
+      color: #8c8c8c;
+      flex-shrink: 0;
+    }
+    .cat-item.active .cat-count { background: #cce4ff; color: #1677ff; }
+    /* func filter */
+    .func-panel {
+      padding: 12px 16px;
+      border-top: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .func-hint { font-size: 11px; color: #8c8c8c; margin-bottom: 8px; }
+    .func-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .func-tag {
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid #e8e8e8;
+      color: #595959;
+      background: #fff;
+      transition: all 0.15s;
+    }
+    .func-tag:hover  { border-color: #1677ff; color: #1677ff; }
+    .func-tag.active { background: #1677ff; border-color: #1677ff; color: #fff; }
+
+    /* ─── Content ───────────────────────────────────── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 20px 24px;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+    .toolbar-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #262626;
+    }
+    .toolbar-count {
+      font-size: 13px;
+      color: #8c8c8c;
+    }
+    .toolbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .view-btn {
+      width: 32px; height: 32px;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      color: #595959;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .view-btn.active, .view-btn:hover { border-color: #1677ff; color: #1677ff; background: #e8f4ff; }
+
+    /* ─── Cards Grid ────────────────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
+    .op-card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #f0f0f0;
+      padding: 18px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      cursor: default;
+    }
+    .op-card:hover {
+      border-color: #4096ff;
+      box-shadow: 0 4px 20px rgba(22,119,255,0.1);
+      transform: translateY(-2px);
+    }
+    .op-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .op-icon {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .op-meta { flex: 1; min-width: 0; }
+    .op-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .op-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+    .badge {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 3px;
+      font-weight: 500;
+    }
+    .op-desc {
+      font-size: 12px;
+      color: #595959;
+      line-height: 1.65;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .op-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+    }
+    .op-scene {
+      font-size: 11px;
+      color: #8c8c8c;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-use {
+      padding: 5px 14px;
+      background: #1677ff;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+    .btn-use:hover { background: #4096ff; }
+
+    /* List view */
+    .cards-list { display: flex; flex-direction: column; gap: 8px; }
+    .op-row {
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 6px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.15s;
+      cursor: default;
+    }
+    .op-row:hover { border-color: #4096ff; }
+    .op-row .op-icon { width: 36px; height: 36px; border-radius: 8px; font-size: 17px; }
+    .op-row-name { font-size: 14px; font-weight: 600; color: #262626; width: 180px; flex-shrink: 0; }
+    .op-row-desc { flex: 1; font-size: 12px; color: #595959; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .op-row-badges { display: flex; gap: 4px; flex-shrink: 0; }
+    .op-row .btn-use { margin-left: 12px; }
+
+    /* Empty */
+    .empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: #8c8c8c;
+    }
+    .empty-icon { font-size: 52px; margin-bottom: 16px; }
+    .empty-text { font-size: 14px; }
+
+    /* Search highlight */
+    mark { background: #fff566; color: inherit; border-radius: 2px; padding: 0 1px; }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
+
+    /* Transition */
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.15s; }
+    .fade-enter-from, .fade-leave-to { opacity: 0; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div>算子广场</div>
+        <div class="logo-sub">医疗数据处理平台</div>
+      </div>
+    </div>
+    <div class="logo-divider"></div>
+    <div class="header-search">
+      <input
+        type="text"
+        placeholder="搜索算子名称或功能描述…"
+        v-model="searchText"
+      />
+      <span class="search-icon">🔍</span>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item"><div class="stat-num">{{ allOps.length }}</div><div class="stat-label">算子总数</div></div>
+      <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">算子类型</div></div>
+      <div class="stat-item"><div class="stat-num">9</div><div class="stat-label">医疗场景</div></div>
+    </div>
+  </header>
+
+  <!-- ── Banner ──────────────────────────────────────── -->
+  <div class="banner">
+    <div class="banner-inner">
+      <div>
+        <div class="banner-title">🏥 医疗数据算子广场</div>
+        <div class="banner-desc">覆盖音频、文档、图片、视频及通用类算子，面向患者隐私保护与医疗数据合规场景</div>
+        <div class="banner-chips">
+          <span
+            v-for="f in funcTypes"
+            :key="f"
+            class="banner-chip"
+            :class="{ active: activeFunc === f }"
+            @click="toggleFunc(f)"
+          >{{ f }}</span>
+        </div>
+      </div>
+      <div class="banner-right">
+        <div class="banner-badge" v-for="t in typeCategories" :key="t.name">
+          <div class="badge-num">{{ t.count }}</div>
+          <div class="badge-label">{{ t.name }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main ────────────────────────────────────────── -->
+  <div class="main-body">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- mode switch -->
+      <div class="mode-switch">
+        <div class="mode-hint">分类方式</div>
+        <div class="mode-tabs">
+          <button class="mode-tab" :class="{ active: viewMode === 'type' }" @click="switchMode('type')">按算子类型</button>
+          <button class="mode-tab" :class="{ active: viewMode === 'scene' }" @click="switchMode('scene')">按医疗场景</button>
+        </div>
+      </div>
+
+      <!-- category list -->
+      <div class="sidebar-scroll">
+        <div class="sidebar-section">{{ viewMode === 'type' ? '算子类型' : '医疗场景' }}</div>
+        <!-- All -->
+        <div
+          class="cat-item"
+          :class="{ active: activeCategory === 'all' }"
+          @click="selectCategory('all')"
+        >
+          <div class="cat-icon" style="background:#f5f5f5">🗂️</div>
+          <span class="cat-label">全部算子</span>
+          <span class="cat-count">{{ allOps.length }}</span>
+        </div>
+        <!-- type or scene items -->
+        <div
+          v-for="cat in currentCategories"
+          :key="cat.name"
+          class="cat-item"
+          :class="{ active: activeCategory === cat.name }"
+          @click="selectCategory(cat.name)"
+        >
+          <div class="cat-icon" :style="{ background: cat.bg }">{{ cat.icon }}</div>
+          <span class="cat-label">{{ cat.name }}</span>
+          <span class="cat-count">{{ cat.count }}</span>
+        </div>
+      </div>
+
+      <!-- func filter -->
+      <div class="func-panel">
+        <div class="func-hint">功能类型</div>
+        <div class="func-tags">
+          <button
+            class="func-tag"
+            :class="{ active: activeFunc === 'all' }"
+            @click="toggleFunc('all')"
+          >全部</button>
+          <button
+            v-for="f in funcTypes.slice(1)"
+            :key="f"
+            class="func-tag"
+            :class="{ active: activeFunc === f }"
+            @click="toggleFunc(f)"
+          >{{ f }}</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+      <!-- toolbar -->
+      <div class="toolbar">
+        <span class="toolbar-title">
+          {{ activeCategory === 'all' ? (viewMode === 'type' ? '全部算子' : '全部医疗场景') : activeCategory }}
+        </span>
+        <span class="toolbar-count">共 {{ filteredOps.length }} 个算子</span>
+        <div class="toolbar-right">
+          <button class="view-btn" :class="{ active: listView === 'grid' }" @click="listView='grid'" title="卡片视图">⊞</button>
+          <button class="view-btn" :class="{ active: listView === 'list' }" @click="listView='list'" title="列表视图">≡</button>
+        </div>
+      </div>
+
+      <!-- empty -->
+      <div v-if="filteredOps.length === 0" class="empty">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">未找到符合条件的算子</div>
+      </div>
+
+      <!-- grid view -->
+      <div v-else-if="listView === 'grid'" class="cards-grid">
+        <div class="op-card" v-for="op in filteredOps" :key="op.id">
+          <div class="op-card-top">
+            <div class="op-icon" :style="{ background: typeConfig[op.type].bg }">{{ typeConfig[op.type].icon }}</div>
+            <div class="op-meta">
+              <div class="op-name" v-html="highlight(op.name)"></div>
+              <div class="op-badges">
+                <span class="badge" :style="{ background: typeConfig[op.type].bg, color: typeConfig[op.type].color }">{{ op.type }}</span>
+                <span class="badge" :style="{ background: funcConfig[op.func].bg, color: funcConfig[op.func].color }">{{ op.func }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="op-desc" v-html="highlight(op.desc)"></div>
+          <div class="op-footer">
+            <div class="op-scene" :title="op.scene">
+              <span>{{ sceneConfig[op.scene].icon }}</span>
+              <span>{{ op.scene }}</span>
+            </div>
+            <button class="btn-use">立即使用</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- list view -->
+      <div v-else class="cards-list">
+        <div class="op-row" v-for="op in filteredOps" :key="op.id">
+          <div class="op-icon" :style="{ background: typeConfig[op.type].bg }">{{ typeConfig[op.type].icon }}</div>
+          <div class="op-row-name" v-html="highlight(op.name)"></div>
+          <div class="op-row-desc" v-html="highlight(op.desc)"></div>
+          <div class="op-row-badges">
+            <span class="badge" :style="{ background: typeConfig[op.type].bg, color: typeConfig[op.type].color }">{{ op.type }}</span>
+            <span class="badge" :style="{ background: funcConfig[op.func].bg, color: funcConfig[op.func].color }">{{ op.func }}</span>
+          </div>
+          <button class="btn-use">立即使用</button>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- /main-body -->
+</div><!-- /app -->
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+const { createApp, ref, computed } = Vue
+
+/* ─── Config ─────────────────────────────────── */
+const typeConfig = {
+  '音频类': { icon: '🎵', color: '#722ed1', bg: '#f9f0ff' },
+  '文档类': { icon: '📄', color: '#1677ff', bg: '#e8f4ff' },
+  '图片类': { icon: '🖼️', color: '#0891b2', bg: '#ecfeff' },
+  '视频类': { icon: '🎬', color: '#c0392b', bg: '#fff1f0' },
+  '通用类': { icon: '⚙️', color: '#389e0d', bg: '#f6ffed' },
+}
+
+const sceneConfig = {
+  '患者隐私脱敏与删除':   { icon: '🔐', color: '#c41d7f', bg: '#fff0f6' },
+  '医疗影像质量控制':     { icon: '🔬', color: '#0891b2', bg: '#ecfeff' },
+  '医疗文档处理与清洗':   { icon: '📋', color: '#1677ff', bg: '#e8f4ff' },
+  '医疗音频处理与质量控制': { icon: '🎙️', color: '#722ed1', bg: '#f9f0ff' },
+  '医疗视频处理与质量控制': { icon: '📹', color: '#d4380d', bg: '#fff2e8' },
+  '医疗内容合规与毒性检测': { icon: '✅', color: '#d46b08', bg: '#fff7e6' },
+  '医疗影像智能分析':     { icon: '🧠', color: '#389e0d', bg: '#f6ffed' },
+  '医疗数据翻译与语义分析': { icon: '🌐', color: '#096dd9', bg: '#e6f4ff' },
+  '医疗数据安全与存储管理': { icon: '🔒', color: '#595959', bg: '#f5f5f5' },
+}
+
+const funcConfig = {
+  '过滤':   { color: '#d46b08', bg: '#fff7e6' },
+  '转换':   { color: '#096dd9', bg: '#e6f4ff' },
+  '检测':   { color: '#cf1322', bg: '#fff1f0' },
+  '分析':   { color: '#389e0d', bg: '#f6ffed' },
+  '处理':   { color: '#1677ff', bg: '#e8f4ff' },
+  '隐私保护': { color: '#c41d7f', bg: '#fff0f6' },
+}
+
+/* ─── Operator Data ──────────────────────────── */
+const allOps = [
+  // ════ 音频类 ════════════════════════════════
+  { id:1,  name:'音频损坏过滤',      type:'音频类', func:'过滤',   scene:'医疗音频处理与质量控制',  desc:'过滤受损或内容为空的音频' },
+  { id:2,  name:'超短音频过滤',      type:'音频类', func:'过滤',   scene:'医疗音频处理与质量控制',  desc:'过滤时长少于自定义阈值的音频' },
+  { id:3,  name:'音频活性过滤',      type:'音频类', func:'过滤',   scene:'医疗音频处理与质量控制',  desc:'过滤不包含人声或有效声音的音频' },
+  { id:4,  name:'音频格式转换',      type:'音频类', func:'转换',   scene:'医疗音频处理与质量控制',  desc:'将音频转化为统一格式，支持格式：mp3、wav、ogg、au、flac、aiff' },
+  { id:5,  name:'音频转文字',        type:'音频类', func:'分析',   scene:'医疗音频处理与质量控制',  desc:'识别音频中的文字内容' },
+  { id:6,  name:'音频毒性检测',      type:'音频类', func:'检测',   scene:'医疗内容合规与毒性检测',  desc:'检测音频中是否包含涉政、色情、暴恐、谩骂、广告以及不良价值观的文字内容' },
+  { id:7,  name:'音频敏感信息过滤',  type:'音频类', func:'隐私保护', scene:'患者隐私脱敏与删除',   desc:'过滤包含敏感和隐私信息的音频' },
+  { id:8,  name:'采样率转换',        type:'音频类', func:'转换',   scene:'医疗音频处理与质量控制',  desc:'改变音频信号的采样率，单位是赫兹(HZ)' },
+  { id:9,  name:'统一转单通道',      type:'音频类', func:'转换',   scene:'医疗音频处理与质量控制',  desc:'将多通道（如立体声或环绕声）音频转换为单通道音频' },
+  { id:10, name:'音频噪声过滤',      type:'音频类', func:'过滤',   scene:'医疗音频处理与质量控制',  desc:'当音频中存在噪声时过滤该音频文件，噪声标准见GB3096-2008' },
+  { id:11, name:'音频静音过滤',      type:'音频类', func:'过滤',   scene:'医疗音频处理与质量控制',  desc:'通过计算音频信号的能量，检测音频文件中是否存在长时间的静音段落' },
+  { id:12, name:'音频波形完整性过滤', type:'音频类', func:'过滤',  scene:'医疗音频处理与质量控制',  desc:'读取音频文件的波形数据，检查波形是否连续且没有明显的突变或中断' },
+  { id:13, name:'音频降噪',          type:'音频类', func:'处理',   scene:'医疗音频处理与质量控制',  desc:'基于频域的噪声估计和减少算法，识别并去除背景噪音' },
+  { id:14, name:'音频编码格式检测',  type:'音频类', func:'检测',   scene:'医疗音频处理与质量控制',  desc:'检查音频文件使用的编解码器是否是用户支持的编码格式' },
+  { id:15, name:'音频分段敏感分析',  type:'音频类', func:'隐私保护', scene:'患者隐私脱敏与删除',   desc:'对音频进行分段检测，分析每段音频是否包含敏感信息' },
+  { id:16, name:'音频特征分析',      type:'音频类', func:'分析',   scene:'医疗音频处理与质量控制',  desc:'分析音频的时域特征、频域特征以及高层特征并给出各个特征的统计结果' },
+  { id:17, name:'音频MOS评估',       type:'音频类', func:'分析',   scene:'医疗音频处理与质量控制',  desc:'评估音频质量，给出音频的MOS评分' },
+  { id:18, name:'音频CRC检测',       type:'音频类', func:'检测',   scene:'医疗音频处理与质量控制',  desc:'使用CRC32循环校验算法，检测目标音频文件的CRC32值' },
+  { id:19, name:'音频能量检测',      type:'音频类', func:'检测',   scene:'医疗音频处理与质量控制',  desc:'检测音频的能量大小，以音频的RMS（Root Mean Square）均方根表示' },
+  { id:20, name:'音频能量过滤',      type:'音频类', func:'过滤',   scene:'医疗音频处理与质量控制',  desc:'检测音频的能量大小，按设定阈值对音频进行过滤' },
+  { id:21, name:'音频分段检测',      type:'音频类', func:'检测',   scene:'医疗音频处理与质量控制',  desc:'检测音频中的语言段落，对音频进行分段，给出每段语言的序号、开始/结束时间及文本内容' },
+
+  // ════ 文档类 ════════════════════════════════
+  { id:22, name:'文本Unicode修复',   type:'文档类', func:'处理',   scene:'医疗文档处理与清洗',      desc:"修复损坏的unicode字符，如'â\x9c\x94 No problems' → '✔ No problems'" },
+  { id:23, name:'文档格式过滤',      type:'文档类', func:'过滤',   scene:'医疗文档处理与清洗',      desc:'过滤掉未在选中格式中的文档' },
+  { id:24, name:'文档损坏过滤',      type:'文档类', func:'过滤',   scene:'医疗文档处理与清洗',      desc:'过滤受损或内容为空的文档' },
+  { id:25, name:'文档繁简转换',      type:'文档类', func:'转换',   scene:'医疗文档处理与清洗',      desc:'支持将中文文本转化为"简体"或"繁体"' },
+  { id:26, name:'文档敏感词屏蔽',    type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'识别文档中的敏感词并用自定义替换词替换' },
+  { id:27, name:'文档大小写转化',    type:'文档类', func:'转换',   scene:'医疗文档处理与清洗',      desc:'支持将英文字母转化为"大写"或"小写"' },
+  { id:28, name:'文档去除无关字符',  type:'文档类', func:'处理',   scene:'医疗文档处理与清洗',      desc:'去除表情符号、乱码、非常规标点等冗余字符和异常字符' },
+  { id:29, name:'文档隐私脱敏',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'对文档中包含的身份证、电话、邮件、IP地址、QQ、URL进行脱敏处理' },
+  { id:30, name:'文档格式转换',      type:'文档类', func:'转换',   scene:'医疗文档处理与清洗',      desc:'将文档转化为统一格式，支持格式：txt、text、docx、doc' },
+  { id:31, name:'文本毒性检测',      type:'文档类', func:'检测',   scene:'医疗内容合规与毒性检测',  desc:'检测文本中是否包含涉政、色情、暴恐、谩骂、广告以及不良价值观的内容' },
+  { id:32, name:'文本翻译',          type:'文档类', func:'分析',   scene:'医疗数据翻译与语义分析',  desc:'支持将中英文文本翻译成"中文"或"英文"' },
+  { id:33, name:'删除身份证号',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'删除文档中的身份证号' },
+  { id:34, name:'删除邮箱账号',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'删除文档中的Email邮箱账号' },
+  { id:35, name:'删除电话号码',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'删除文档中的手机电话号码' },
+  { id:36, name:'删除URL地址',       type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'删除文档中的URL地址' },
+  { id:37, name:'删除IP地址',        type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'删除文档中的IP地址' },
+  { id:38, name:'删除QQ账号',        type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'删除文档中的QQ账号' },
+  { id:39, name:'隐私信息删除',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'隐私信息删除，包括身份证、邮箱、电话、URL、IP、QQ，可多选' },
+  { id:40, name:'替换身份证号',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'根据自定义替换词替换文档中的身份证号' },
+  { id:41, name:'替换邮箱账号',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'根据自定义替换词替换文档中的邮箱账号' },
+  { id:42, name:'替换电话号码',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'根据自定义替换词替换文档中的电话号码' },
+  { id:43, name:'替换URL地址',       type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'根据自定义替换词替换文档中的URL地址' },
+  { id:44, name:'替换IP地址',        type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'根据自定义替换词替换文档中的IP地址' },
+  { id:45, name:'替换QQ账号',        type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'根据自定义替换词替换文档中的QQ账号' },
+  { id:46, name:'隐私信息替换',      type:'文档类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'将文档中包含的身份证、电话、邮件、IP地址、QQ账号替换成自定义词语' },
+  { id:47, name:'正则匹配',          type:'文档类', func:'处理',   scene:'患者隐私脱敏与删除',      desc:'根据自定义正则表达式匹配并替换文档中的内容' },
+  { id:48, name:'去除html标签',      type:'文档类', func:'处理',   scene:'医疗文档处理与清洗',      desc:'从HTML文本中提取纯文本内容，去除所有标签' },
+  { id:49, name:'删除括号中的内容',  type:'文档类', func:'处理',   scene:'医疗文档处理与清洗',      desc:'去除文本中的括号以及括号中的内容，括号类型包括()、()、<>、[]、【】、《》' },
+  { id:50, name:'去除冗余段落',      type:'文档类', func:'处理',   scene:'医疗文档处理与清洗',      desc:'在单个文本内部去除重复的段落，以提高文本的可读性和简洁性' },
+  { id:51, name:'文本质量统计',      type:'文档类', func:'分析',   scene:'医疗文档处理与清洗',      desc:'统计字符数、中文字数、单词数、句子数、字重复率、词重复率、句子重复率共七个指标' },
+  { id:52, name:'文档结构清洗',      type:'文档类', func:'处理',   scene:'医疗文档处理与清洗',      desc:'从文本中移除不必要的目录结构、页码标记和水印信息，仅支持docx/doc格式' },
+  { id:53, name:'纯文本PDF提取',     type:'文档类', func:'处理',   scene:'医疗文档处理与清洗',      desc:'对纯文本类PDF（非扫描件或图片）进行文本提取，提取速度快，效果好' },
+  { id:54, name:'图片PDF提取',       type:'文档类', func:'处理',   scene:'医疗文档处理与清洗',      desc:'对包括扫描件或图片类在内的PDF进行文本提取，速度较慢' },
+  { id:55, name:'文本标签识别',      type:'文档类', func:'分析',   scene:'医疗数据翻译与语义分析',  desc:'对文本进行分类，一共有十个类别：财经、房产、股票、教育、科技、社会、时政、体育、游戏、娱乐' },
+  { id:56, name:'文本摘要',          type:'文档类', func:'分析',   scene:'医疗数据翻译与语义分析',  desc:'利用大语言模型对文章进行总结，生成文章的摘要，便于用户快速了解主要内容' },
+  { id:57, name:'文本CRC检测',       type:'文档类', func:'检测',   scene:'医疗文档处理与清洗',      desc:'使用CRC32循环校验算法，检测目标文档文件的CRC32值' },
+
+  // ════ 图片类 ════════════════════════════════
+  { id:58, name:'图片添加水印',      type:'图片类', func:'处理',   scene:'医疗数据翻译与语义分析',  desc:'在图片中添加自定义水印' },
+  { id:59, name:'人脸模糊化',        type:'图片类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'对图片中检测到的人脸进行模糊化处理' },
+  { id:60, name:'图片人脸修复模型',  type:'图片类', func:'处理',   scene:'医疗影像智能分析',        desc:'对图片中检测到的人脸进行修复和增强' },
+  { id:61, name:'图片人体姿态分析',  type:'图片类', func:'分析',   scene:'医疗影像智能分析',        desc:'定位图片中人体的17个关键点，输出关键点的信息' },
+  { id:62, name:'图片人体姿态标注图', type:'图片类', func:'分析',  scene:'医疗影像智能分析',        desc:'定位图片中人体的17个关键点，输出标注后的人体定位图' },
+  { id:63, name:'图片人群密度热图',  type:'图片类', func:'分析',   scene:'医疗影像智能分析',        desc:'识别图片中的人群密度，生成对应的Heatmap图' },
+  { id:64, name:'图片人群密度计算',  type:'图片类', func:'分析',   scene:'医疗影像智能分析',        desc:'计算图片中的总人数' },
+  { id:65, name:'图片质量打分：MOS指标', type:'图片类', func:'分析', scene:'医疗影像质量控制',     desc:'对图像的视觉质量进行评价，输出评价MOS分，范围[0,1]，值越大代表图像质量越好' },
+  { id:66, name:'图片异常分类',      type:'图片类', func:'检测',   scene:'医疗影像质量控制',        desc:'检测图像异常类型，可分类为"正常"、"绿屏"、"花屏"' },
+  { id:67, name:'图片目标定位图',    type:'图片类', func:'分析',   scene:'医疗影像智能分析',        desc:'识别图片中的常见物体，共80种类别，输出目标定位图' },
+  { id:68, name:'图片目标分析',      type:'图片类', func:'分析',   scene:'医疗影像智能分析',        desc:'识别图片中的常见物体，共80种类别，输出识别结果' },
+  { id:69, name:'图片增强',          type:'图片类', func:'处理',   scene:'医疗影像质量控制',        desc:'支持对图像进行亮度、色彩、对比度和锐度四个维度的自定义增强' },
+  { id:70, name:'图片格式过滤',      type:'图片类', func:'过滤',   scene:'医疗影像质量控制',        desc:'过滤掉未在选中格式中的图片' },
+  { id:71, name:'图片损坏过滤',      type:'图片类', func:'过滤',   scene:'医疗影像质量控制',        desc:'过滤受损或内容为空的图片' },
+  { id:72, name:'图片模糊过滤',      type:'图片类', func:'过滤',   scene:'医疗影像质量控制',        desc:'过滤模糊程度较大的低质量图片' },
+  { id:73, name:'图像旋转',          type:'图片类', func:'处理',   scene:'医疗影像质量控制',        desc:'根据自定义角度按顺时针方向旋转图片' },
+  { id:74, name:'图像大小变换',      type:'图片类', func:'处理',   scene:'医疗影像质量控制',        desc:'根据自定义的长度和宽度改变图片大小' },
+  { id:75, name:'图像灰度化',        type:'图片类', func:'处理',   scene:'医疗影像质量控制',        desc:'将图片转化为灰度图' },
+  { id:76, name:'图像格式转换',      type:'图片类', func:'转换',   scene:'医疗影像质量控制',        desc:'将图片转化为统一格式，支持格式：jpg、jpeg、png、bmp、webp、tif、tiff' },
+  { id:77, name:'图片标签化',        type:'图片类', func:'分析',   scene:'医疗影像智能分析',        desc:'识别图片中的主体内容并打上类型标签，支持数千个内容标签，覆盖常见物体品类' },
+  { id:78, name:'图片涉暴检测',      type:'图片类', func:'检测',   scene:'医疗内容合规与毒性检测',  desc:'检测图片中是否包含暴恐或不适宜的内容' },
+  { id:79, name:'图片色情检测',      type:'图片类', func:'检测',   scene:'医疗内容合规与毒性检测',  desc:'检测图片中是否包含色情或不适宜的内容' },
+  { id:80, name:'图片广告检测',      type:'图片类', func:'检测',   scene:'医疗内容合规与毒性检测',  desc:'检测图片中是否包含广告或不适宜的内容' },
+  { id:81, name:'图片涉政检测',      type:'图片类', func:'检测',   scene:'医疗内容合规与毒性检测',  desc:'检测图片中是否包含政治或不适宜内容' },
+  { id:82, name:'图片违法违规检测',  type:'图片类', func:'检测',   scene:'医疗内容合规与毒性检测',  desc:'检测图片中是否包含违法违规或不适宜内容' },
+  { id:83, name:'图像毒性检测',      type:'图片类', func:'检测',   scene:'医疗内容合规与毒性检测',  desc:'检测图像中是否包含涉政、色情、暴恐、谩骂、广告以及不良价值观的文字内容' },
+  { id:84, name:'图片OCR识别',       type:'图片类', func:'分析',   scene:'医疗影像智能分析',        desc:'识别图片中所包含的文字信息' },
+  { id:85, name:'图片涉暴过滤',      type:'图片类', func:'过滤',   scene:'医疗内容合规与毒性检测',  desc:'过滤包含暴恐或不适宜内容的图片' },
+  { id:86, name:'图片涉黄过滤',      type:'图片类', func:'过滤',   scene:'医疗内容合规与毒性检测',  desc:'过滤包含色情或不适宜内容的图片' },
+  { id:87, name:'图片广告过滤',      type:'图片类', func:'过滤',   scene:'医疗内容合规与毒性检测',  desc:'过滤包含广告或不适宜内容的图片' },
+  { id:88, name:'图片涉政过滤',      type:'图片类', func:'过滤',   scene:'医疗内容合规与毒性检测',  desc:'过滤包含政治或不适宜内容的图片' },
+  { id:89, name:'图片违法违规过滤',  type:'图片类', func:'过滤',   scene:'医疗内容合规与毒性检测',  desc:'过滤包含违法违规或不适宜内容的图片' },
+  { id:90, name:'图片敏感信息过滤',  type:'图片类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'过滤包含敏感和隐私信息的图片' },
+  { id:91, name:'图片马赛克',        type:'图片类', func:'隐私保护', scene:'患者隐私脱敏与删除',    desc:'根据自定义的像素块大小对图片进行规则化处理，达到隐藏或保护图像信息的效果' },
+  { id:92, name:'图片镜像',          type:'图片类', func:'处理',   scene:'医疗影像质量控制',        desc:'对图像进行镜像翻转，支持上下翻转或左右翻转' },
+  { id:93, name:'低分辨率图片过滤',  type:'图片类', func:'过滤',   scene:'医疗影像质量控制',        desc:'比较图片的宽度和高度与设定阈值，若低于阈值则认为该图片为低分辨率图片' },
+  { id:94, name:'图像降噪',          type:'图片类', func:'处理',   scene:'医疗影像质量控制',        desc:'使用高斯滤波器对图像进行降噪处理，以减少图像中的噪声' },
+  { id:95, name:'图片目标裁剪',      type:'图片类', func:'处理',   scene:'医疗影像智能分析',        desc:'根据用户选择的目标对象类型对图片进行裁剪，输出裁剪后的图片' },
+  { id:96, name:'图像AI增强',        type:'图片类', func:'处理',   scene:'医疗影像质量控制',        desc:'通过Real-ESRGAN深度学习超分模型，对图片进行AI增强，提升图片的清晰度和细节' },
+  { id:97, name:'图像CRC检测',       type:'图片类', func:'检测',   scene:'医疗影像质量控制',        desc:'使用CRC32循环校验算法，检测目标图像文件的CRC32值' },
+
+  // ════ 通用类 ════════════════════════════════
+  { id:98,  name:'文件透传',    type:'通用类', func:'处理', scene:'医疗数据安全与存储管理', desc:'文件透传，不做任何处理' },
+  { id:99,  name:'文件加密',    type:'通用类', func:'处理', scene:'医疗数据安全与存储管理', desc:'使用Argon2算法根据密码和盐生成密钥，以AES的CFB模式加密文件，偏移量为16字节' },
+  { id:100, name:'文件解密',    type:'通用类', func:'处理', scene:'医疗数据安全与存储管理', desc:'使用Argon2算法根据密码和盐生成密钥，以AES的CFB模式解密文件，偏移量为16字节' },
+  { id:101, name:'文件重复过滤', type:'通用类', func:'过滤', scene:'医疗数据安全与存储管理', desc:'根据SHA256对文件进行文件级去重' },
+
+  // ════ 视频类 ════════════════════════════════
+  { id:102, name:'视频目标跟踪分析', type:'视频类', func:'分析', scene:'医疗影像智能分析',        desc:'检测并跟踪视频中的常见物体，共80种类别，输出每一帧的识别结果' },
+  { id:103, name:'视频损坏过滤',     type:'视频类', func:'过滤', scene:'医疗视频处理与质量控制',  desc:'过滤受损或内容为空的视频' },
+  { id:104, name:'超短视频过滤',     type:'视频类', func:'过滤', scene:'医疗视频处理与质量控制',  desc:'过滤时长少于自定义阈值的视频' },
+  { id:105, name:'视频格式转换',     type:'视频类', func:'转换', scene:'医疗视频处理与质量控制',  desc:'将视频转化为统一格式，支持格式：mp4、avi、asf、f4v、flv、mpeg、vob、mov' },
+  { id:106, name:'视频文件抽帧',     type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'支持自定义时间窗口和单位时间窗口内帧数对视频进行均匀抽帧' },
+  { id:107, name:'视频质量评价-VTQ部分', type:'视频类', func:'分析', scene:'医疗视频处理与质量控制', desc:'基于《超高清视频图像质量客观评价方法》(GY/T 412-2024)评价视频的VTQ指标' },
+  { id:108, name:'视频涉暴检测',     type:'视频类', func:'检测', scene:'医疗内容合规与毒性检测',  desc:'检测视频中是否包含暴恐或不适宜内容' },
+  { id:109, name:'视频色情检测',     type:'视频类', func:'检测', scene:'医疗内容合规与毒性检测',  desc:'检测视频中是否包含色情或不适宜的内容' },
+  { id:110, name:'视频广告检测',     type:'视频类', func:'检测', scene:'医疗内容合规与毒性检测',  desc:'检测视频中是否包含广告或不适宜的内容' },
+  { id:111, name:'视频涉政检测',     type:'视频类', func:'检测', scene:'医疗内容合规与毒性检测',  desc:'检测视频中是否包含政治或不适宜的内容' },
+  { id:112, name:'视频违法违规检测', type:'视频类', func:'检测', scene:'医疗内容合规与毒性检测',  desc:'检测视频中是否包含违法违规或不适宜内容' },
+  { id:113, name:'视频目标轨迹标注', type:'视频类', func:'分析', scene:'医疗影像智能分析',        desc:'检测并跟踪视频中的常见物体，共80种类别，输出标注好的视频' },
+  { id:114, name:'视频流抽帧',       type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'基于预设时间规则自动抽取视频帧画面，适用于长视频素材的轻量化处理与结构化存档' },
+  { id:115, name:'视频文件关键帧',   type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'基于I帧信息抽取关键帧，在保证数据量尽可能小的同时，采集视频的关键信息' },
+  { id:116, name:'视频流关键帧',     type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'从视频流中基于I帧信息抽取关键帧' },
+  { id:117, name:'视频剪辑',         type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'按配置的跳过开头与跳过结尾时长进行视频剪辑' },
+  { id:118, name:'视频分辨率调整',   type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'按配置调整视频的分辨率，支持按比例缩放或按固定值缩放' },
+  { id:119, name:'视频帧率调整',     type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'按配置调整视频的帧率，一般视频的帧率都在24~60之间' },
+  { id:120, name:'视频降噪',         type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'使用高斯滤波器对视频进行降噪处理，以减少视频中的噪声' },
+  { id:121, name:'视频编码格式检测', type:'视频类', func:'检测', scene:'医疗视频处理与质量控制',  desc:'检查视频文件使用的编解码器是否是用户支持的编码格式' },
+  { id:122, name:'视频AI增强',       type:'视频类', func:'处理', scene:'医疗视频处理与质量控制',  desc:'通过Real-ESRGAN深度学习超分模型，对视频进行AI增强，提升视频的清晰度和细节' },
+  { id:123, name:'视频CRC检测',      type:'视频类', func:'检测', scene:'医疗视频处理与质量控制',  desc:'使用CRC32循环校验算法，检测目标视频文件的CRC32值' },
+]
+
+/* ─── App ────────────────────────────────────── */
+createApp({
+  setup() {
+    const searchText    = ref('')
+    const viewMode      = ref('type')   // 'type' | 'scene'
+    const activeCategory = ref('all')
+    const activeFunc    = ref('all')
+    const listView      = ref('grid')   // 'grid' | 'list'
+
+    /* func types list */
+    const funcTypes = ['全部', '过滤', '转换', '检测', '分析', '处理', '隐私保护']
+
+    /* type categories with counts */
+    const typeCategories = computed(() =>
+      Object.entries(typeConfig).map(([name, cfg]) => ({
+        name, ...cfg,
+        count: allOps.filter(o => o.type === name).length,
+      }))
+    )
+
+    /* scene categories with counts */
+    const sceneCategories = computed(() =>
+      Object.entries(sceneConfig).map(([name, cfg]) => ({
+        name, ...cfg,
+        count: allOps.filter(o => o.scene === name).length,
+      }))
+    )
+
+    /* current sidebar categories */
+    const currentCategories = computed(() =>
+      viewMode.value === 'type' ? typeCategories.value : sceneCategories.value
+    )
+
+    /* filtered operators */
+    const filteredOps = computed(() => {
+      let res = allOps
+      if (searchText.value.trim()) {
+        const s = searchText.value.trim().toLowerCase()
+        res = res.filter(o =>
+          o.name.toLowerCase().includes(s) || o.desc.toLowerCase().includes(s)
+        )
+      }
+      if (activeCategory.value !== 'all') {
+        if (viewMode.value === 'type') {
+          res = res.filter(o => o.type === activeCategory.value)
+        } else {
+          res = res.filter(o => o.scene === activeCategory.value)
+        }
+      }
+      if (activeFunc.value !== 'all') {
+        res = res.filter(o => o.func === activeFunc.value)
+      }
+      return res
+    })
+
+    /* highlight search text */
+    function highlight(text) {
+      const s = searchText.value.trim()
+      if (!s) return text
+      const escaped = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      return text.replace(new RegExp(escaped, 'gi'), m => `<mark>${m}</mark>`)
+    }
+
+    function switchMode(mode) {
+      viewMode.value = mode
+      activeCategory.value = 'all'
+    }
+
+    function selectCategory(name) {
+      activeCategory.value = name
+    }
+
+    function toggleFunc(f) {
+      if (f === '全部') { activeFunc.value = 'all'; return }
+      activeFunc.value = (activeFunc.value === f) ? 'all' : f
+    }
+
+    return {
+      searchText, viewMode, activeCategory, activeFunc, listView,
+      funcTypes, typeCategories, sceneCategories, currentCategories,
+      filteredOps, highlight, switchMode, selectCategory, toggleFunc,
+      typeConfig, sceneConfig, funcConfig, allOps,
+    }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>
