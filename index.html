@@ -432,6 +432,79 @@
     /* Transition */
     .fade-enter-active, .fade-leave-active { transition: opacity 0.15s; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+    /* ─── Two-level Scene Sidebar ──────────────────────── */
+    .scene-group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .scene-group-header:hover { background: #f5f7ff; }
+    .scene-group-header.active { background: #e8f4ff; border-left-color: #1677ff; }
+    .scene-group-header.active .cat-label { color: #1677ff; font-weight: 600; }
+    .scene-group-header.active .cat-count { background: #cce4ff; color: #1677ff; }
+    .scene-expand {
+      font-size: 9px;
+      color: #bfbfbf;
+      transition: transform 0.18s;
+      flex-shrink: 0;
+    }
+    .scene-expand.open { transform: rotate(90deg); }
+    .scene-subtag-list { padding-bottom: 4px; }
+    .scene-subtag-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px 6px 44px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .scene-subtag-item:hover { background: #f5f7ff; }
+    .scene-subtag-item.active { background: #fff0f6; border-left-color: #c41d7f; }
+    .subtag-icon { font-size: 12px; flex-shrink: 0; }
+    .subtag-label { flex: 1; font-size: 12px; color: #595959; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .scene-subtag-item.active .subtag-label { color: #c41d7f; font-weight: 500; }
+    .subtag-count { font-size: 11px; padding: 1px 5px; border-radius: 8px; background: #f5f5f5; color: #8c8c8c; flex-shrink: 0; }
+    .scene-subtag-item.active .subtag-count { background: #ffd6e7; color: #c41d7f; }
+
+    /* ─── Scene Badges on Cards ────────────────────────── */
+    .op-scene-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+      flex: 1;
+    }
+    .scene-l1-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: 500;
+      max-width: 170px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .scene-l2-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      max-width: 170px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -507,25 +580,59 @@
         <!-- All -->
         <div
           class="cat-item"
-          :class="{ active: activeCategory === 'all' }"
-          @click="selectCategory('all')"
+          :class="{ active: activeCategory === 'all' && activeSceneGroup === 'all' }"
+          @click="selectAll()"
         >
           <div class="cat-icon" style="background:#f5f5f5">🗂️</div>
           <span class="cat-label">全部算子</span>
           <span class="cat-count">{{ allOps.length }}</span>
         </div>
-        <!-- type or scene items -->
-        <div
-          v-for="cat in currentCategories"
-          :key="cat.name"
-          class="cat-item"
-          :class="{ active: activeCategory === cat.name }"
-          @click="selectCategory(cat.name)"
-        >
-          <div class="cat-icon" :style="{ background: cat.bg }">{{ cat.icon }}</div>
-          <span class="cat-label">{{ cat.name }}</span>
-          <span class="cat-count">{{ cat.count }}</span>
-        </div>
+
+        <!-- Type mode: flat list -->
+        <template v-if="viewMode === 'type'">
+          <div
+            v-for="cat in typeCategories"
+            :key="cat.name"
+            class="cat-item"
+            :class="{ active: activeCategory === cat.name }"
+            @click="selectCategory(cat.name)"
+          >
+            <div class="cat-icon" :style="{ background: cat.bg }">{{ cat.icon }}</div>
+            <span class="cat-label">{{ cat.name }}</span>
+            <span class="cat-count">{{ cat.count }}</span>
+          </div>
+        </template>
+
+        <!-- Scene mode: two-level hierarchy -->
+        <template v-else>
+          <div v-for="(gcfg, gname) in sceneGroupConfig" :key="gname">
+            <!-- L1 group header -->
+            <div
+              class="scene-group-header"
+              :class="{ active: activeSceneGroup === gname && activeCategory === 'all' }"
+              @click="selectGroup(gname)"
+            >
+              <div class="cat-icon" :style="{ background: gcfg.bg }">{{ gcfg.icon }}</div>
+              <span class="cat-label">{{ gname }}</span>
+              <span class="cat-count">{{ groupCounts[gname] }}</span>
+              <span class="scene-expand" :class="{ open: expandedGroups.includes(gname) }">▶</span>
+            </div>
+            <!-- L2 sub-scene tags -->
+            <div class="scene-subtag-list" v-if="expandedGroups.includes(gname)">
+              <div
+                v-for="sc in gcfg.children"
+                :key="sc"
+                class="scene-subtag-item"
+                :class="{ active: activeCategory === sc }"
+                @click="selectCategory(sc)"
+              >
+                <span class="subtag-icon">{{ sceneConfig[sc].icon }}</span>
+                <span class="subtag-label">{{ sc }}</span>
+                <span class="subtag-count">{{ sceneCountMap[sc] || 0 }}</span>
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
 
       <!-- func filter -->
@@ -553,7 +660,11 @@
       <!-- toolbar -->
       <div class="toolbar">
         <span class="toolbar-title">
-          {{ activeCategory === 'all' ? (viewMode === 'type' ? '全部算子' : '全部医疗场景') : activeCategory }}
+          {{ viewMode === 'type'
+            ? (activeCategory === 'all' ? '全部算子' : activeCategory)
+            : (activeCategory !== 'all'
+                ? activeCategory
+                : (activeSceneGroup !== 'all' ? activeSceneGroup : '全部医疗场景')) }}
         </span>
         <span class="toolbar-count">共 {{ filteredOps.length }} 个算子</span>
         <div class="toolbar-right">
@@ -583,9 +694,15 @@
           </div>
           <div class="op-desc" v-html="highlight(op.desc)"></div>
           <div class="op-footer">
-            <div class="op-scene" :title="op.scene">
-              <span>{{ sceneConfig[op.scene].icon }}</span>
-              <span>{{ op.scene }}</span>
+            <div class="op-scene-wrap">
+              <span class="scene-l1-badge"
+                :style="{ background: sceneGroupConfig[sceneToGroup[op.scene]].bg, color: sceneGroupConfig[sceneToGroup[op.scene]].color }">
+                {{ sceneGroupConfig[sceneToGroup[op.scene]].icon }} {{ sceneToGroup[op.scene] }}
+              </span>
+              <span class="scene-l2-badge"
+                :style="{ background: sceneConfig[op.scene].bg, color: sceneConfig[op.scene].color }">
+                {{ sceneConfig[op.scene].icon }} {{ op.scene }}
+              </span>
             </div>
             <button class="btn-use">立即使用</button>
           </div>
@@ -601,6 +718,7 @@
           <div class="op-row-badges">
             <span class="badge" :style="{ background: typeConfig[op.type].bg, color: typeConfig[op.type].color }">{{ op.type }}</span>
             <span class="badge" :style="{ background: funcConfig[op.func].bg, color: funcConfig[op.func].color }">{{ op.func }}</span>
+            <span class="badge" :style="{ background: sceneGroupConfig[sceneToGroup[op.scene]].bg, color: sceneGroupConfig[sceneToGroup[op.scene]].color }">{{ sceneGroupConfig[sceneToGroup[op.scene]].icon }} {{ sceneToGroup[op.scene] }}</span>
           </div>
           <button class="btn-use">立即使用</button>
         </div>
@@ -634,6 +752,30 @@ const sceneConfig = {
   '医疗数据翻译与语义分析': { icon: '🌐', color: '#096dd9', bg: '#e6f4ff' },
   '医疗数据安全与存储管理': { icon: '🔒', color: '#595959', bg: '#f5f5f5' },
 }
+
+/* ─── Scene Group Hierarchy (L1 → L2) ───────────── */
+const sceneGroupConfig = {
+  '数据处理与质控': {
+    icon: '⚙️', color: '#1677ff', bg: '#e8f4ff',
+    children: ['医疗音频处理与质量控制', '医疗文档处理与清洗', '医疗影像质量控制', '医疗视频处理与质量控制'],
+  },
+  '智能识别与分析': {
+    icon: '🧠', color: '#389e0d', bg: '#f6ffed',
+    children: ['医疗影像智能分析', '医疗数据翻译与语义分析'],
+  },
+  '隐私保护与合规': {
+    icon: '🔐', color: '#c41d7f', bg: '#fff0f6',
+    children: ['患者隐私脱敏与删除', '医疗内容合规与毒性检测'],
+  },
+  '数据安全与存储': {
+    icon: '🔒', color: '#595959', bg: '#f5f5f5',
+    children: ['医疗数据安全与存储管理'],
+  },
+}
+/* reverse lookup: L2 scene name → L1 group name */
+const sceneToGroup = Object.fromEntries(
+  Object.entries(sceneGroupConfig).flatMap(([g, cfg]) => cfg.children.map(s => [s, g]))
+)
 
 const funcConfig = {
   '过滤':   { color: '#d46b08', bg: '#fff7e6' },
@@ -818,11 +960,13 @@ const allOps = [
 /* ─── App ────────────────────────────────────── */
 createApp({
   setup() {
-    const searchText    = ref('')
-    const viewMode      = ref('type')   // 'type' | 'scene'
-    const activeCategory = ref('all')
-    const activeFunc    = ref('all')
-    const listView      = ref('grid')   // 'grid' | 'list'
+    const searchText      = ref('')
+    const viewMode        = ref('type')   // 'type' | 'scene'
+    const activeCategory  = ref('all')    // L2 scene name or type name or 'all'
+    const activeSceneGroup = ref('all')   // L1 group name or 'all'
+    const expandedGroups  = ref([])       // L1 groups currently expanded in sidebar
+    const activeFunc      = ref('all')
+    const listView        = ref('grid')   // 'grid' | 'list'
 
     /* func types list */
     const funcTypes = ['全部', '过滤', '转换', '检测', '分析', '处理', '隐私保护']
@@ -843,7 +987,23 @@ createApp({
       }))
     )
 
-    /* current sidebar categories */
+    /* fast L2 scene count lookup */
+    const sceneCountMap = computed(() => {
+      const map = {}
+      for (const op of allOps) map[op.scene] = (map[op.scene] || 0) + 1
+      return map
+    })
+
+    /* L1 group count lookup */
+    const groupCounts = computed(() => {
+      const counts = {}
+      for (const [gname, gcfg] of Object.entries(sceneGroupConfig)) {
+        counts[gname] = gcfg.children.reduce((sum, sc) => sum + (sceneCountMap.value[sc] || 0), 0)
+      }
+      return counts
+    })
+
+    /* current sidebar categories (type mode only) */
     const currentCategories = computed(() =>
       viewMode.value === 'type' ? typeCategories.value : sceneCategories.value
     )
@@ -857,11 +1017,18 @@ createApp({
           o.name.toLowerCase().includes(s) || o.desc.toLowerCase().includes(s)
         )
       }
-      if (activeCategory.value !== 'all') {
-        if (viewMode.value === 'type') {
+      if (viewMode.value === 'type') {
+        if (activeCategory.value !== 'all') {
           res = res.filter(o => o.type === activeCategory.value)
-        } else {
+        }
+      } else {
+        if (activeCategory.value !== 'all') {
+          // L2 specific sub-scene selected
           res = res.filter(o => o.scene === activeCategory.value)
+        } else if (activeSceneGroup.value !== 'all') {
+          // L1 group selected — show all L2 scenes within it
+          const children = sceneGroupConfig[activeSceneGroup.value].children
+          res = res.filter(o => children.includes(o.scene))
         }
       }
       if (activeFunc.value !== 'all') {
@@ -881,10 +1048,46 @@ createApp({
     function switchMode(mode) {
       viewMode.value = mode
       activeCategory.value = 'all'
+      activeSceneGroup.value = 'all'
+      expandedGroups.value = []
     }
 
+    /* reset to show-all state */
+    function selectAll() {
+      activeCategory.value = 'all'
+      activeSceneGroup.value = 'all'
+    }
+
+    /* select a type (type mode) or a L2 sub-scene (scene mode) */
     function selectCategory(name) {
       activeCategory.value = name
+      if (viewMode.value === 'scene' && name !== 'all') {
+        const grp = sceneToGroup[name]
+        if (grp) {
+          activeSceneGroup.value = grp
+          if (!expandedGroups.value.includes(grp)) {
+            expandedGroups.value = [...expandedGroups.value, grp]
+          }
+        } else {
+          activeSceneGroup.value = 'all'
+        }
+      }
+    }
+
+    /* select a L1 group and toggle-expand it; re-clicking deactivates */
+    function selectGroup(gname) {
+      const isActive = activeSceneGroup.value === gname && activeCategory.value === 'all'
+      if (isActive) {
+        // deactivate and collapse
+        activeSceneGroup.value = 'all'
+        expandedGroups.value = expandedGroups.value.filter(g => g !== gname)
+      } else {
+        activeSceneGroup.value = gname
+        activeCategory.value = 'all'
+        if (!expandedGroups.value.includes(gname)) {
+          expandedGroups.value = [...expandedGroups.value, gname]
+        }
+      }
     }
 
     function toggleFunc(f) {
@@ -893,10 +1096,13 @@ createApp({
     }
 
     return {
-      searchText, viewMode, activeCategory, activeFunc, listView,
+      searchText, viewMode, activeCategory, activeSceneGroup, expandedGroups,
+      activeFunc, listView,
       funcTypes, typeCategories, sceneCategories, currentCategories,
-      filteredOps, highlight, switchMode, selectCategory, toggleFunc,
-      typeConfig, sceneConfig, funcConfig, allOps,
+      sceneCountMap, groupCounts,
+      filteredOps, highlight,
+      switchMode, selectAll, selectCategory, selectGroup, toggleFunc,
+      typeConfig, sceneConfig, funcConfig, sceneGroupConfig, sceneToGroup, allOps,
     }
   }
 }).mount('#app')
