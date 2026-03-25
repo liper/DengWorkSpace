@@ -680,14 +680,15 @@
       <!-- dataset scenes view -->
       <div v-if="viewMode === 'dataset'" class="dataset-view">
         <div class="ds-group" v-for="group in filteredDatasetScenes" :key="group.id">
-          <div class="ds-group-header" @click="toggleGroup(group.id)">
+          <div class="ds-group-header" @click="toggleGroup(group.id)"
+               role="button" :aria-expanded="expandedGroups[group.id] ? 'true' : 'false'">
             <div class="ds-group-icon" :style="{ background: group.bg }">{{ group.icon }}</div>
             <div class="ds-group-info">
               <span class="ds-group-name">{{ group.name }}</span>
               <span class="ds-group-desc">{{ group.desc }}</span>
             </div>
             <span class="ds-group-count">{{ group.children.length }} 个场景</span>
-            <span class="ds-toggle">{{ expandedGroups[group.id] ? '▲' : '▼' }}</span>
+            <span class="ds-toggle" :aria-hidden="true">{{ expandedGroups[group.id] ? '▲' : '▼' }}</span>
           </div>
           <div class="ds-children" v-show="expandedGroups[group.id] || activeCategory !== 'all'">
             <div class="ds-item-card" v-for="(item, idx) in group.children" :key="item.id">
@@ -1026,7 +1027,7 @@ createApp({
     const activeFunc    = ref('all')
     const listView      = ref('grid')   // 'grid' | 'list'
 
-    /* dataset groups expand state – all expanded by default */
+    /* dataset groups expand state – all groups expanded by default */
     const expandedGroups = ref(Object.fromEntries(datasetScenes.map(s => [s.id, true])))
 
     function toggleGroup(id) {
