@@ -432,6 +432,118 @@
     /* Transition */
     .fade-enter-active, .fade-leave-active { transition: opacity 0.15s; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+    /* ─── Dataset Scene View ────────────────────────── */
+    .dataset-view { display: flex; flex-direction: column; gap: 12px; }
+    .ds-group {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #f0f0f0;
+      overflow: hidden;
+    }
+    .ds-group-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .ds-group-header:hover { background: #f5f7ff; }
+    .ds-group-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .ds-group-info { flex: 1; min-width: 0; }
+    .ds-group-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #262626;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .ds-group-desc {
+      font-size: 12px;
+      color: #8c8c8c;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    .ds-group-count {
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 10px;
+      background: #f5f5f5;
+      color: #595959;
+      flex-shrink: 0;
+    }
+    .ds-toggle {
+      font-size: 11px;
+      color: #bfbfbf;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+      width: 16px;
+      text-align: center;
+    }
+    .ds-children {
+      border-top: 1px solid #f5f5f5;
+      padding: 8px 12px 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 8px;
+    }
+    .ds-item-card {
+      border: 1px solid #f0f0f0;
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #fafafa;
+    }
+    .ds-item-card:hover {
+      border-color: #4096ff;
+      box-shadow: 0 2px 8px rgba(22,119,255,0.08);
+      background: #fff;
+    }
+    .ds-item-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #e8f4ff;
+      color: #1677ff;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .ds-item-content { flex: 1; min-width: 0; }
+    .ds-item-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #262626;
+      margin-bottom: 4px;
+    }
+    .ds-item-desc {
+      font-size: 12px;
+      color: #8c8c8c;
+      line-height: 1.6;
+    }
+    .ds-item-tag {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      font-weight: 500;
+      align-self: flex-start;
+    }
   </style>
 </head>
 <body>
@@ -498,12 +610,13 @@
         <div class="mode-tabs">
           <button class="mode-tab" :class="{ active: viewMode === 'type' }" @click="switchMode('type')">按算子类型</button>
           <button class="mode-tab" :class="{ active: viewMode === 'scene' }" @click="switchMode('scene')">按医疗场景</button>
+          <button class="mode-tab" :class="{ active: viewMode === 'dataset' }" @click="switchMode('dataset')">数据集场景</button>
         </div>
       </div>
 
       <!-- category list -->
       <div class="sidebar-scroll">
-        <div class="sidebar-section">{{ viewMode === 'type' ? '算子类型' : '医疗场景' }}</div>
+        <div class="sidebar-section">{{ viewMode === 'type' ? '算子类型' : viewMode === 'scene' ? '医疗场景' : '数据集分类' }}</div>
         <!-- All -->
         <div
           class="cat-item"
@@ -511,8 +624,8 @@
           @click="selectCategory('all')"
         >
           <div class="cat-icon" style="background:#f5f5f5">🗂️</div>
-          <span class="cat-label">全部算子</span>
-          <span class="cat-count">{{ allOps.length }}</span>
+          <span class="cat-label">{{ viewMode === 'dataset' ? '全部数据集场景' : '全部算子' }}</span>
+          <span class="cat-count">{{ allCount }}</span>
         </div>
         <!-- type or scene items -->
         <div
@@ -529,7 +642,7 @@
       </div>
 
       <!-- func filter -->
-      <div class="func-panel">
+      <div class="func-panel" v-if="viewMode !== 'dataset'">
         <div class="func-hint">功能类型</div>
         <div class="func-tags">
           <button
@@ -553,17 +666,44 @@
       <!-- toolbar -->
       <div class="toolbar">
         <span class="toolbar-title">
-          {{ activeCategory === 'all' ? (viewMode === 'type' ? '全部算子' : '全部医疗场景') : activeCategory }}
+          {{ activeCategory === 'all'
+            ? (viewMode === 'type' ? '全部算子' : viewMode === 'scene' ? '全部医疗场景' : '全部数据集场景')
+            : activeCategory }}
         </span>
-        <span class="toolbar-count">共 {{ filteredOps.length }} 个算子</span>
-        <div class="toolbar-right">
+        <span class="toolbar-count">共 {{ viewMode === 'dataset' ? currentDatasetCount : filteredOps.length }} 个{{ viewMode === 'dataset' ? '场景' : '算子' }}</span>
+        <div class="toolbar-right" v-if="viewMode !== 'dataset'">
           <button class="view-btn" :class="{ active: listView === 'grid' }" @click="listView='grid'" title="卡片视图">⊞</button>
           <button class="view-btn" :class="{ active: listView === 'list' }" @click="listView='list'" title="列表视图">≡</button>
         </div>
       </div>
 
+      <!-- dataset scenes view -->
+      <div v-if="viewMode === 'dataset'" class="dataset-view">
+        <div class="ds-group" v-for="group in filteredDatasetScenes" :key="group.id">
+          <div class="ds-group-header" @click="toggleGroup(group.id)">
+            <div class="ds-group-icon" :style="{ background: group.bg }">{{ group.icon }}</div>
+            <div class="ds-group-info">
+              <span class="ds-group-name">{{ group.name }}</span>
+              <span class="ds-group-desc">{{ group.desc }}</span>
+            </div>
+            <span class="ds-group-count">{{ group.children.length }} 个场景</span>
+            <span class="ds-toggle">{{ expandedGroups[group.id] ? '▲' : '▼' }}</span>
+          </div>
+          <div class="ds-children" v-show="expandedGroups[group.id] || activeCategory !== 'all'">
+            <div class="ds-item-card" v-for="(item, idx) in group.children" :key="item.id">
+              <div class="ds-item-num" :style="{ background: group.bg, color: group.color }">{{ idx + 1 }}</div>
+              <div class="ds-item-content">
+                <div class="ds-item-name">{{ item.name }}</div>
+                <div class="ds-item-desc">{{ item.desc }}</div>
+              </div>
+              <div class="ds-item-tag" :style="{ color: group.color, background: group.bg }">{{ group.short }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- empty -->
-      <div v-if="filteredOps.length === 0" class="empty">
+      <div v-else-if="filteredOps.length === 0" class="empty">
         <div class="empty-icon">🔍</div>
         <div class="empty-text">未找到符合条件的算子</div>
       </div>
@@ -780,14 +920,118 @@ const allOps = [
   { id:123, name:'视频CRC检测',      type:'视频类', func:'检测', scene:'医疗视频处理与质量控制',  desc:'使用CRC32循环校验算法，检测目标视频文件的CRC32值' },
 ]
 
+/* ─── Dataset Scenes ──────────────────────────── */
+const datasetScenes = [
+  {
+    id: 1, name: '临床诊断与治疗', short: '临床诊断',
+    icon: '🏥', color: '#c41d7f', bg: '#fff0f6',
+    desc: '支持各类疾病早期筛查、辅助诊断及治疗方案制定',
+    children: [
+      { id: 101, name: '疾病早筛数据集',       desc: '肿瘤、心血管疾病、糖尿病等慢性病早期筛查模型训练数据' },
+      { id: 102, name: '影像辅助诊断数据集',   desc: 'X光、CT、MRI、超声等多模态影像标注数据，支持AI辅助诊断' },
+      { id: 103, name: '病理切片分析数据集',   desc: '组织病理切片高分辨率图像及细胞级标注，支持数字病理AI' },
+      { id: 104, name: '手术规划数据集',       desc: '手术导航与规划所需的三维重建影像及操作标注数据' },
+      { id: 105, name: '治疗效果评估数据集',   desc: '患者治疗前后对照数据，用于评估治疗方案效果与预后预测' },
+    ],
+  },
+  {
+    id: 2, name: '电子病历与医学文档', short: '电子病历',
+    icon: '📋', color: '#1677ff', bg: '#e8f4ff',
+    desc: '结构化与非结构化医疗文本数据的处理、提取与利用',
+    children: [
+      { id: 201, name: '结构化EMR数据集',       desc: '电子病历结构化字段提取与命名实体识别的标注训练数据' },
+      { id: 202, name: '出院小结与病历数据集',  desc: '出院小结、手术记录等临床文书的自然语言处理数据' },
+      { id: 203, name: '检验报告提取数据集',    desc: '化验单、检查报告关键指标自动抽取的标注数据' },
+      { id: 204, name: '医学文献语料库',        desc: '中英文医学期刊论文、临床指南及综述文献数据集' },
+      { id: 205, name: '中医药知识数据集',      desc: '中医典籍、方剂、证候及本草等传统医学知识图谱数据' },
+    ],
+  },
+  {
+    id: 3, name: '医学影像', short: '医学影像',
+    icon: '🔬', color: '#0891b2', bg: '#ecfeff',
+    desc: '覆盖多种医学成像模态的高质量标注影像数据集',
+    children: [
+      { id: 301, name: '放射影像数据集',   desc: '胸片、头颅CT、腹部MRI等放射科影像及病灶分割标注数据' },
+      { id: 302, name: '病理图像数据集',   desc: '全切片图像（WSI）及细胞级标注，支持数字病理智能分析' },
+      { id: 303, name: '眼底图像数据集',   desc: '视网膜眼底照片及病变区域标注，用于眼科疾病筛查' },
+      { id: 304, name: '内镜图像数据集',   desc: '胃镜、肠镜、支气管镜等内镜影像及病变检测标注数据' },
+      { id: 305, name: '皮肤镜图像数据集', desc: '皮肤病变皮肤镜图像及分类标注，支持皮肤科AI诊断' },
+      { id: 306, name: '超声图像数据集',   desc: '腹部、心脏、产科等超声影像及测量标注数据' },
+    ],
+  },
+  {
+    id: 4, name: '医疗语音与对话', short: '医疗语音',
+    icon: '🎙️', color: '#722ed1', bg: '#f9f0ff',
+    desc: '医疗场景下语音识别、语义理解与对话的专项数据',
+    children: [
+      { id: 401, name: '门诊问诊对话数据集',   desc: '医患问诊录音及转录文本，用于训练医疗对话AI系统' },
+      { id: 402, name: '医学术语语音数据集',   desc: '专业医学术语标准发音数据，提升医疗领域语音识别准确率' },
+      { id: 403, name: '手术室指令数据集',     desc: '手术室环境下语音指令识别数据，支持无接触操作系统' },
+      { id: 404, name: '医学知识问答数据集',   desc: '医学知识问答对，用于训练医疗智能问答与导诊系统' },
+    ],
+  },
+  {
+    id: 5, name: '药物研发与基因组', short: '药物研发',
+    icon: '🧬', color: '#389e0d', bg: '#f6ffed',
+    desc: '支持新药研发全链路的多维度专项数据资源',
+    children: [
+      { id: 501, name: '分子结构数据集',     desc: '药物小分子SMILES结构、3D构象及生物活性标注数据' },
+      { id: 502, name: '临床试验数据集',     desc: '多期临床试验受试者数据及安全性、有效性评估数据' },
+      { id: 503, name: '基因组与蛋白质组数据集', desc: '基因序列、蛋白质结构与功能注释的多组学数据' },
+      { id: 504, name: '药物不良反应数据集', desc: '药品不良事件上报数据及信号挖掘训练数据' },
+      { id: 505, name: '药物相互作用数据集', desc: '多药联用相互作用知识图谱及风险预警数据' },
+    ],
+  },
+  {
+    id: 6, name: '公共卫生与流行病', short: '公共卫生',
+    icon: '🌍', color: '#d46b08', bg: '#fff7e6',
+    desc: '面向人群健康监测与公共卫生决策的数据集',
+    children: [
+      { id: 601, name: '传染病监测数据集', desc: '传染病发病率、传播链及人群接触数据，支持疫情预测模型' },
+      { id: 602, name: '慢性病管理数据集', desc: '高血压、糖尿病等慢性病患者的长期随访与监测数据' },
+      { id: 603, name: '疫苗接种记录数据集', desc: '人群疫苗接种情况及免疫效果评估数据' },
+      { id: 604, name: '健康体检大数据',   desc: '体检人群多项检测指标与健康风险评估数据' },
+    ],
+  },
+  {
+    id: 7, name: '智慧医院管理', short: '医院管理',
+    icon: '🏗️', color: '#595959', bg: '#f5f5f5',
+    desc: '提升医院运营效率与服务质量的数字化数据集',
+    children: [
+      { id: 701, name: '医疗资源调度数据集', desc: '床位、手术室、设备等资源利用率及调度优化数据' },
+      { id: 702, name: '患者就医流程数据集', desc: '挂号、候诊、就诊、取药全流程时序行为数据' },
+      { id: 703, name: '医疗费用分析数据集', desc: '诊疗费用明细及医保结算数据，支持费用预测与控制' },
+      { id: 704, name: '医疗设备维护数据集', desc: '医疗设备运行日志及故障预测的时序传感器数据' },
+    ],
+  },
+  {
+    id: 8, name: '医学教育与培训', short: '医学教育',
+    icon: '🎓', color: '#096dd9', bg: '#e6f4ff',
+    desc: '支持医学人才培养与技能考核的数字化数据集',
+    children: [
+      { id: 801, name: '医学教学案例数据集',   desc: '典型病例、罕见病案例及教学解析的结构化数据' },
+      { id: 802, name: '医学模拟训练数据集',   desc: '手术模拟器与临床技能训练的过程交互数据' },
+      { id: 803, name: '医学考试题库数据集',   desc: '执业医师、护士、药师等职业资格考试题目数据' },
+      { id: 804, name: '继续教育内容数据集',   desc: '医生继续教育课程及学习行为的数字化数据' },
+    ],
+  },
+]
+
 /* ─── App ────────────────────────────────────── */
 createApp({
   setup() {
     const searchText    = ref('')
-    const viewMode      = ref('type')   // 'type' | 'scene'
+    const viewMode      = ref('type')   // 'type' | 'scene' | 'dataset'
     const activeCategory = ref('all')
     const activeFunc    = ref('all')
     const listView      = ref('grid')   // 'grid' | 'list'
+
+    /* dataset groups expand state – all expanded by default */
+    const expandedGroups = ref(Object.fromEntries(datasetScenes.map(s => [s.id, true])))
+
+    function toggleGroup(id) {
+      expandedGroups.value[id] = !expandedGroups.value[id]
+    }
 
     /* func types list */
     const funcTypes = ['全部', '过滤', '转换', '检测', '分析', '处理', '隐私保护']
@@ -808,9 +1052,37 @@ createApp({
       }))
     )
 
+    /* dataset categories (first-level) with counts */
+    const datasetCategories = computed(() =>
+      datasetScenes.map(s => ({
+        name: s.name, icon: s.icon, color: s.color, bg: s.bg,
+        count: s.children.length,
+      }))
+    )
+
     /* current sidebar categories */
-    const currentCategories = computed(() =>
-      viewMode.value === 'type' ? typeCategories.value : sceneCategories.value
+    const currentCategories = computed(() => {
+      if (viewMode.value === 'type') return typeCategories.value
+      if (viewMode.value === 'scene') return sceneCategories.value
+      return datasetCategories.value
+    })
+
+    /* total count shown in sidebar "all" button */
+    const allCount = computed(() =>
+      viewMode.value === 'dataset'
+        ? datasetScenes.reduce((s, g) => s + g.children.length, 0)
+        : allOps.length
+    )
+
+    /* dataset scenes filtered by active first-level category */
+    const filteredDatasetScenes = computed(() => {
+      if (activeCategory.value === 'all') return datasetScenes
+      return datasetScenes.filter(s => s.name === activeCategory.value)
+    })
+
+    /* count of currently visible dataset items */
+    const currentDatasetCount = computed(() =>
+      filteredDatasetScenes.value.reduce((s, g) => s + g.children.length, 0)
     )
 
     /* filtered operators */
@@ -859,8 +1131,10 @@ createApp({
 
     return {
       searchText, viewMode, activeCategory, activeFunc, listView,
-      funcTypes, typeCategories, sceneCategories, currentCategories,
-      filteredOps, highlight, switchMode, selectCategory, toggleFunc,
+      funcTypes, typeCategories, sceneCategories, datasetCategories, currentCategories,
+      filteredOps, filteredDatasetScenes, currentDatasetCount, allCount,
+      expandedGroups, toggleGroup,
+      highlight, switchMode, selectCategory, toggleFunc,
       typeConfig, sceneConfig, funcConfig, allOps,
     }
   }
