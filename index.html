@@ -505,6 +505,87 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
+    /* ─── Scene-grouped Table View ─────────────────────── */
+    .scene-table-wrap {
+      overflow-x: auto;
+    }
+    .st-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      font-size: 12px;
+    }
+    .st-table thead th {
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #8c8c8c;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .st-l1-row td {
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .st-l1-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .st-l2-row td {
+      padding: 7px 14px 7px 32px;
+      font-size: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid #f0f0f0;
+      border-left: 3px solid transparent;
+    }
+    .st-l2-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .st-op-row td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: top;
+      color: #262626;
+    }
+    .st-op-row:last-child td { border-bottom: none; }
+    .st-op-row:hover td { background: #f5f7ff; }
+    .st-num {
+      font-size: 11px;
+      color: #bfbfbf;
+      width: 36px;
+      text-align: center;
+      vertical-align: middle !important;
+    }
+    .st-name {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .st-desc {
+      color: #595959;
+      line-height: 1.6;
+      min-width: 220px;
+    }
+    .st-actions { white-space: nowrap; }
+    .st-row-count {
+      margin-left: 8px;
+      font-size: 11px;
+      font-weight: 400;
+      padding: 1px 8px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.28);
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
@@ -670,6 +751,7 @@
         <div class="toolbar-right">
           <button class="view-btn" :class="{ active: listView === 'grid' }" @click="listView='grid'" title="卡片视图">⊞</button>
           <button class="view-btn" :class="{ active: listView === 'list' }" @click="listView='list'" title="列表视图">≡</button>
+          <button class="view-btn" :class="{ active: listView === 'table' }" @click="listView='table'" title="场景表格视图">⊟</button>
         </div>
       </div>
 
@@ -710,7 +792,7 @@
       </div>
 
       <!-- list view -->
-      <div v-else class="cards-list">
+      <div v-else-if="listView === 'list'" class="cards-list">
         <div class="op-row" v-for="op in filteredOps" :key="op.id">
           <div class="op-icon" :style="{ background: typeConfig[op.type].bg }">{{ typeConfig[op.type].icon }}</div>
           <div class="op-row-name" v-html="highlight(op.name)"></div>
@@ -722,6 +804,64 @@
           </div>
           <button class="btn-use">立即使用</button>
         </div>
+      </div>
+
+      <!-- scene table view -->
+      <div v-else class="scene-table-wrap">
+        <table class="st-table">
+          <colgroup>
+            <col style="width:38px">
+            <col style="width:140px">
+            <col style="width:72px">
+            <col style="width:72px">
+            <col>
+            <col style="width:84px">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>算子名称</th>
+              <th>算子类型</th>
+              <th>功能类型</th>
+              <th>功能描述</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-for="group in sceneTableData" :key="group.name">
+              <!-- L1 group header row -->
+              <tr class="st-l1-row">
+                <td colspan="6" :style="{ background: group.bg, color: group.color }">
+                  <span class="st-l1-label">
+                    {{ group.icon }} {{ group.name }}
+                    <span class="st-row-count">{{ group.total }} 个算子</span>
+                  </span>
+                </td>
+              </tr>
+              <template v-for="sub in group.subs" :key="sub.scene">
+                <!-- L2 sub-scene header row -->
+                <tr class="st-l2-row">
+                  <td colspan="6"
+                    :style="{ borderLeftColor: sub.color, background: sub.bg, color: sub.color }">
+                    <span class="st-l2-label">
+                      {{ sub.icon }} {{ sub.scene }}
+                      <span class="st-row-count" :style="{ background: sub.color + '22' }">{{ sub.ops.length }} 个</span>
+                    </span>
+                  </td>
+                </tr>
+                <!-- operator rows -->
+                <tr v-for="(op, idx) in sub.ops" :key="op.id" class="st-op-row">
+                  <td class="st-num">{{ idx + 1 }}</td>
+                  <td class="st-name" v-html="highlight(op.name)"></td>
+                  <td><span class="badge" :style="{ background: typeConfig[op.type].bg, color: typeConfig[op.type].color }">{{ op.type }}</span></td>
+                  <td><span class="badge" :style="{ background: funcConfig[op.func].bg, color: funcConfig[op.func].color }">{{ op.func }}</span></td>
+                  <td class="st-desc" v-html="highlight(op.desc)"></td>
+                  <td class="st-actions"><button class="btn-use">立即使用</button></td>
+                </tr>
+              </template>
+            </template>
+          </tbody>
+        </table>
       </div>
     </main>
 
@@ -1037,6 +1177,29 @@ createApp({
       return res
     })
 
+    /* scene-grouped table data: L1 → L2 → ops, based on filteredOps */
+    const sceneTableData = computed(() =>
+      Object.entries(sceneGroupConfig)
+        .map(([gname, gcfg]) => {
+          const subs = gcfg.children
+            .map(sc => ({
+              scene: sc,
+              ...sceneConfig[sc],
+              ops: filteredOps.value.filter(o => o.scene === sc),
+            }))
+            .filter(s => s.ops.length > 0)
+          return {
+            name: gname,
+            icon: gcfg.icon,
+            color: gcfg.color,
+            bg: gcfg.bg,
+            subs,
+            total: subs.reduce((sum, s) => sum + s.ops.length, 0),
+          }
+        })
+        .filter(g => g.total > 0)
+    )
+
     /* highlight search text */
     function highlight(text) {
       const s = searchText.value.trim()
@@ -1099,7 +1262,7 @@ createApp({
       searchText, viewMode, activeCategory, activeSceneGroup, expandedGroups,
       activeFunc, listView,
       funcTypes, typeCategories, sceneCategories, currentCategories,
-      sceneCountMap, groupCounts,
+      sceneCountMap, groupCounts, sceneTableData,
       filteredOps, highlight,
       switchMode, selectAll, selectCategory, selectGroup, toggleFunc,
       typeConfig, sceneConfig, funcConfig, sceneGroupConfig, sceneToGroup, allOps,
