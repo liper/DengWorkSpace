@@ -361,6 +361,28 @@
       overflow: hidden;
       margin-bottom: 14px;
     }
+    .op-medical-desc {
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #f6ffed;
+      border: 1px solid #d9f7be;
+    }
+    .op-medical-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #389e0d;
+      margin-bottom: 4px;
+    }
+    .op-medical-text {
+      font-size: 12px;
+      color: #595959;
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
     .op-footer {
       display: flex;
       align-items: center;
@@ -393,23 +415,70 @@
 
     /* List view */
     .cards-list { display: flex; flex-direction: column; gap: 8px; }
+    .list-header {
+      display: grid;
+      grid-template-columns: 40px 168px minmax(220px, 1fr) minmax(260px, 1.2fr) 220px 88px;
+      gap: 12px;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+    }
     .op-row {
       background: #fff;
       border: 1px solid #f0f0f0;
       border-radius: 6px;
       padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: border-color 0.15s;
-      cursor: default;
-    }
+       display: grid;
+       grid-template-columns: 40px 168px minmax(220px, 1fr) minmax(260px, 1.2fr) 220px 88px;
+       align-items: start;
+       gap: 12px;
+       transition: border-color 0.15s;
+       cursor: default;
+     }
     .op-row:hover { border-color: #4096ff; }
     .op-row .op-icon { width: 36px; height: 36px; border-radius: 8px; font-size: 17px; }
-    .op-row-name { font-size: 14px; font-weight: 600; color: #262626; width: 180px; flex-shrink: 0; }
-    .op-row-desc { flex: 1; font-size: 12px; color: #595959; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .op-row-badges { display: flex; gap: 4px; flex-shrink: 0; }
-    .op-row .btn-use { margin-left: 12px; }
+    .op-row-name { font-size: 14px; font-weight: 600; color: #262626; }
+    .op-row-desc,
+    .op-row-medical {
+      font-size: 12px;
+      color: #595959;
+      line-height: 1.65;
+    }
+    .op-row-badges {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      align-content: flex-start;
+    }
+    .op-row .btn-use { margin-left: auto; }
+    .op-row-scene {
+      width: 100%;
+      font-size: 11px;
+      color: #8c8c8c;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 1280px) {
+      .list-header { display: none; }
+      .op-row {
+        grid-template-columns: 40px 1fr;
+      }
+      .op-row-badges,
+      .op-row .btn-use,
+      .op-row-desc,
+      .op-row-medical {
+        grid-column: 2;
+      }
+      .op-row .btn-use {
+        margin-left: 0;
+        width: fit-content;
+      }
+    }
 
     /* Empty */
     .empty {
@@ -582,6 +651,10 @@
             </div>
           </div>
           <div class="op-desc" v-html="highlight(op.desc)"></div>
+          <div class="op-medical-desc">
+            <div class="op-medical-title">医疗场景描述</div>
+            <div class="op-medical-text" v-html="highlight(op.medicalDesc)"></div>
+          </div>
           <div class="op-footer">
             <div class="op-scene" :title="op.scene">
               <span>{{ sceneConfig[op.scene].icon }}</span>
@@ -594,13 +667,26 @@
 
       <!-- list view -->
       <div v-else class="cards-list">
+        <div class="list-header">
+          <span></span>
+          <span>算子名称</span>
+          <span>功能描述</span>
+          <span>医疗场景描述</span>
+          <span>标签</span>
+          <span></span>
+        </div>
         <div class="op-row" v-for="op in filteredOps" :key="op.id">
           <div class="op-icon" :style="{ background: typeConfig[op.type].bg }">{{ typeConfig[op.type].icon }}</div>
           <div class="op-row-name" v-html="highlight(op.name)"></div>
           <div class="op-row-desc" v-html="highlight(op.desc)"></div>
+          <div class="op-row-medical" v-html="highlight(op.medicalDesc)"></div>
           <div class="op-row-badges">
-            <span class="badge" :style="{ background: typeConfig[op.type].bg, color: typeConfig[op.type].color }">{{ op.type }}</span>
-            <span class="badge" :style="{ background: funcConfig[op.func].bg, color: funcConfig[op.func].color }">{{ op.func }}</span>
+             <span class="badge" :style="{ background: typeConfig[op.type].bg, color: typeConfig[op.type].color }">{{ op.type }}</span>
+             <span class="badge" :style="{ background: funcConfig[op.func].bg, color: funcConfig[op.func].color }">{{ op.func }}</span>
+             <div class="op-row-scene">
+               <span>{{ sceneConfig[op.scene].icon }}</span>
+               <span>{{ op.scene }}</span>
+             </div>
           </div>
           <button class="btn-use">立即使用</button>
         </div>
@@ -780,6 +866,37 @@ const allOps = [
   { id:123, name:'视频CRC检测',      type:'视频类', func:'检测', scene:'医疗视频处理与质量控制',  desc:'使用CRC32循环校验算法，检测目标视频文件的CRC32值' },
 ]
 
+const medicalSubjects = {
+  '音频类': '问诊录音、随访通话与客服录音',
+  '文档类': '电子病历、检查报告、出院小结与知情同意书',
+  '图片类': '检查截图、报告拍照件、患者照片与护理现场图片',
+  '视频类': '远程问诊视频、病区巡检视频与宣教视频',
+  '通用类': '医疗资料归档、交换与外发文件',
+}
+
+const medicalSceneGoals = {
+  '患者隐私脱敏与删除': '患者隐私脱敏、科研共享与对外流转',
+  '医疗影像质量控制': '医学影像质控、远程会诊预处理与模型入参',
+  '医疗文档处理与清洗': '病历清洗、标准化入库与结构化整理',
+  '医疗音频处理与质量控制': '问诊录音质检、转写预处理与录音归档',
+  '医疗视频处理与质量控制': '远程会诊视频治理、留痕归档与质量抽检',
+  '医疗内容合规与毒性检测': '平台内容审核、医患沟通合规与风险预警',
+  '医疗影像智能分析': '医疗影像辅助分析、现场运营监测与结构化标注',
+  '医疗数据翻译与语义分析': '病历语义理解、跨语种资料处理与信息速览',
+  '医疗数据安全与存储管理': '医疗数据安全存储、传输保护与交换管理',
+}
+
+function buildMedicalDescription(op) {
+  const subject = medicalSubjects[op.type] || '医疗业务数据'
+  const goal = medicalSceneGoals[op.scene] || '医疗数据治理'
+  const cleanDesc = op.desc.replace(/[。；]+$/u, '')
+  return `在${goal}场景中，${op.name}主要面向${subject}，可${cleanDesc}，便于医疗数据在业务流转、归档或合规处理中直接落地。`
+}
+
+allOps.forEach(op => {
+  op.medicalDesc = buildMedicalDescription(op)
+})
+
 /* ─── App ────────────────────────────────────── */
 createApp({
   setup() {
@@ -819,7 +936,9 @@ createApp({
       if (searchText.value.trim()) {
         const s = searchText.value.trim().toLowerCase()
         res = res.filter(o =>
-          o.name.toLowerCase().includes(s) || o.desc.toLowerCase().includes(s)
+          o.name.toLowerCase().includes(s) ||
+          o.desc.toLowerCase().includes(s) ||
+          o.medicalDesc.toLowerCase().includes(s)
         )
       }
       if (activeCategory.value !== 'all') {
