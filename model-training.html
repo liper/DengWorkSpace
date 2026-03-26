@@ -134,6 +134,30 @@
     .biz-chip.pass { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
     .biz-chip.fail { background: #fff1f0; border-color: #ffa39e; color: #cf1322; }
 
+    /* ─── Chart compliance badge ────────────────────── */
+    .chart-badge {
+      font-size: 10px; padding: 1px 7px; border-radius: 8px;
+      font-weight: 600; white-space: nowrap; flex-shrink: 0;
+    }
+    .chart-badge.pass { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+    .chart-badge.fail { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .chart-badge.warn { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+
+    /* ─── Real-time biz-validation row ─────────────── */
+    .biz-val-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px;
+    }
+    .bvc {
+      background: #fff; border-radius: 7px; border: 1px solid #f0f0f0;
+      padding: 7px 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .bvc.pass-card { border-color: #b7eb8f; background: #fcfff7; }
+    .bvc.fail-card { border-color: #ffa39e; background: #fff7f7; }
+    .bvc.info-card { border-color: #ffd591; background: #fffdf5; }
+    .bvc-label { font-size: 10px; color: #8c8c8c; margin-bottom: 3px; }
+    .bvc-main  { font-size: 13px; font-weight: 700; color: #262626; display: flex; align-items: center; gap: 4px; }
+    .bvc-sub   { font-size: 10px; color: #8c8c8c; margin-top: 2px; }
+
     /* ─── Form Fields ───────────────────────────────── */
     .form-row { display: flex; align-items: center; margin-bottom: 9px; }
     .form-row:last-child { margin-bottom: 0; }
@@ -756,6 +780,48 @@
             </div>
           </div>
 
+          <!-- Real-time business parameter validation -->
+          <div v-if="epData.length" class="biz-val-row">
+            <!-- 1. 检出率 -->
+            <div class="bvc" :class="latest && latest.sensitivity * 100 >= cfg.minDetectRate ? 'pass-card' : 'fail-card'">
+              <div class="bvc-label">⚕ 高危检出率目标</div>
+              <div class="bvc-main">
+                <span :style="{ color: latest && latest.sensitivity * 100 >= cfg.minDetectRate ? '#52c41a' : '#ff4d4f' }">
+                  {{ latest ? fmtPct(latest.sensitivity) : '--' }}
+                </span>
+                <span style="font-size:10px;color:#8c8c8c;font-weight:400;">/ {{ cfg.minDetectRate }}%</span>
+                <span style="font-size:11px;">{{ latest && latest.sensitivity * 100 >= cfg.minDetectRate ? '✓' : '✗' }}</span>
+              </div>
+              <div class="bvc-sub">
+                {{ crossEpoch ? `第 ${crossEpoch} 轮首次达标` : '训练中，尚未达标' }}
+              </div>
+            </div>
+            <!-- 2. 优化方向 + 置信度 -->
+            <div class="bvc info-card">
+              <div class="bvc-label">🎯 优化方向</div>
+              <div class="bvc-main" style="font-size:12px;">{{ biasLabel }}</div>
+              <div class="bvc-sub">置信度阈值 {{ cfg.confThreshold.toFixed(2) }}</div>
+            </div>
+            <!-- 3. 高危权重 -->
+            <div class="bvc info-card">
+              <div class="bvc-label">⚖ 高危样本权重</div>
+              <div class="bvc-main">{{ cfg.highRiskWeight }}<span style="font-size:11px;font-weight:400;">x</span></div>
+              <div class="bvc-sub">{{ cfg.highRiskDiseases.length }} 种高危病种加权</div>
+            </div>
+            <!-- 4. AUC -->
+            <div class="bvc" :class="!latest ? '' : latest.auc >= 0.80 ? 'pass-card' : 'fail-card'">
+              <div class="bvc-label">📊 AUC 判别能力</div>
+              <div class="bvc-main">
+                <span :style="{ color: latest && latest.auc >= 0.80 ? '#52c41a' : '#fa8c16' }">
+                  {{ latest ? latest.auc.toFixed(3) : '--' }}
+                </span>
+                <span style="font-size:10px;color:#8c8c8c;font-weight:400;">/ ≥0.80</span>
+                <span style="font-size:11px;">{{ latest ? (latest.auc >= 0.80 ? '✓' : '△') : '' }}</span>
+              </div>
+              <div class="bvc-sub">F1: {{ latest ? latest.f1.toFixed(3) : '--' }}</div>
+            </div>
+          </div>
+
           <!-- Empty -->
           <div v-if="!epData.length" class="empty-state">
             <div class="empty-icon">🚀</div>
@@ -810,14 +876,26 @@
             <!-- 3. Sensitivity & Specificity -->
             <div class="chart-card">
               <div class="chart-hd">
-                <span class="chart-title">灵敏度 & 特异度</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span class="chart-title">灵敏度 & 特异度</span>
+                  <span v-if="latest" class="chart-badge"
+                        :class="latest.sensitivity * 100 >= cfg.minDetectRate ? 'pass' : 'fail'">
+                    {{ fmtPct(latest.sensitivity) }} {{ latest.sensitivity * 100 >= cfg.minDetectRate ? '✓' : '✗' }}
+                  </span>
+                </div>
                 <div class="chart-legend">
                   <span class="legend-item"><span class="legend-dash" style="background:#52c41a"></span>灵敏度</span>
                   <span class="legend-item"><span class="legend-dash" style="background:#722ed1"></span>特异度</span>
                   <span class="legend-item"><span class="legend-dash" style="background:#ff4d4f;opacity:.6"></span>检出率下限</span>
+                  <span class="legend-item"><span class="legend-dash" style="background:#52c41a;opacity:.6"></span>达标轮次</span>
                 </div>
               </div>
               <svg :viewBox="`0 0 ${CW} ${CH}`" class="chart-svg">
+                <!-- danger zone: shaded area below minDetectRate threshold -->
+                <rect :x="PAD_L" :y="threshY"
+                      :width="CW - PAD_R - PAD_L"
+                      :height="(CH - PAD_B) - threshY"
+                      fill="#fff1f0" opacity="0.55" />
                 <g v-html="gridHtml(0, 1, true)"></g>
                 <!-- minimum detection rate threshold line -->
                 <line :x1="PAD_L" :x2="CW - PAD_R"
@@ -828,6 +906,15 @@
                       font-size="9" fill="#ff4d4f" opacity="0.8">
                   {{ cfg.minDetectRate }}%
                 </text>
+                <!-- milestone: first epoch sensitivity crosses threshold -->
+                <line v-if="crossEpochX !== null"
+                      :x1="crossEpochX" :x2="crossEpochX"
+                      :y1="PAD_T" :y2="CH - PAD_B"
+                      stroke="#52c41a" stroke-width="1.2"
+                      stroke-dasharray="3 3" opacity="0.85" />
+                <text v-if="crossEpochX !== null"
+                      :x="crossEpochX + 3" :y="PAD_T + 9"
+                      font-size="8" fill="#52c41a" opacity="0.9">灵敏度达标 第{{ crossEpoch }}轮</text>
                 <polyline v-if="sensPts" :points="sensPts"
                           fill="none" stroke="#52c41a" stroke-width="2"
                           stroke-linecap="round" stroke-linejoin="round" />
@@ -840,14 +927,28 @@
             <!-- 4. F1 & AUC -->
             <div class="chart-card">
               <div class="chart-hd">
-                <span class="chart-title">F1 分数 & AUC-ROC</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span class="chart-title">F1 分数 & AUC-ROC</span>
+                  <span v-if="latest" class="chart-badge"
+                        :class="latest.auc >= 0.80 ? 'pass' : 'warn'">
+                    AUC {{ latest.auc.toFixed(3) }} {{ latest.auc >= 0.80 ? '✓' : '△' }}
+                  </span>
+                </div>
                 <div class="chart-legend">
                   <span class="legend-item"><span class="legend-dash" style="background:#1677ff"></span>F1</span>
                   <span class="legend-item"><span class="legend-dash" style="background:#faad14"></span>AUC</span>
+                  <span class="legend-item"><span class="legend-dash" style="background:#fa8c16;opacity:.6"></span>AUC≥0.80下限</span>
                 </div>
               </div>
               <svg :viewBox="`0 0 ${CW} ${CH}`" class="chart-svg">
                 <g v-html="gridHtml(0, 1, true)"></g>
+                <!-- AUC minimum acceptable reference line (0.80) -->
+                <line :x1="PAD_L" :x2="CW - PAD_R"
+                      :y1="aucRefY" :y2="aucRefY"
+                      stroke="#fa8c16" stroke-width="1"
+                      stroke-dasharray="4 3" opacity="0.6" />
+                <text :x="CW - PAD_R + 2" :y="aucRefY + 4"
+                      font-size="9" fill="#fa8c16" opacity="0.7">0.80</text>
                 <polyline v-if="f1Pts" :points="f1Pts"
                           fill="none" stroke="#1677ff" stroke-width="2"
                           stroke-linecap="round" stroke-linejoin="round" />
@@ -924,6 +1025,33 @@
               </template>
             </div>
           </div>
+
+          <!-- Per-disease table -->
+          <div class="section-title">业务参数合规验证</div>
+          <table class="data-table" style="margin-bottom:14px;">
+            <thead>
+              <tr>
+                <th>业务参数</th>
+                <th>预设目标值</th>
+                <th>训练结果</th>
+                <th>说明</th>
+                <th>合规判定</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="bc in results.bizChecks" :key="bc.label">
+                <td><strong>{{ bc.label }}</strong></td>
+                <td>{{ bc.preset }}</td>
+                <td>{{ bc.actual }}</td>
+                <td style="color:#8c8c8c;font-size:11px;">{{ bc.note }}</td>
+                <td>
+                  <span v-if="bc.pass === true"  class="tag tag-pass">✓ 通过</span>
+                  <span v-else-if="bc.pass === false" class="tag tag-fail">✗ 未通过</span>
+                  <span v-else class="tag" style="background:#f5f5f5;color:#8c8c8c;border:1px solid #e0e0e0;">已应用</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
           <!-- Per-disease table -->
           <div class="section-title">各高危疾病检测指标</div>
@@ -1179,6 +1307,22 @@ createApp({
       return PAD_T + (1 - v) * innerH
     })
 
+    // Epoch index where sensitivity first crosses the minDetectRate target
+    const crossEpoch = computed(() => {
+      const minS = cfg.minDetectRate / 100
+      const found = epData.value.find(d => d.sensitivity >= minS)
+      return found ? found.epoch : null
+    })
+
+    // X-coordinate of the crossEpoch milestone line in SVG space
+    const crossEpochX = computed(() => {
+      if (crossEpoch.value === null) return null
+      return PAD_L + (crossEpoch.value / cfg.epochs) * innerW
+    })
+
+    // Y-coordinate for AUC = 0.80 reference line
+    const aucRefY = computed(() => PAD_T + (1 - 0.80) * innerH)
+
     function gridHtml(yMin, yMax, isPercent) {
       const ticks = 4
       let html = ''
@@ -1334,6 +1478,58 @@ createApp({
       setTimeout(() => { tab.value = 'results' }, 600)
     }
 
+    function buildBizChecks(last, minS, bias, sensPass, perDisease) {
+      const biasTxt = bias > 0.65 ? '偏重漏诊' : bias < 0.35 ? '偏重误诊' : '均衡'
+      // Confidence threshold effect: a lower threshold boosts recall; model here approximates
+      // the direction of effect relative to the neutral 0.50 baseline.
+      const confEffect = cfg.confThreshold < 0.45 ? '低阈值：召回率↑ 精确率↓'
+                       : cfg.confThreshold > 0.55 ? '高阈值：精确率↑ 召回率↓'
+                       : '标准阈值（0.50），召回/精确均衡'
+      const diseasePassCount = perDisease.filter(d => d.pass).length
+      const failNames = perDisease.filter(d => !d.pass).map(d => d.name).join('、')
+      return [
+        {
+          label: '最低检出率',
+          preset: `≥ ${cfg.minDetectRate}%`,
+          actual: fmtPct(last.sensitivity),
+          pass: sensPass,
+          note: sensPass
+            ? `漏诊率约 ${fmtPct(1 - last.sensitivity)}，满足临床部署要求`
+            : `差距 ${((minS - last.sensitivity) * 100).toFixed(1)}%，漏诊率 ${fmtPct(1 - last.sensitivity)} 偏高`,
+        },
+        {
+          label: '优化方向',
+          preset: biasTxt,
+          actual: `灵敏度 ${fmtPct(last.sensitivity)} / 特异度 ${fmtPct(last.specificity)}`,
+          pass: null,
+          note: bias > 0.65 ? '偏漏诊策略生效，灵敏度优先，误诊率约 ' + fmtPct(1 - last.specificity)
+              : bias < 0.35 ? '偏误诊策略生效，特异度优先，漏诊率约 ' + fmtPct(1 - last.sensitivity)
+              : '均衡策略生效，两项指标协调',
+        },
+        {
+          label: '置信度阈值',
+          preset: cfg.confThreshold.toFixed(2),
+          actual: `当前灵敏度 ${fmtPct(last.sensitivity)} / 特异度 ${fmtPct(last.specificity)}`,
+          pass: null,
+          note: confEffect,
+        },
+        {
+          label: '高危样本权重',
+          preset: `${cfg.highRiskWeight}x`,
+          actual: `${cfg.highRiskDiseases.length} 种病种已加权训练`,
+          pass: null,
+          note: `高危样本损失系数 ${cfg.highRiskWeight}x，有效抑制高危类别漏报`,
+        },
+        {
+          label: '高危病种覆盖',
+          preset: `${cfg.highRiskDiseases.length} 种`,
+          actual: `${diseasePassCount}/${perDisease.length} 种达标`,
+          pass: diseasePassCount === perDisease.length,
+          note: failNames ? `未达标：${failNames}` : '所有高危病种均已达检出率目标',
+        },
+      ]
+    }
+
     function buildResults() {
       const last = epData.value[epData.value.length - 1]
       const minS = cfg.minDetectRate / 100
@@ -1439,6 +1635,7 @@ createApp({
         f1: last.f1, auc: last.auc,
         loss: last.loss, valLoss: last.valLoss,
         sensPass, perDisease, recs,
+        bizChecks: buildBizChecks(last, minS, bias, sensPass, perDisease),
       }
     }
 
@@ -1460,6 +1657,7 @@ createApp({
       maxLoss,
       lossTrainPts, lossValPts, accTrainPts, accValPts,
       sensPts, specPts, f1Pts, aucPts, threshY,
+      crossEpoch, crossEpochX, aucRefY,
       gridHtml,
       startTraining, togglePause, stopTraining,
       fmtPct,
