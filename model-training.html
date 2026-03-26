@@ -85,6 +85,55 @@
       color: #d46b08; border-bottom-color: #ffd591;
     }
 
+    /* ─── Linkage styles ────────────────────────────────── */
+    .form-card-hd-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+    .btn-apply-preset {
+      font-size: 10px; padding: 2px 8px; border-radius: 3px;
+      background: #fff7e6; color: #d46b08; border: 1px solid #ffd591;
+      cursor: pointer; font-weight: 600; transition: all 0.15s; white-space: nowrap;
+      line-height: 1.6;
+    }
+    .btn-apply-preset:hover:not(:disabled) { background: #ffe7ba; border-color: #fa8c16; }
+    .btn-apply-preset:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-apply-preset.all-match { background: #f6ffed; color: #389e0d; border-color: #b7eb8f; cursor: default; }
+    .param-field-wrap { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .param-hint { font-size: 10px; display: flex; align-items: center; gap: 3px; line-height: 1.4; }
+    .param-hint.diff { color: #fa8c16; }
+    .param-hint.match { color: #52c41a; }
+    .param-hint .hint-icon { font-size: 9px; }
+    /* Highlight the input border when it differs from recommendation */
+    .form-input.diff-border { border-color: #ffd591; background: #fffbe6; }
+    .form-select.diff-border { border-color: #ffd591; background: #fffbe6; }
+    /* Link bridge between cards */
+    .link-bridge {
+      display: flex; align-items: center; gap: 7px;
+      margin: 6px 0 8px; padding: 6px 10px;
+      background: linear-gradient(90deg, #fffbe6 0%, #e6f7ff 100%);
+      border-radius: 6px; border: 1px dashed #ffd591;
+    }
+    .link-bridge-icon { font-size: 14px; flex-shrink: 0; }
+    .link-bridge-text { font-size: 11px; color: #595959; flex: 1; line-height: 1.4; }
+    .link-bridge-text strong { color: #d46b08; }
+    .link-bridge-tag {
+      font-size: 10px; padding: 1px 7px;
+      background: #fff7e6; border: 1px solid #ffd591; border-radius: 10px;
+      color: #d46b08; white-space: nowrap; font-weight: 600; flex-shrink: 0;
+    }
+    .link-bridge-tag.full { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
+    /* Business constraints strip in progress card */
+    .biz-strip {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+      padding-top: 7px; border-top: 1px dashed #ffd591;
+    }
+    .biz-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 10px;
+      background: #fff7e6; border: 1px solid #ffd591;
+      font-size: 11px; color: #d46b08; font-weight: 500;
+    }
+    .biz-chip.pass { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
+    .biz-chip.fail { background: #fff1f0; border-color: #ffa39e; color: #cf1322; }
+
     /* ─── Form Fields ───────────────────────────────── */
     .form-row { display: flex; align-items: center; margin-bottom: 9px; }
     .form-row:last-child { margin-bottom: 0; }
@@ -418,38 +467,107 @@
 
         <!-- 训练参数 -->
         <div class="form-card">
-          <div class="form-card-hd">⚙️ 训练参数</div>
+          <div class="form-card-hd">
+            <div class="form-card-hd-row">
+              <span>⚙️ 训练参数</span>
+              <button
+                class="btn-apply-preset"
+                :class="{ 'all-match': derivedMatchCount === 5 }"
+                :disabled="isLocked || derivedMatchCount === 5"
+                @click="applyDerived"
+                :title="derivedMatchCount === 5 ? '所有参数已与业务推荐一致' : '根据下方医疗业务参数自动设置推荐训练参数'"
+              >
+                {{ derivedMatchCount === 5 ? '✓ 已同步推荐' : '⚕→⚙ 应用业务推荐' }}
+              </button>
+            </div>
+          </div>
           <div class="form-card-bd">
             <div class="form-row">
               <label class="form-label">训练轮次</label>
-              <input type="number" class="form-input" v-model.number="cfg.epochs"
-                     min="10" max="300" :disabled="isLocked" />
+              <div class="param-field-wrap">
+                <input type="number" class="form-input"
+                       :class="{ 'diff-border': cfg.epochs !== derivedParams.epochs }"
+                       v-model.number="cfg.epochs"
+                       min="10" max="300" :disabled="isLocked" />
+                <div class="param-hint" :class="cfg.epochs === derivedParams.epochs ? 'match' : 'diff'">
+                  <span class="hint-icon">{{ cfg.epochs === derivedParams.epochs ? '✓' : '↗' }}</span>
+                  <span v-if="cfg.epochs === derivedParams.epochs">已按业务推荐设置</span>
+                  <span v-else>业务推荐 {{ derivedParams.epochs }} 轮（基于检出率 {{ cfg.minDetectRate }}%）</span>
+                </div>
+              </div>
             </div>
             <div class="form-row">
               <label class="form-label">批次大小</label>
-              <input type="number" class="form-input" v-model.number="cfg.batchSize"
-                     min="8" max="256" :disabled="isLocked" />
+              <div class="param-field-wrap">
+                <input type="number" class="form-input"
+                       :class="{ 'diff-border': cfg.batchSize !== derivedParams.batchSize }"
+                       v-model.number="cfg.batchSize"
+                       min="8" max="256" :disabled="isLocked" />
+                <div class="param-hint" :class="cfg.batchSize === derivedParams.batchSize ? 'match' : 'diff'">
+                  <span class="hint-icon">{{ cfg.batchSize === derivedParams.batchSize ? '✓' : '↗' }}</span>
+                  <span v-if="cfg.batchSize === derivedParams.batchSize">已按业务推荐设置</span>
+                  <span v-else>业务推荐 {{ derivedParams.batchSize }}（高危权重 {{ cfg.highRiskWeight }}x 下利于样本均衡）</span>
+                </div>
+              </div>
             </div>
             <div class="form-row">
               <label class="form-label">学习率</label>
-              <input type="number" class="form-input" v-model.number="cfg.lr"
-                     step="0.0001" min="0.00001" max="0.1" :disabled="isLocked" />
+              <div class="param-field-wrap">
+                <input type="number" class="form-input"
+                       :class="{ 'diff-border': cfg.lr !== derivedParams.lr }"
+                       v-model.number="cfg.lr"
+                       step="0.0001" min="0.00001" max="0.1" :disabled="isLocked" />
+                <div class="param-hint" :class="cfg.lr === derivedParams.lr ? 'match' : 'diff'">
+                  <span class="hint-icon">{{ cfg.lr === derivedParams.lr ? '✓' : '↗' }}</span>
+                  <span v-if="cfg.lr === derivedParams.lr">已按业务推荐设置</span>
+                  <span v-else>业务推荐 {{ derivedParams.lr }}（{{ derivedLrReason }}）</span>
+                </div>
+              </div>
             </div>
             <div class="form-row">
               <label class="form-label">优化器</label>
-              <select class="form-select" v-model="cfg.optimizer" :disabled="isLocked">
-                <option>Adam</option>
-                <option>AdamW</option>
-                <option>SGD</option>
-                <option>RMSprop</option>
-              </select>
+              <div class="param-field-wrap">
+                <select class="form-select"
+                        :class="{ 'diff-border': cfg.optimizer !== derivedParams.optimizer }"
+                        v-model="cfg.optimizer" :disabled="isLocked">
+                  <option>Adam</option>
+                  <option>AdamW</option>
+                  <option>SGD</option>
+                  <option>RMSprop</option>
+                </select>
+                <div class="param-hint" :class="cfg.optimizer === derivedParams.optimizer ? 'match' : 'diff'">
+                  <span class="hint-icon">{{ cfg.optimizer === derivedParams.optimizer ? '✓' : '↗' }}</span>
+                  <span v-if="cfg.optimizer === derivedParams.optimizer">已按业务推荐设置</span>
+                  <span v-else>业务推荐 {{ derivedParams.optimizer }}（检出率 ≥90% 时 AdamW 正则化更稳定）</span>
+                </div>
+              </div>
             </div>
             <div class="form-row">
               <label class="form-label">权重衰减</label>
-              <input type="number" class="form-input" v-model.number="cfg.weightDecay"
-                     step="0.0001" min="0" max="0.01" :disabled="isLocked" />
+              <div class="param-field-wrap">
+                <input type="number" class="form-input"
+                       :class="{ 'diff-border': cfg.weightDecay !== derivedParams.weightDecay }"
+                       v-model.number="cfg.weightDecay"
+                       step="0.0001" min="0" max="0.01" :disabled="isLocked" />
+                <div class="param-hint" :class="cfg.weightDecay === derivedParams.weightDecay ? 'match' : 'diff'">
+                  <span class="hint-icon">{{ cfg.weightDecay === derivedParams.weightDecay ? '✓' : '↗' }}</span>
+                  <span v-if="cfg.weightDecay === derivedParams.weightDecay">已按业务推荐设置</span>
+                  <span v-else>业务推荐 {{ derivedParams.weightDecay }}（严格检出目标下需更强正则化）</span>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- 联动说明 bridge -->
+        <div class="link-bridge">
+          <span class="link-bridge-icon">🔗</span>
+          <div class="link-bridge-text">
+            <strong>业务参数驱动训练配置</strong>：下方医疗业务参数实时计算上方推荐值
+          </div>
+          <span class="link-bridge-tag" :class="{ full: derivedMatchCount === 5 }">
+            {{ derivedMatchCount }}/5 项已同步
+          </span>
         </div>
 
         <!-- 医疗业务参数 (highlighted) -->
@@ -622,6 +740,19 @@
               <span class="pmeta">最低检出率 <span>{{ cfg.minDetectRate }}%</span></span>
               <span class="pmeta">优化方向 <span>{{ biasLabel }}</span></span>
               <span v-if="etaStr" class="pmeta">预计剩余 <span>{{ etaStr }}</span></span>
+            </div>
+            <!-- Business constraints strip -->
+            <div class="biz-strip" v-if="state !== 'idle'">
+              <span class="biz-chip">⚕ 检出率目标 {{ cfg.minDetectRate }}%</span>
+              <span class="biz-chip">{{ biasLabel }} 导向</span>
+              <span class="biz-chip">高危权重 {{ cfg.highRiskWeight }}x</span>
+              <span class="biz-chip" v-if="cfg.highRiskDiseases.length">
+                🎯 {{ cfg.highRiskDiseases.length }} 种高危病种
+              </span>
+              <span class="biz-chip" v-if="latest"
+                    :class="latest.sensitivity * 100 >= cfg.minDetectRate ? 'pass' : 'fail'">
+                {{ latest.sensitivity * 100 >= cfg.minDetectRate ? '✓ 检出达标' : '✗ 检出未达标' }}
+              </span>
             </div>
           </div>
 
@@ -939,6 +1070,64 @@ createApp({
       return latest.value.sensitivity * 100 >= cfg.minDetectRate ? 'g' : 'r'
     })
 
+    /* ── Derived params: recommended model params from business params ── */
+    const derivedParams = computed(() => {
+      const rate = cfg.minDetectRate   // 70–99: stricter detection → more epochs + regularization
+      const bias = cfg.biasFocus       // 0=reduce false positives, 100=reduce false negatives
+      const wt   = cfg.highRiskWeight  // 1–5: heavier weight → smaller batch for class balance
+
+      // More strict detection target → more epochs for convergence.
+      // Formula: base 40 epochs, +1.8 per percentage point above 70% detection rate (range: 0–52.2),
+      // +0.35 per bias unit (range: 0–35), rounded to nearest 5. Max capped at 200.
+      const epochs = Math.min(200, Math.round((40 + (rate - 70) * 1.8 + bias * 0.35) / 5) * 5)
+
+      // Recall-biased training → lower LR for stable near-boundary convergence
+      const lr = bias > 65 ? 0.0005 : bias < 35 ? 0.001 : 0.0008
+
+      // Heavier high-risk weight → smaller batch for better class balance.
+      // HIGH_WEIGHT_THRESHOLD = 3.5x: indicates severe class imbalance requiring small batch.
+      // MEDIUM_WEIGHT_THRESHOLD = 2.0x: moderate imbalance, standard 32 batch.
+      const HIGH_WEIGHT_THRESHOLD   = 3.5
+      const MEDIUM_WEIGHT_THRESHOLD = 2.0
+      const batchSize = wt >= HIGH_WEIGHT_THRESHOLD ? 16 : wt >= MEDIUM_WEIGHT_THRESHOLD ? 32 : 64
+
+      // Strict recall (≥90%) → AdamW for better weight-decay regularization
+      const optimizer = rate >= 90 ? 'AdamW' : 'Adam'
+
+      // Strict detection target → more regularization to prevent overfitting to rare positives
+      const weightDecay = rate >= 90 ? 0.0005 : 0.0001
+
+      return { epochs, lr, batchSize, optimizer, weightDecay }
+    })
+
+    const derivedMatchCount = computed(() => {
+      const d = derivedParams.value
+      return [
+        cfg.epochs     === d.epochs,
+        cfg.lr         === d.lr,
+        cfg.batchSize  === d.batchSize,
+        cfg.optimizer  === d.optimizer,
+        cfg.weightDecay === d.weightDecay,
+      ].filter(Boolean).length
+    })
+
+    const derivedLrReason = computed(() => {
+      const bias = cfg.biasFocus
+      if (bias > 65) return '偏漏诊方向需低 LR 精细调参'
+      if (bias < 35) return '偏误诊方向可用较大 LR'
+      return '均衡模式推荐中等 LR'
+    })
+
+    function applyDerived() {
+      if (isLocked.value) return
+      const d = derivedParams.value
+      cfg.epochs      = d.epochs
+      cfg.lr          = d.lr
+      cfg.batchSize   = d.batchSize
+      cfg.optimizer   = d.optimizer
+      cfg.weightDecay = d.weightDecay
+    }
+
     const elapsedStr = computed(() => {
       const ms = elapsedMs.value
       if (!ms) return ''
@@ -1030,8 +1219,11 @@ createApp({
       const valAccuracy = Math.min(0.97, accuracy - 0.018 + rnd(0.008))
 
       // ── Sensitivity (recall) — influenced by bias & minDetectRate ─
-      // Simulation tuning: sensFinal blends the minimum detection rate target (weight 0.82),
-      // bias toward reducing missed diagnoses (weight 0.14), and extra high-risk sample weight bonus (0.02 per unit above 1x).
+      // NOTE: These coefficients (0.82, 0.14, 0.02) are demo/simulation values tuned to
+      // produce realistic-looking training curves. They are NOT empirically validated
+      // clinical thresholds. TODO: Replace with measured model behavior before production use.
+      // sensFinal blends: detection rate target (weight 0.82), bias toward reducing missed
+      // diagnoses (weight 0.14), and high-risk sample weight bonus (0.02 per unit above 1x).
       const sensFinal = Math.min(0.98, minS * 0.82 + bias * 0.14 + (wt - 1) * 0.02)
       const sensBase  = 0.44 + sensFinal * 0.62 * (1 - Math.exp(-4.8 * t))
       const sensitivity = Math.min(0.99, sensBase + rnd(0.010))
@@ -1095,7 +1287,8 @@ createApp({
       addLog(`医疗参数 — 最低检出率: ${cfg.minDetectRate}%  优化方向: ${biasLabel.value}  高危权重: ${cfg.highRiskWeight}x`, 'ok')
       addLog(`高危疾病: ${cfg.highRiskDiseases.length ? cfg.highRiskDiseases.join('、') : '（未选择）'}`)
 
-      // Simulation timing: target ~14 seconds total wall-clock time regardless of epoch count.
+      // Simulation timing (demo only — not applicable to real training pipelines).
+      // Target ~14 seconds total wall-clock time regardless of epoch count.
       // Each epoch takes between MIN_EPOCH_MS and MAX_EPOCH_MS milliseconds.
       const MIN_EPOCH_MS   = 80    // floor: fast enough for snappy feedback
       const MAX_EPOCH_MS   = 350   // ceiling: slow enough to see chart movement
@@ -1262,6 +1455,7 @@ createApp({
       elapsedMs, logRef,
       isLocked, latest, progressPct,
       biasLabel, biasDesc, statusText, configSubText, sensCls, elapsedStr, etaStr,
+      derivedParams, derivedMatchCount, derivedLrReason, applyDerived,
       CW, CH, PAD_L, PAD_R, PAD_T, PAD_B,
       maxLoss,
       lossTrainPts, lossValPts, accTrainPts, accValPts,
