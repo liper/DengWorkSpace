@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>医疗 MaaS 平台 · 能力支持说明书</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+                   'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      color: #262626;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+
+    /* ─── Header ───────────────────────────────── */
+    .header {
+      position: sticky; top: 0; z-index: 200;
+      height: 60px;
+      background: #001529;
+      display: flex; align-items: center;
+      padding: 0 32px;
+      gap: 20px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      color: #fff; font-size: 17px; font-weight: 700;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #1677ff, #36cfc9);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.15); }
+    .logo-sub { font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 400; }
+    .header-nav {
+      margin-left: auto;
+      display: flex; gap: 6px;
+    }
+    .nav-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px; font-weight: 500;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.75);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+    .nav-btn.active { background: #1677ff; border-color: #1677ff; color: #fff; }
+
+    /* ─── Hero Banner ───────────────────────────── */
+    .hero {
+      background: linear-gradient(120deg, #0f3460 0%, #1677ff 55%, #06b6d4 100%);
+      padding: 48px 32px 52px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      padding: 4px 14px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      font-size: 12px; color: rgba(255,255,255,0.9);
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-size: 32px; font-weight: 800; color: #fff;
+      margin-bottom: 12px; letter-spacing: 1px;
+    }
+    .hero-desc {
+      font-size: 15px; color: rgba(255,255,255,0.78);
+      max-width: 640px; margin: 0 auto 28px;
+      line-height: 1.8;
+    }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 14px 28px;
+      text-align: center;
+    }
+    .hero-stat-num { font-size: 28px; font-weight: 800; color: #fff; }
+    .hero-stat-label { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+    /* ─── TOC Nav Strip ─────────────────────────── */
+    .toc-strip {
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex; justify-content: center;
+      padding: 0 32px;
+      gap: 0;
+      overflow-x: auto;
+    }
+    .toc-item {
+      padding: 14px 22px;
+      font-size: 14px; font-weight: 500;
+      color: #595959;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+      text-decoration: none;
+    }
+    .toc-item:hover { color: #1677ff; }
+    .toc-item.active { color: #1677ff; border-bottom-color: #1677ff; }
+
+    /* ─── Page Container ────────────────────────── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 40px 32px 80px; }
+
+    /* ─── Section ───────────────────────────────── */
+    .section { margin-bottom: 56px; }
+    .section-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 24px;
+    }
+    .section-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .section-icon.blue  { background: linear-gradient(135deg,#e6f4ff,#bae0ff); }
+    .section-icon.green { background: linear-gradient(135deg,#f6ffed,#b7eb8f); }
+    .section-icon.purple{ background: linear-gradient(135deg,#f9f0ff,#d3adf7); }
+    .section-title { font-size: 22px; font-weight: 700; color: #0f1d3a; }
+    .section-subtitle { font-size: 13px; color: #8c8c8c; margin-top: 3px; }
+    .section-divider {
+      height: 3px; width: 48px;
+      background: linear-gradient(90deg,#1677ff,#36cfc9);
+      border-radius: 2px; margin-bottom: 24px;
+    }
+    .section-intro {
+      background: linear-gradient(135deg,#f0f7ff,#e6f4ff);
+      border-left: 4px solid #1677ff;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 20px;
+      font-size: 14px; color: #434343;
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+
+    /* ─── Tool Grid ─────────────────────────────── */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .tool-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #f0f0f0;
+      padding: 20px;
+      transition: box-shadow 0.2s, transform 0.2s;
+      cursor: default;
+    }
+    .tool-card:hover {
+      box-shadow: 0 6px 24px rgba(22,119,255,0.12);
+      transform: translateY(-2px);
+    }
+    .tool-card-head {
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 10px;
+    }
+    .tool-emoji {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .tool-name { font-size: 15px; font-weight: 700; color: #1f1f1f; margin-bottom: 3px; }
+    .tool-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tool-badge {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px; font-weight: 500;
+    }
+    .tool-desc {
+      font-size: 13px; color: #595959;
+      line-height: 1.7;
+      border-top: 1px solid #f5f5f5;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    .tool-input-output {
+      display: flex; gap: 6px; margin-top: 10px;
+    }
+    .io-tag {
+      flex: 1; text-align: center;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      background: #f5f5f5; color: #595959;
+    }
+    .io-tag span { display: block; font-size: 10px; color: #8c8c8c; margin-bottom: 1px; }
+
+    /* ─── Low-Code Section ──────────────────────── */
+    .agent-tabs {
+      display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .agent-tab {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.18s;
+    }
+    .agent-tab.a1 { background: #e6f4ff; color: #1677ff; border-color: #91caff; }
+    .agent-tab.a2 { background: #f6ffed; color: #389e0d; border-color: #b7eb8f; }
+    .agent-tab.a3 { background: #fff0f6; color: #c41d7f; border-color: #ffadd2; }
+
+    .lowcode-panels { display: flex; flex-direction: column; gap: 20px; }
+    .lowcode-panel {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #f0f0f0;
+      overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px;
+    }
+    .panel-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .panel-title { font-size: 16px; font-weight: 700; }
+    .panel-subtitle { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .panel-body { padding: 0 20px 20px; }
+
+    .feature-list { display: flex; flex-direction: column; gap: 10px; }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+    }
+    .feature-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .feature-text { font-size: 13px; color: #434343; line-height: 1.7; }
+    .feature-text strong { color: #1f1f1f; }
+
+    .flow-diagram {
+      background: #f8faff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 12px;
+      border: 1px dashed #b3d0ff;
+    }
+    .flow-row {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .flow-node {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .flow-arrow {
+      font-size: 16px; color: #91caff;
+    }
+    .flow-label {
+      font-size: 11px; color: #8c8c8c;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* ─── Feature Highlights ────────────────────── */
+    .highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+    }
+    .highlight-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #f0f0f0;
+      padding: 24px;
+      transition: box-shadow 0.2s;
+    }
+    .highlight-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+    .highlight-head {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px;
+    }
+    .highlight-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .highlight-title { font-size: 16px; font-weight: 700; color: #1f1f1f; }
+    .highlight-tag {
+      margin-left: auto;
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: 11px; font-weight: 500;
+    }
+    .highlight-points { display: flex; flex-direction: column; gap: 8px; }
+    .highlight-point {
+      display: flex; gap: 8px;
+      font-size: 13px; color: #434343; line-height: 1.7;
+    }
+    .point-check { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+    .advantage-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+    @media (max-width: 800px) {
+      .advantage-grid { grid-template-columns: 1fr; }
+      .highlights-grid { grid-template-columns: 1fr; }
+    }
+    .advantage-card {
+      background: linear-gradient(135deg, #0f3460, #1677ff);
+      border-radius: 12px;
+      padding: 24px;
+      color: #fff;
+    }
+    .advantage-icon { font-size: 28px; margin-bottom: 10px; }
+    .advantage-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .advantage-desc { font-size: 13px; color: rgba(255,255,255,0.78); line-height: 1.7; }
+
+    /* ─── Callout ────────────────────────────────── */
+    .callout {
+      background: linear-gradient(135deg,#fff7e6,#fff2cc);
+      border-left: 4px solid #fa8c16;
+      border-radius: 0 10px 10px 0;
+      padding: 14px 20px;
+      font-size: 13px; color: #7c4a00;
+      line-height: 1.8;
+      margin: 20px 0;
+    }
+    .callout strong { color: #d4580a; }
+
+    /* ─── Footer ─────────────────────────────────── */
+    .footer {
+      background: #001529;
+      padding: 28px 32px;
+      text-align: center;
+      color: rgba(255,255,255,0.45);
+      font-size: 12px;
+    }
+    .footer a { color: #40a9ff; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Header ─────────────────────────────────── -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🏥</div>
+    <div>
+      <div>医疗 MaaS 平台</div>
+      <div class="logo-sub">Model as a Service · 医疗行业版</div>
+    </div>
+    <div class="logo-divider"></div>
+    <span style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.7)">能力支持说明书</span>
+  </div>
+  <nav class="header-nav">
+    <a class="nav-btn" href="index.html">算子广场</a>
+    <a class="nav-btn active" href="medical-maas-proposal.html">能力说明书</a>
+  </nav>
+</div>
+
+<!-- ─── Hero ────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-tag">📋 招标能力支持文档 · v1.0.0</div>
+  <div class="hero-title">医疗 MaaS 平台 · 核心能力设计</div>
+  <div class="hero-desc">
+    面向医疗行业 AI 落地场景，围绕<strong style="color:#fff">医疗资源工具集</strong>、<strong style="color:#fff">低代码智能编排</strong>、
+    <strong style="color:#fff">产品特色亮点</strong>三大维度，全面阐述平台核心能力与差异化优势。
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">12+</div>
+      <div class="hero-stat-label">医疗通用工具组件</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">3</div>
+      <div class="hero-stat-label">智能体编排模式</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">6</div>
+      <div class="hero-stat-label">特色功能模块</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">3</div>
+      <div class="hero-stat-label">核心产品优势</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOC Strip ────────────────────────────────── -->
+<div class="toc-strip">
+  <a class="toc-item active" href="#section-tools">一、医疗资源工具集</a>
+  <a class="toc-item" href="#section-lowcode">二、低代码编辑能力</a>
+  <a class="toc-item" href="#section-features">三、特色功能</a>
+  <a class="toc-item" href="#section-advantages">四、产品优势</a>
+</div>
+
+<!-- ─── Main Content ─────────────────────────────── -->
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════
+       一、医疗资源工具集
+  ══════════════════════════════════════════════ -->
+  <section class="section" id="section-tools">
+    <div class="section-header">
+      <div class="section-icon blue">🔧</div>
+      <div>
+        <div class="section-title">一、医疗资源工具集设计</div>
+        <div class="section-subtitle">Medical Resource Toolkit · 扩展 LLM 院内能力的核心工具组件库</div>
+      </div>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="section-intro">
+      系统资源库内置一批<strong>面向医疗院内场景的通用工具组件（Skill）</strong>，可由智能体按需调用，
+      扩展大语言模型在科学计算、院内数据检索、临床辅助决策等方面的能力边界。
+      所有工具均遵循统一的输入/输出接口规范，支持低代码拖拽组合、参数化配置，
+      开发成本低、扩展性强。
+    </div>
+
+    <div class="tool-grid" id="tool-grid">
+      <!-- 工具卡片由 Vue 渲染 -->
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       二、低代码编辑能力
+  ══════════════════════════════════════════════ -->
+  <section class="section" id="section-lowcode">
+    <div class="section-header">
+      <div class="section-icon green">⚙️</div>
+      <div>
+        <div class="section-title">二、低代码编辑能力设计</div>
+        <div class="section-subtitle">Low-Code Orchestration · 可视化拖拽编排，构建可追溯医疗 AI 决策链条</div>
+      </div>
+    </div>
+    <div class="section-divider" style="background:linear-gradient(90deg,#52c41a,#36cfc9)"></div>
+
+    <div class="section-intro" style="border-left-color:#52c41a;background:linear-gradient(135deg,#f6fff0,#f0fff4)">
+      平台具备完整的<strong>低代码可视化编排能力</strong>，基于拖拽式界面，用户可自由组合智能体节点与 Skill 工具，
+      形成可追溯、可复用的医疗 AI 决策链条。支持三种核心智能体编排模式：
+      <strong>自主规划 Agent</strong>、<strong>工作流 Agent（流程编排）</strong>、<strong>多智能体组合 Agent</strong>，
+      全面覆盖从单任务智能决策到跨科室协同的复杂医疗场景。
+    </div>
+
+    <!-- Agent 类型标签 -->
+    <div class="agent-tabs">
+      <div class="agent-tab a1">🤖 自主规划 Agent</div>
+      <div class="agent-tab a2">🔀 工作流 Agent</div>
+      <div class="agent-tab a3">🧩 多智能体组合 Agent</div>
+    </div>
+
+    <div class="lowcode-panels" id="lowcode-panels">
+      <!-- Vue 渲染 -->
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       三、特色功能
+  ══════════════════════════════════════════════ -->
+  <section class="section" id="section-features">
+    <div class="section-header">
+      <div class="section-icon purple">✨</div>
+      <div>
+        <div class="section-title">三、产品设计特色及亮点</div>
+        <div class="section-subtitle">Product Highlights · 六大特色功能 × 丰富工具集 × 低代码编排</div>
+      </div>
+    </div>
+    <div class="section-divider" style="background:linear-gradient(90deg,#722ed1,#eb2f96)"></div>
+
+    <div class="callout">
+      <strong>亮点融合说明：</strong>
+      以下特色功能在白皮书六大核心能力基础上，深度融合<strong>医疗工具集</strong>与<strong>低代码编排</strong>两大模块，
+      强调「工具即插即用、流程所见即所得、决策全程可追溯」的平台理念，
+      形成差异化竞争优势。
+    </div>
+
+    <div class="highlights-grid" id="highlights-grid">
+      <!-- Vue 渲染 -->
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       四、产品优势
+  ══════════════════════════════════════════════ -->
+  <section class="section" id="section-advantages">
+    <div class="section-header">
+      <div class="section-icon blue">🏆</div>
+      <div>
+        <div class="section-title">四、产品优势总结</div>
+        <div class="section-subtitle">三大核心优势，全面解决医疗 AI 落地痛点</div>
+      </div>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="advantage-grid" id="advantage-grid">
+      <!-- Vue 渲染 -->
+    </div>
+  </section>
+
+</div><!-- /page -->
+
+<!-- ─── Footer ────────────────────────────────────── -->
+<div class="footer">
+  医疗 MaaS 平台 v1.0.0 · 能力支持说明书 &nbsp;|&nbsp;
+  <a href="index.html">返回算子广场</a>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+const { createApp, ref, onMounted } = Vue
+
+/* ═══════════════════════════════════════
+   1. 医疗通用工具集数据
+═══════════════════════════════════════ */
+const medicalTools = [
+  {
+    id: 1,
+    emoji: '⚖️',
+    bg: '#e6f4ff',
+    name: 'BMI 计算工具',
+    tags: [{ label: '临床计算', color: '#1677ff', bg: '#e6f4ff' }, { label: '通用', color: '#389e0d', bg: '#f6ffed' }],
+    desc: '根据患者身高、体重自动计算 BMI 指数，结合年龄与性别给出营养状态评估（偏瘦/正常/超重/肥胖），可联动营养科、内分泌科决策智能体。',
+    input: '身高/体重',
+    output: 'BMI 等级报告',
+  },
+  {
+    id: 2,
+    emoji: '💊',
+    bg: '#fff0f6',
+    name: '药品信息查询',
+    tags: [{ label: '药学', color: '#c41d7f', bg: '#fff0f6' }, { label: '检索', color: '#d46b08', bg: '#fff7e6' }],
+    desc: '接入院内药品数据库，支持按药品名称、成分、适应症、禁忌症多维检索。返回规格、用法用量、相互作用等完整说明，辅助医嘱审核。',
+    input: '药品名称 / ATC 码',
+    output: '药品详情 JSON',
+  },
+  {
+    id: 3,
+    emoji: '🩺',
+    bg: '#fff7e6',
+    name: '院内检验数据查询',
+    tags: [{ label: 'LIS 集成', color: '#d46b08', bg: '#fff7e6' }, { label: '检索', color: '#d46b08', bg: '#fff7e6' }],
+    desc: '通过 HL7/FHIR 标准接口查询患者检验报告（血常规、生化、免疫等），支持时间范围筛选与历史趋势对比，为 LLM 提供实时检验上下文。',
+    input: '患者 ID + 时间范围',
+    output: '检验结果结构化数据',
+  },
+  {
+    id: 4,
+    emoji: '📋',
+    bg: '#f9f0ff',
+    name: '电子病历结构化解析',
+    tags: [{ label: 'NLP', color: '#722ed1', bg: '#f9f0ff' }, { label: '分析', color: '#389e0d', bg: '#f6ffed' }],
+    desc: '对自由文本电子病历进行 NLP 解析，自动提取主诉、现病史、诊断、手术史等关键字段，输出结构化 JSON，供下游智能体直接使用。',
+    input: '病历自由文本',
+    output: '结构化医疗实体',
+  },
+  {
+    id: 5,
+    emoji: '🧮',
+    bg: '#f6ffed',
+    name: '临床评分计算器',
+    tags: [{ label: '评分工具', color: '#389e0d', bg: '#f6ffed' }, { label: '临床计算', color: '#1677ff', bg: '#e6f4ff' }],
+    desc: '内置 Glasgow 昏迷评分、APACHE II 危重评分、CHADS₂ 卒中风险、Wells DVT 评分等 20+ 临床评分量表，参数化调用，结果自动附带解读说明。',
+    input: '临床参数键值对',
+    output: '评分结果 + 风险等级',
+  },
+  {
+    id: 6,
+    emoji: '🩸',
+    bg: '#fff1f0',
+    name: '用药剂量智能计算',
+    tags: [{ label: '药学计算', color: '#cf1322', bg: '#fff1f0' }, { label: '安全', color: '#595959', bg: '#f5f5f5' }],
+    desc: '根据患者体重、肾功能（肌酐清除率）、年龄等生理参数，计算抗生素、化疗药、抗凝药等特殊药物的个体化推荐剂量，并校验是否超出安全阈值。',
+    input: '患者生理参数 + 药物名称',
+    output: '推荐剂量 + 安全预警',
+  },
+  {
+    id: 7,
+    emoji: '🏥',
+    bg: '#e6f4ff',
+    name: 'ICD 诊断编码查询',
+    tags: [{ label: 'ICD-10/11', color: '#1677ff', bg: '#e6f4ff' }, { label: '编码', color: '#389e0d', bg: '#f6ffed' }],
+    desc: '支持按中文病名、英文术语或 ICD 编码双向检索，返回标准诊断编码、层级分类与同义词列表，辅助病案编码审核与病组 DRG 付费分析。',
+    input: '诊断名称 / ICD 编码',
+    output: '标准编码 + 分类树',
+  },
+  {
+    id: 8,
+    emoji: '📈',
+    bg: '#fff7e6',
+    name: '生命体征趋势分析',
+    tags: [{ label: '监测', color: '#d46b08', bg: '#fff7e6' }, { label: '分析', color: '#389e0d', bg: '#f6ffed' }],
+    desc: '从护理系统读取体温、血压、心率、SpO₂ 等生命体征时序数据，计算统计趋势（均值、标准差、变化斜率），识别异常波动并生成预警标注。',
+    input: '患者 ID + 体征类型',
+    output: '趋势图表 + 预警标签',
+  },
+  {
+    id: 9,
+    emoji: '🔬',
+    bg: '#f9f0ff',
+    name: '医学影像报告解读',
+    tags: [{ label: '影像 AI', color: '#722ed1', bg: '#f9f0ff' }, { label: '分析', color: '#389e0d', bg: '#f6ffed' }],
+    desc: '对接 PACS/RIS 系统，调用预训练影像模型对 CT、MRI、X-Ray 报告文本进行语义理解，提取病灶描述、测量数值与诊断结论，输出结构化摘要。',
+    input: '影像报告文本 / DICOM 路径',
+    output: '结构化病灶摘要',
+  },
+  {
+    id: 10,
+    emoji: '🧬',
+    bg: '#f6ffed',
+    name: '手术风险预测评估',
+    tags: [{ label: '风险预测', color: '#389e0d', bg: '#f6ffed' }, { label: '临床决策', color: '#1677ff', bg: '#e6f4ff' }],
+    desc: '整合患者年龄、ASA 分级、手术类型、合并症等多维特征，调用预训练风险预测模型，输出术后并发症概率及建议的麻醉 / 护理干预措施。',
+    input: '术前评估结构化数据',
+    output: '风险等级 + 干预建议',
+  },
+  {
+    id: 11,
+    emoji: '💉',
+    bg: '#fff0f6',
+    name: '药物相互作用检测',
+    tags: [{ label: '安全审查', color: '#c41d7f', bg: '#fff0f6' }, { label: '检测', color: '#cf1322', bg: '#fff1f0' }],
+    desc: '基于药物相互作用知识图谱，对患者当前用药方案进行全量配伍检查，识别严重、中等、轻微三级相互作用，给出替代用药建议，保障用药安全。',
+    input: '当前用药列表',
+    output: '相互作用风险报告',
+  },
+  {
+    id: 12,
+    emoji: '🗂️',
+    bg: '#f5f5f5',
+    name: '院内知识库检索',
+    tags: [{ label: 'RAG', color: '#595959', bg: '#f5f5f5' }, { label: '检索', color: '#d46b08', bg: '#fff7e6' }],
+    desc: '基于向量化检索技术，对院内临床指南、诊疗规范、用药手册等知识文档进行语义检索，为 LLM 提供权威、院内化的上下文知识增强（RAG）支持。',
+    input: '自然语言问句',
+    output: 'Top-K 相关文档片段',
+  },
+]
+
+/* ═══════════════════════════════════════
+   2. 低代码编排模式数据
+═══════════════════════════════════════ */
+const agentModes = [
+  {
+    id: 'auto',
+    icon: '🤖',
+    iconBg: '#e6f4ff',
+    titleColor: '#1677ff',
+    title: '自主规划 Agent（ReAct 模式）',
+    subtitle: '无需预定义流程，LLM 自主推理、规划并调用工具链',
+    headerBg: '#f0f7ff',
+    dotColor: '#1677ff',
+    features: [
+      { text: '<strong>动态工具调用：</strong>Agent 自主判断每步需要调用哪个 Skill（如先查检验 → 再算风险评分 → 最后检索指南），无需人工预设执行顺序。' },
+      { text: '<strong>多轮推理链：</strong>支持 Chain-of-Thought 中间推理过程可视化，每步工具调用结果均记录至决策日志，全程可追溯审计。' },
+      { text: '<strong>异常自愈：</strong>当某个工具调用失败或返回不可信结果时，Agent 自动重试或切换备用工具，保障任务连续性。' },
+      { text: '<strong>适用场景：</strong>临床辅助问诊、自由文本病历摘要生成、开放式医学知识问答等非结构化任务。' },
+    ],
+    flow: {
+      nodes: [
+        { label: '用户指令', color: '#e6f4ff', textColor: '#1677ff' },
+        { label: 'LLM 规划器', color: '#1677ff', textColor: '#fff' },
+        { label: '工具调用', color: '#91caff', textColor: '#1677ff' },
+        { label: '结果观察', color: '#e6f4ff', textColor: '#1677ff' },
+        { label: '最终输出', color: '#52c41a', textColor: '#fff' },
+      ],
+      label: '* LLM 规划器 → 工具调用 → 结果观察 形成动态循环，直至任务完成',
+    },
+  },
+  {
+    id: 'workflow',
+    icon: '🔀',
+    iconBg: '#f6ffed',
+    titleColor: '#389e0d',
+    title: '工作流 Agent（流程编排模式）',
+    subtitle: '可视化节点拖拽，定义有向无环图（DAG）医疗业务流程',
+    headerBg: '#f6fff0',
+    dotColor: '#52c41a',
+    features: [
+      { text: '<strong>可视化拖拽编排：</strong>提供开始/结束节点、LLM 节点、工具节点、条件分支节点、循环节点、人工审核节点等，通过拖拽连线即可搭建完整流程。' },
+      { text: '<strong>条件分支与并行：</strong>支持基于规则（If/Else）或 LLM 判断结果的分支执行，以及多路径并行执行后汇聚，满足复杂临床路径需求。' },
+      { text: '<strong>人工介入节点：</strong>在关键决策点（如手术方案审核）插入"人工确认"节点，流程自动暂停等待医师审批，确保临床安全。' },
+      { text: '<strong>流程版本管理：</strong>工作流定义支持版本存储与回溯，每次执行实例均绑定具体版本，保障流程一致性与合规性。' },
+      { text: '<strong>适用场景：</strong>标准化临床路径执行、患者入院评估流程、体检报告多模块并行生成等结构化业务流程。' },
+    ],
+    flow: {
+      nodes: [
+        { label: '触发事件', color: '#f6ffed', textColor: '#389e0d' },
+        { label: '信息采集节点', color: '#b7eb8f', textColor: '#389e0d' },
+        { label: '条件判断', color: '#fa8c16', textColor: '#fff' },
+        { label: '并行执行', color: '#389e0d', textColor: '#fff' },
+        { label: '审核输出', color: '#52c41a', textColor: '#fff' },
+      ],
+      label: '* 支持 IF/ELSE 分支、并行分叉汇聚、人工节点中断等复杂流程控制',
+    },
+  },
+  {
+    id: 'multi',
+    icon: '🧩',
+    iconBg: '#fff0f6',
+    titleColor: '#c41d7f',
+    title: '多智能体组合 Agent（Multi-Agent 协同）',
+    subtitle: '主控 Agent 调度多个专科子 Agent，协同完成跨域医疗任务',
+    headerBg: '#fff5f9',
+    dotColor: '#eb2f96',
+    features: [
+      { text: '<strong>主控-子 Agent 架构：</strong>由 Orchestrator 主控 Agent 分解任务，按需调用专科子 Agent（如影像 Agent、药学 Agent、检验 Agent），各司其职，结果自动汇总。' },
+      { text: '<strong>跨科室协同：</strong>不同科室或业务域的专科 Agent 可在同一任务上下文内并发执行，通过共享上下文总线传递中间结果，实现信息互通。' },
+      { text: '<strong>角色与权限隔离：</strong>每个子 Agent 仅能访问其授权的工具集和数据源，满足医院数据安全分级要求，防止越权访问。' },
+      { text: '<strong>动态组合配置：</strong>低代码界面支持拖拽"子 Agent 节点"，无需编码即可新增或替换协同 Agent，快速适配新科室或新业务场景。' },
+      { text: '<strong>适用场景：</strong>多学科会诊（MDT）智能辅助、综合性患者健康报告生成、跨科室医疗资源协调调度等复杂协同任务。' },
+    ],
+    flow: {
+      nodes: [
+        { label: '复杂任务输入', color: '#fff0f6', textColor: '#c41d7f' },
+        { label: '主控 Agent', color: '#eb2f96', textColor: '#fff' },
+        { label: '影像子Agent', color: '#f9f0ff', textColor: '#722ed1' },
+        { label: '药学子Agent', color: '#fff0f6', textColor: '#c41d7f' },
+        { label: '汇总输出', color: '#52c41a', textColor: '#fff' },
+      ],
+      label: '* 主控 Agent 分发子任务，各专科子 Agent 并行执行后统一汇聚',
+    },
+  },
+]
+
+/* ═══════════════════════════════════════
+   3. 特色功能数据（融合低代码与工具集亮点）
+═══════════════════════════════════════ */
+const highlights = [
+  {
+    num: '01',
+    numBg: '#1677ff',
+    title: '即插即用的医疗工具集生态',
+    tag: '工具集',
+    tagBg: '#e6f4ff',
+    tagColor: '#1677ff',
+    points: [
+      '提供 12+ 开箱即用的医疗通用工具组件（BMI 计算、药品查询、ICD 编码、临床评分等），覆盖临床全流程。',
+      '所有工具遵循统一 OpenAPI 规范，支持零代码配置参数即可接入智能体，降低二次开发成本。',
+      '工具执行结果自动缓存与复用，减少院内系统重复调用，保障系统稳定性。',
+      '支持医院自研工具接入，通过标准化 SDK 即可将现有院内系统能力封装为工具节点。',
+    ],
+  },
+  {
+    num: '02',
+    numBg: '#52c41a',
+    title: '三模式低代码可视化编排',
+    tag: '低代码',
+    tagBg: '#f6ffed',
+    tagColor: '#389e0d',
+    points: [
+      '支持自主规划（ReAct）、工作流（DAG）、多智能体协同三种编排模式，一套界面覆盖全场景。',
+      '拖拽式节点连线，非技术医护人员即可搭建复杂 AI 决策流程，研发门槛极低。',
+      '流程每步执行结果全程留痕，形成完整的医疗 AI 决策溯源链，满足等保合规要求。',
+      '工作流模板库内置 ICU 监护、手术评估、出院随访等 10+ 标准临床路径模板，开箱即用。',
+    ],
+  },
+  {
+    num: '03',
+    numBg: '#722ed1',
+    title: '统一算力接入与智能调度',
+    tag: '算力管理',
+    tagBg: '#f9f0ff',
+    tagColor: '#722ed1',
+    points: [
+      '支持主流 GPU 及算力服务器一站式接入，兼容医疗机构本地算力与第三方算力资源。',
+      '根据任务优先级与资源实时状态，自动分配最优算力，避免资源浪费，提升任务处理效率。',
+      '通过算力资源池化管理实现按需弹性调配，减少重复建设，降低医疗机构算力投入成本。',
+    ],
+  },
+  {
+    num: '04',
+    numBg: '#fa8c16',
+    title: '全生命周期模型管理',
+    tag: '模型管理',
+    tagBg: '#fff7e6',
+    tagColor: '#d46b08',
+    points: [
+      '内置完善的模型版本控制系统，详细记录每次迭代历史，支持版本回溯查询。',
+      '支持不同模型版本的灰度发布与 A/B 测试，实现业务无感升级，不影响临床正常诊疗。',
+      '提供一键回滚机制，模型出现运行异常时快速恢复稳定版本，保障临床业务连续性。',
+      '工具集中的 Skill 组件同样纳入版本管理，确保工具调用结果的稳定性与可重现性。',
+    ],
+  },
+  {
+    num: '05',
+    numBg: '#eb2f96',
+    title: '低门槛创新研发模式',
+    tag: '创新研发',
+    tagBg: '#fff0f6',
+    tagColor: '#c41d7f',
+    points: [
+      '通过"训练配方+自定义超参调优"模式，无算法背景的医护人员可自主完成模型微调。',
+      '医疗场景化打包将复杂技术参数与业务参数结合，形成标准化训练包，降低研发门槛。',
+      '低代码编排结果可直接转化为训练数据标注任务，工具集与研发模块形成闭环。',
+    ],
+  },
+  {
+    num: '06',
+    numBg: '#13c2c2',
+    title: '全景化资源监控与运维',
+    tag: '稳定运维',
+    tagBg: '#e6fffb',
+    tagColor: '#08979c',
+    points: [
+      '7×24 小时实时监控算力资源、机器节点、AI 应用服务运行状态，全面掌握平台健康。',
+      '配置智能预警规则，实时感知异常，及时推送告警，实现异常早发现、早处理。',
+      '集成自动化运维脚本，降低人工干预频率，减少运维人员技术门槛与工作负担。',
+    ],
+  },
+]
+
+/* ═══════════════════════════════════════
+   4. 产品优势数据
+═══════════════════════════════════════ */
+const advantages = [
+  {
+    icon: '🗄️',
+    title: '资源纳管优势',
+    desc: '破解"资源分散、资源黑盒"问题。统一工具集与模型仓库，实现医疗 AI 核心资源精细化管理；算力池化调度降低投入与运维成本；工具 SDK 开放接入让院内能力持续沉淀复用。',
+  },
+  {
+    icon: '🔍',
+    title: '质量测评与持续监测优势',
+    desc: '破解"应用质量难保障、风险难管控"问题。全生命周期性能监测覆盖调用量、响应延迟、准确性等核心指标；低代码流程全步骤留痕确保决策可追溯；出具专业医疗属性测评报告支撑选型决策。',
+  },
+  {
+    icon: '🚀',
+    title: '创新研发优势',
+    desc: '破解"AI 门槛高、研发效率低"问题。工具集即插即用降低集成成本；低代码编排让医护人员直接主导 AI 流程搭建；三模式 Agent 覆盖单任务至跨科室协同全场景，加速医疗 AI 模型研发与落地。',
+  },
+]
+
+/* ═══════════════════════════════════════
+   Vue App
+═══════════════════════════════════════ */
+createApp({
+  setup() {
+    return { medicalTools, agentModes, highlights, advantages }
+  },
+  template: `
+    <div>
+      <!-- 工具卡片 -->
+      <teleport to="#tool-grid">
+        <div v-for="t in medicalTools" :key="t.id" class="tool-card">
+          <div class="tool-card-head">
+            <div class="tool-emoji" :style="{ background: t.bg }">{{ t.emoji }}</div>
+            <div>
+              <div class="tool-name">{{ t.name }}</div>
+              <div class="tool-badges">
+                <span v-for="tag in t.tags" :key="tag.label" class="tool-badge"
+                  :style="{ background: tag.bg, color: tag.color }">{{ tag.label }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="tool-desc">{{ t.desc }}</div>
+          <div class="tool-input-output">
+            <div class="io-tag"><span>输入</span>{{ t.input }}</div>
+            <div class="io-tag"><span>输出</span>{{ t.output }}</div>
+          </div>
+        </div>
+      </teleport>
+
+      <!-- 低代码面板 -->
+      <teleport to="#lowcode-panels">
+        <div v-for="mode in agentModes" :key="mode.id" class="lowcode-panel">
+          <div class="panel-header" :style="{ background: mode.headerBg }">
+            <div class="panel-icon" :style="{ background: mode.iconBg }">{{ mode.icon }}</div>
+            <div>
+              <div class="panel-title" :style="{ color: mode.titleColor }">{{ mode.title }}</div>
+              <div class="panel-subtitle">{{ mode.subtitle }}</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="feature-list">
+              <div v-for="(f, i) in mode.features" :key="i" class="feature-item">
+                <div class="feature-dot" :style="{ background: mode.dotColor }"></div>
+                <div class="feature-text" v-html="f.text"></div>
+              </div>
+            </div>
+            <div class="flow-diagram">
+              <div class="flow-row">
+                <template v-for="(node, ni) in mode.flow.nodes" :key="ni">
+                  <div class="flow-node" :style="{ background: node.color, color: node.textColor }">
+                    {{ node.label }}
+                  </div>
+                  <div class="flow-arrow" v-if="ni < mode.flow.nodes.length - 1">→</div>
+                </template>
+              </div>
+              <div class="flow-label">{{ mode.flow.label }}</div>
+            </div>
+          </div>
+        </div>
+      </teleport>
+
+      <!-- 特色功能卡片 -->
+      <teleport to="#highlights-grid">
+        <div v-for="h in highlights" :key="h.num" class="highlight-card">
+          <div class="highlight-head">
+            <div class="highlight-num" :style="{ background: h.numBg }">{{ h.num }}</div>
+            <div class="highlight-title">{{ h.title }}</div>
+            <span class="highlight-tag" :style="{ background: h.tagBg, color: h.tagColor }">{{ h.tag }}</span>
+          </div>
+          <div class="highlight-points">
+            <div v-for="(p, pi) in h.points" :key="pi" class="highlight-point">
+              <span class="point-check">✅</span>
+              <span>{{ p }}</span>
+            </div>
+          </div>
+        </div>
+      </teleport>
+
+      <!-- 产品优势卡片 -->
+      <teleport to="#advantage-grid">
+        <div v-for="adv in advantages" :key="adv.title" class="advantage-card">
+          <div class="advantage-icon">{{ adv.icon }}</div>
+          <div class="advantage-title">{{ adv.title }}</div>
+          <div class="advantage-desc">{{ adv.desc }}</div>
+        </div>
+      </teleport>
+    </div>
+  `
+}).mount(document.body)
+
+/* TOC active highlight on scroll */
+const tocItems = document.querySelectorAll('.toc-item')
+const sections = document.querySelectorAll('.section')
+window.addEventListener('scroll', () => {
+  let current = ''
+  sections.forEach(sec => {
+    if (window.scrollY + 80 >= sec.offsetTop) current = '#' + sec.id
+  })
+  tocItems.forEach(item => {
+    item.classList.toggle('active', item.getAttribute('href') === current)
+  })
+}, { passive: true })
+</script>
+</body>
+</html>
