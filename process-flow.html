@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>全景业务流程图 · 医疗数据处理平台</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+                   'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      color: #262626;
+      background: #f0f2f5;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; outline: none; }
+
+    /* ─── App Shell ─────────────────────────────────── */
+    #app { height: 100vh; display: flex; flex-direction: column; }
+
+    /* ─── Header ────────────────────────────────────── */
+    .header {
+      height: 60px;
+      background: #001529;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+      flex-shrink: 0;
+      z-index: 200;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #1677ff, #36cfc9);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .header-divider {
+      width: 1px; height: 24px; background: rgba(255,255,255,0.15); flex-shrink: 0;
+    }
+    .header-subtitle {
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+    }
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn {
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-primary {
+      background: #1677ff;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #4096ff; }
+    .btn-default {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .btn-default:hover { background: rgba(255,255,255,0.2); }
+    .btn-link { text-decoration: none; }
+
+    /* ─── Toolbar ───────────────────────────────────── */
+    .toolbar {
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .toolbar-label {
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 500;
+    }
+    .phase-tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .phase-tab {
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all .2s;
+      background: #f5f5f5;
+      color: #595959;
+    }
+    .phase-tab.active {
+      background: #e6f4ff;
+      border-color: #1677ff;
+      color: #1677ff;
+    }
+    .phase-tab:hover:not(.active) { background: #ebebeb; }
+    .toolbar-sep { width: 1px; height: 20px; background: #e8e8e8; }
+    .toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #595959; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* ─── Main Layout ───────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ─── Canvas Area ───────────────────────────────── */
+    .canvas-wrap {
+      flex: 1;
+      overflow: auto;
+      padding: 32px 24px;
+      position: relative;
+    }
+    .canvas {
+      min-width: 1200px;
+      position: relative;
+    }
+
+    /* ─── Phase Banner ──────────────────────────────── */
+    .phase-section {
+      margin-bottom: 48px;
+    }
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .phase-badge {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .phase-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #262626;
+    }
+    .phase-desc {
+      font-size: 12px;
+      color: #8c8c8c;
+      margin-left: auto;
+    }
+    .phase-line {
+      flex: 1;
+      height: 2px;
+      border-radius: 2px;
+      opacity: 0.3;
+    }
+
+    /* ─── Flow Row ──────────────────────────────────── */
+    .flow-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      position: relative;
+    }
+
+    /* ─── Step Card ─────────────────────────────────── */
+    .step-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .step-card {
+      width: 160px;
+      flex-shrink: 0;
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 14px 14px;
+      cursor: pointer;
+      transition: all .25s;
+      border: 2px solid transparent;
+      position: relative;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .step-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .step-card.active {
+      border-color: currentColor;
+      box-shadow: 0 0 0 3px rgba(22,119,255,0.15), 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .step-card.done .step-status {
+      display: flex;
+    }
+    .step-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      margin: 0 auto 10px;
+    }
+    .step-img-wrap {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 auto 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .step-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #262626;
+      line-height: 1.4;
+      margin-bottom: 5px;
+    }
+    .step-sub {
+      font-size: 11px;
+      color: #8c8c8c;
+      line-height: 1.4;
+    }
+    .step-status {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 18px; height: 18px;
+      background: #52c41a;
+      border-radius: 50%;
+      display: none;
+      align-items: center; justify-content: center;
+      font-size: 10px;
+      color: #fff;
+      border: 2px solid #fff;
+    }
+    .step-badge-num {
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 1.5px solid #d9d9d9;
+      border-radius: 8px;
+      padding: 1px 7px;
+      font-size: 10px;
+      color: #8c8c8c;
+      white-space: nowrap;
+    }
+
+    /* ─── Arrow Connector ───────────────────────────── */
+    .arrow {
+      width: 48px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding-top: 26px;
+    }
+    .arrow-line {
+      width: 100%;
+      height: 2px;
+      position: relative;
+    }
+    .arrow-line::after {
+      content: '';
+      position: absolute;
+      right: -1px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 6px solid transparent;
+      border-left-width: 10px;
+    }
+    .arrow-label {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #8c8c8c;
+      white-space: nowrap;
+      background: #f0f2f5;
+      padding: 0 4px;
+      border-radius: 3px;
+    }
+
+    /* ─── Decision Diamond ──────────────────────────── */
+    .decision-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .decision-card {
+      width: 120px; height: 80px;
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .25s;
+    }
+    .decision-shape {
+      width: 100%; height: 100%;
+      position: absolute;
+      top: 0; left: 0;
+      transform: rotate(0deg);
+    }
+    .decision-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .decision-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #262626;
+      line-height: 1.3;
+    }
+
+    /* ─── Swimlane ──────────────────────────────────── */
+    .swimlane-row {
+      display: flex;
+      align-items: stretch;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    .swimlane-label {
+      width: 80px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border-radius: 8px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      font-size: 12px;
+      font-weight: 600;
+      color: #595959;
+      border-left: 4px solid;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .swimlane-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: rgba(255,255,255,0.5);
+      border-radius: 8px;
+      padding: 20px 20px;
+      border: 1px dashed #e8e8e8;
+    }
+
+    /* ─── Side Panel ────────────────────────────────── */
+    .side-panel {
+      width: 320px;
+      flex-shrink: 0;
+      background: #fff;
+      border-left: 1px solid #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width .3s;
+    }
+    .side-panel.collapsed { width: 0; }
+    .panel-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .panel-title { font-size: 15px; font-weight: 700; color: #262626; }
+    .panel-close {
+      margin-left: auto;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      color: #8c8c8c;
+    }
+    .panel-close:hover { background: #e8e8e8; color: #262626; }
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .info-section { margin-bottom: 20px; }
+    .info-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8c8c8c;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 10px;
+    }
+    .info-icon-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .info-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .info-name { font-size: 15px; font-weight: 700; color: #262626; }
+    .info-type { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+
+    .info-desc {
+      font-size: 13px;
+      color: #595959;
+      line-height: 1.7;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .ops-list { display: flex; flex-direction: column; gap: 8px; }
+    .op-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    .op-num {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #1677ff;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .op-text { font-size: 12px; color: #595959; line-height: 1.6; }
+
+    .input-output-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .io-box {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .io-label { font-size: 10px; color: #8c8c8c; font-weight: 600; margin-bottom: 5px; }
+    .io-items { display: flex; flex-direction: column; gap: 3px; }
+    .io-tag {
+      font-size: 11px;
+      color: #595959;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      display: inline-block;
+    }
+
+    .config-area {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .config-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .config-row:last-child { margin-bottom: 0; }
+    .config-key { font-size: 12px; color: #8c8c8c; width: 60px; flex-shrink: 0; }
+    .config-val { font-size: 12px; color: #262626; font-weight: 500; flex: 1; }
+    .config-edit {
+      font-size: 11px; color: #1677ff; cursor: pointer;
+    }
+    .config-edit:hover { text-decoration: underline; }
+
+    /* icon picker */
+    .icon-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .icon-option {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: 1.5px solid #e8e8e8;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all .15s;
+      background: #fff;
+    }
+    .icon-option:hover { border-color: #1677ff; background: #e6f4ff; }
+    .icon-option.selected { border-color: #1677ff; background: #e6f4ff; }
+
+    /* color picker */
+    .color-picker-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .color-swatch {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .15s;
+      border: 2px solid transparent;
+    }
+    .color-swatch.selected { border-color: #000; transform: scale(1.15); }
+    .color-swatch:hover { transform: scale(1.1); }
+
+    /* ─── Animated Pulse ────────────────────────────── */
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .pulse-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: inherit;
+      animation: pulse-ring 2s infinite;
+    }
+
+    /* ─── Flow animate ──────────────────────────────── */
+    @keyframes dash-flow {
+      to { stroke-dashoffset: -20; }
+    }
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .phase-section {
+      animation: fade-in-up .5s ease both;
+    }
+    .phase-section:nth-child(1) { animation-delay: 0s; }
+    .phase-section:nth-child(2) { animation-delay: .1s; }
+    .phase-section:nth-child(3) { animation-delay: .2s; }
+    .phase-section:nth-child(4) { animation-delay: .3s; }
+
+    /* ─── Empty Panel Placeholder ───────────────────── */
+    .empty-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #bfbfbf;
+      gap: 12px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .empty-panel-icon { font-size: 48px; }
+    .empty-panel-text { font-size: 13px; line-height: 1.6; }
+
+    /* ─── Overview mini map ─────────────────────────── */
+    .minimap {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 180px;
+      background: rgba(0,21,41,0.9);
+      border-radius: 10px;
+      padding: 12px;
+      z-index: 300;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .minimap-title {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 8px;
+      font-weight: 600;
+      letter-spacing: .5px;
+    }
+    .minimap-phases { display: flex; flex-direction: column; gap: 5px; }
+    .minimap-phase {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      border-radius: 6px;
+      padding: 4px 6px;
+      transition: background .2s;
+    }
+    .minimap-phase:hover { background: rgba(255,255,255,0.1); }
+    .minimap-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .minimap-text { font-size: 11px; color: rgba(255,255,255,0.75); }
+
+    /* ─── Vertical down arrow between phases ─────── */
+    .phase-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .phase-connector-line {
+      width: 2px;
+      height: 100%;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .phase-connector-arrow {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+    }
+    .phase-connector-label {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    /* scrollbar */
+    .canvas-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+    .canvas-wrap::-webkit-scrollbar-track { background: transparent; }
+    .canvas-wrap::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+
+    .panel-body::-webkit-scrollbar { width: 4px; }
+    .panel-body::-webkit-scrollbar-track { background: transparent; }
+    .panel-body::-webkit-scrollbar-thumb { background: #e8e8e8; border-radius: 2px; }
+
+    /* tag chips */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .chip-blue { background: #e6f4ff; color: #1677ff; }
+    .chip-green { background: #f6ffed; color: #52c41a; }
+    .chip-orange { background: #fff7e6; color: #fa8c16; }
+    .chip-red { background: #fff2f0; color: #ff4d4f; }
+
+    /* Responsive tweak */
+    @media (max-width: 900px) {
+      .side-panel { width: 0; }
+      .minimap { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══════════════════ HEADER ═══════════════════ -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🏥</div>
+      <span>医疗数据处理平台</span>
+    </div>
+    <div class="header-divider"></div>
+    <span class="header-subtitle">全景业务流程图</span>
+    <div class="header-actions">
+      <button class="btn btn-default" @click="togglePanel">
+        {{ panelOpen ? '收起详情' : '展开详情' }}
+      </button>
+      <button class="btn btn-default" @click="resetDemo">重置演示</button>
+      <button class="btn btn-primary" @click="runDemo">▶ 演示流程</button>
+      <a href="index.html" class="btn btn-default btn-link">返回算子广场</a>
+    </div>
+  </header>
+
+  <!-- ═══════════════════ TOOLBAR ══════════════════ -->
+  <div class="toolbar">
+    <span class="toolbar-label">视图筛选：</span>
+    <div class="phase-tabs">
+      <span
+        v-for="tab in phaseTabs"
+        :key="tab.id"
+        class="phase-tab"
+        :class="{ active: activePhaseFilter === tab.id }"
+        @click="activePhaseFilter = tab.id"
+      >{{ tab.label }}</span>
+    </div>
+    <div class="toolbar-sep"></div>
+    <div class="toolbar-right">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#52c41a"></div>
+        <span>已完成</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#1677ff"></div>
+        <span>进行中</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#d9d9d9"></div>
+        <span>待处理</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#ff4d4f"></div>
+        <span>异常</span>
+      </div>
+      <div class="toolbar-sep"></div>
+      <span class="toolbar-label">共 {{ totalSteps }} 个节点</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ MAIN ══════════════════════ -->
+  <div class="main">
+
+    <!-- Canvas -->
+    <div class="canvas-wrap" ref="canvasRef">
+      <div class="canvas">
+
+        <!-- iterate phases -->
+        <template v-for="(phase, pi) in visiblePhases" :key="phase.id">
+          <div :id="'phase-'+phase.id" class="phase-section">
+
+            <!-- Phase header -->
+            <div class="phase-header">
+              <div class="phase-badge" :style="{ background: phase.color }">{{ pi + 1 }}</div>
+              <span class="phase-title">{{ phase.name }}</span>
+              <div class="phase-line" :style="{ background: phase.color }"></div>
+              <span class="phase-desc">{{ phase.desc }}</span>
+            </div>
+
+            <!-- Swimlanes or flat row -->
+            <template v-if="phase.swimlanes">
+              <div v-for="lane in phase.swimlanes" :key="lane.id" class="swimlane-row">
+                <div class="swimlane-label" :style="{ borderLeftColor: phase.color, color: phase.color }">
+                  {{ lane.name }}
+                </div>
+                <div class="swimlane-content">
+                  <template v-for="(item, si) in lane.steps" :key="item.id">
+                    <div class="step-wrap">
+                      <div
+                        class="step-card"
+                        :class="{ active: selectedStep && selectedStep.id === item.id, done: item.status === 'done' }"
+                        :style="{ borderColor: selectedStep && selectedStep.id === item.id ? phase.color : 'transparent', color: phase.color }"
+                        @click="selectStep(item, phase)"
+                      >
+                        <div class="step-status">✓</div>
+                        <div class="step-icon-wrap" :style="{ background: phase.color + '18' }">
+                          <span>{{ item.icon }}</span>
+                        </div>
+                        <div class="step-name">{{ item.name }}</div>
+                        <div class="step-sub">{{ item.sub }}</div>
+                        <div class="step-badge-num" v-if="item.stepNum">步骤 {{ item.stepNum }}</div>
+                      </div>
+                    </div>
+                    <!-- arrow between steps -->
+                    <div class="arrow" v-if="si < lane.steps.length - 1">
+                      <div class="arrow-line" :style="{ background: phase.color + '60' }"></div>
+                      <svg width="48" height="12" style="position:absolute;top:50%;margin-top:-6px;">
+                        <defs>
+                          <marker :id="'arrow-'+phase.id+'-'+si" markerWidth="6" markerHeight="6"
+                                  refX="5" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L6,3 z" :fill="phase.color"/>
+                          </marker>
+                        </defs>
+                        <line x1="2" y1="6" x2="42" y2="6"
+                              :stroke="phase.color" stroke-width="2"
+                              stroke-dasharray="4 3"
+                              :marker-end="'url(#arrow-'+phase.id+'-'+si+')'"/>
+                      </svg>
+                      <span class="arrow-label" v-if="item.arrowLabel">{{ item.arrowLabel }}</span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+
+            <!-- flat row (no swimlanes) -->
+            <template v-else>
+              <div class="flow-row">
+                <template v-for="(item, si) in phase.steps" :key="item.id">
+                  <div class="step-wrap">
+                    <div
+                      class="step-card"
+                      :class="{ active: selectedStep && selectedStep.id === item.id, done: item.status === 'done' }"
+                      :style="{ borderColor: selectedStep && selectedStep.id === item.id ? phase.color : 'transparent', color: phase.color }"
+                      @click="selectStep(item, phase)"
+                    >
+                      <div class="step-status">✓</div>
+                      <div class="step-icon-wrap" :style="{ background: phase.color + '18' }">
+                        <span>{{ item.icon }}</span>
+                      </div>
+                      <div class="step-name">{{ item.name }}</div>
+                      <div class="step-sub">{{ item.sub }}</div>
+                      <div class="step-badge-num" v-if="item.stepNum">步骤 {{ item.stepNum }}</div>
+                    </div>
+                  </div>
+                  <div class="arrow" v-if="si < phase.steps.length - 1">
+                    <svg width="48" height="12" style="position:absolute;top:50%;margin-top:-6px;">
+                      <defs>
+                        <marker :id="'arr-'+phase.id+'-'+si" markerWidth="6" markerHeight="6"
+                                refX="5" refY="3" orient="auto">
+                          <path d="M0,0 L0,6 L6,3 z" :fill="phase.color"/>
+                        </marker>
+                      </defs>
+                      <line x1="2" y1="6" x2="42" y2="6"
+                            :stroke="phase.color" stroke-width="2"
+                            stroke-dasharray="4 3"
+                            :marker-end="'url(#arr-'+phase.id+'-'+si+')'"/>
+                    </svg>
+                    <span class="arrow-label" v-if="item.arrowLabel">{{ item.arrowLabel }}</span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+
+          <!-- phase connector arrow between phases -->
+          <div class="phase-connector" v-if="pi < visiblePhases.length - 1">
+            <div class="phase-connector-line" :style="{ background: phase.color + '40' }"></div>
+            <div class="phase-connector-arrow" :style="{ borderTopColor: phase.color + '80', borderTopWidth: '8px', borderTopStyle: 'solid' }"></div>
+            <div class="phase-connector-label" :style="{ color: phase.color }">
+              ↓ {{ phase.nextLabel || '流转至下一阶段' }}
+            </div>
+          </div>
+        </template>
+
+      </div>
+    </div>
+
+    <!-- Side Panel -->
+    <div class="side-panel" :class="{ collapsed: !panelOpen }">
+
+      <!-- no selection -->
+      <template v-if="!selectedStep">
+        <div class="empty-panel">
+          <div class="empty-panel-icon">🗺️</div>
+          <div class="empty-panel-text">
+            点击流程图中的任意节点<br/>查看操作详情与配置项
+          </div>
+        </div>
+      </template>
+
+      <!-- step detail -->
+      <template v-else>
+        <div class="panel-header">
+          <div class="info-icon" :style="{ background: selectedPhase.color + '20', fontSize:'20px', width:'32px', height:'32px', borderRadius:'8px', display:'flex', alignItems:'center', justifyContent:'center' }">
+            {{ selectedStep.icon }}
+          </div>
+          <span class="panel-title">{{ selectedStep.name }}</span>
+          <div class="panel-close" @click="selectedStep = null">✕</div>
+        </div>
+        <div class="panel-body">
+
+          <!-- Overview -->
+          <div class="info-section">
+            <div class="info-section-title">节点概览</div>
+            <div class="info-icon-row">
+              <div class="info-icon" :style="{ background: selectedPhase.color + '20' }">
+                {{ selectedStep.icon }}
+              </div>
+              <div>
+                <div class="info-name">{{ selectedStep.name }}</div>
+                <div class="info-type">
+                  <span class="chip chip-blue">{{ selectedPhase.name }}</span>
+                  &nbsp;
+                  <span :class="statusChipClass(selectedStep.status)">{{ statusLabel(selectedStep.status) }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="info-desc">{{ selectedStep.detail }}</div>
+          </div>
+
+          <!-- Operations -->
+          <div class="info-section" v-if="selectedStep.ops && selectedStep.ops.length">
+            <div class="info-section-title">用户操作步骤</div>
+            <div class="ops-list">
+              <div class="op-item" v-for="(op, i) in selectedStep.ops" :key="i">
+                <div class="op-num">{{ i + 1 }}</div>
+                <div class="op-text">{{ op }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input / Output -->
+          <div class="info-section" v-if="selectedStep.inputs || selectedStep.outputs">
+            <div class="info-section-title">输入 / 输出</div>
+            <div class="input-output-grid">
+              <div class="io-box" v-if="selectedStep.inputs">
+                <div class="io-label">📥 输入</div>
+                <div class="io-items">
+                  <span class="io-tag" v-for="t in selectedStep.inputs" :key="t">{{ t }}</span>
+                </div>
+              </div>
+              <div class="io-box" v-if="selectedStep.outputs">
+                <div class="io-label">📤 输出</div>
+                <div class="io-items">
+                  <span class="io-tag" v-for="t in selectedStep.outputs" :key="t">{{ t }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Icon Config -->
+          <div class="info-section">
+            <div class="info-section-title">🎨 图标配置</div>
+            <div class="config-area">
+              <div class="config-row">
+                <span class="config-key">当前图标</span>
+                <span class="config-val" style="font-size:20px;">{{ selectedStep.icon }}</span>
+              </div>
+              <div class="config-row">
+                <span class="config-key">选择图标</span>
+              </div>
+              <div class="icon-picker">
+                <div
+                  v-for="ic in iconOptions"
+                  :key="ic"
+                  class="icon-option"
+                  :class="{ selected: selectedStep.icon === ic }"
+                  @click="selectedStep.icon = ic"
+                >{{ ic }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Config -->
+          <div class="info-section">
+            <div class="info-section-title">🎨 颜色配置</div>
+            <div class="config-area">
+              <div class="config-row">
+                <span class="config-key">阶段色</span>
+                <span class="config-val" :style="{ color: selectedPhase.color }">{{ selectedPhase.color }}</span>
+              </div>
+              <div class="color-picker-row">
+                <div
+                  v-for="c in colorOptions"
+                  :key="c"
+                  class="color-swatch"
+                  :style="{ background: c }"
+                  :class="{ selected: selectedPhase.color === c }"
+                  @click="selectedPhase.color = c"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="info-section">
+            <div class="info-section-title">状态设置</div>
+            <div class="config-area">
+              <div class="config-row" v-for="s in statusOptions" :key="s.value">
+                <span class="config-key">
+                  <input type="radio" :value="s.value" v-model="selectedStep.status" style="cursor:pointer;" />
+                </span>
+                <span class="config-val">
+                  <span :class="statusChipClass(s.value)">{{ s.label }}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- Minimap -->
+  <div class="minimap">
+    <div class="minimap-title">PHASE OVERVIEW</div>
+    <div class="minimap-phases">
+      <div
+        v-for="phase in phases"
+        :key="phase.id"
+        class="minimap-phase"
+        @click="scrollToPhase(phase.id)"
+      >
+        <div class="minimap-dot" :style="{ background: phase.color }"></div>
+        <span class="minimap-text">{{ phase.name }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+const { createApp, ref, computed, nextTick } = Vue;
+
+createApp({
+  setup() {
+    const canvasRef = ref(null);
+    const panelOpen = ref(true);
+    const activePhaseFilter = ref('all');
+    const selectedStep = ref(null);
+    const selectedPhase = ref(null);
+
+    const phaseTabs = [
+      { id: 'all', label: '全部阶段' },
+      { id: 'access', label: '数据接入' },
+      { id: 'process', label: '数据处理' },
+      { id: 'train', label: '模型训练' },
+      { id: 'apply', label: '模型应用' },
+      { id: 'output', label: '结果输出' },
+    ];
+
+    const iconOptions = [
+      '🔐','👤','🏥','📋','📂','🔍','⚙️','🧩','🤖','📊',
+      '📈','💊','🧬','🩺','🗃️','📡','🔬','💡','✅','📤',
+      '🛡️','🗺️','🔗','📝','🧪','🎯','🚀','📌','⚡','🌐',
+    ];
+
+    const colorOptions = [
+      '#1677ff','#52c41a','#fa8c16','#722ed1','#eb2f96',
+      '#13c2c2','#f5222d','#2f54eb','#faad14','#389e0d',
+    ];
+
+    const statusOptions = [
+      { value: 'pending', label: '待处理' },
+      { value: 'active', label: '进行中' },
+      { value: 'done',   label: '已完成' },
+      { value: 'error',  label: '异常'   },
+    ];
+
+    function mkStep(id, icon, name, sub, detail, ops, inputs, outputs, stepNum, arrowLabel, status = 'pending') {
+      return { id, icon, name, sub, detail, ops: ops || [], inputs, outputs, stepNum, arrowLabel, status };
+    }
+
+    const phases = ref([
+      {
+        id: 'access', name: '数据接入阶段', color: '#1677ff',
+        desc: '用户登录系统并导入原始医疗数据',
+        nextLabel: '进入数据处理阶段',
+        steps: [
+          mkStep('login','🔐','用户登录','账号密码 / SSO',
+            '用户通过账号密码或企业单点登录（SSO）进入系统，系统对用户身份进行鉴权，并根据角色分配权限。',
+            ['打开浏览器，访问平台登录页面','输入账号和密码或点击"企业登录"按钮','通过双因素验证（如短信验证码）','点击"登录"按钮，进入工作台首页'],
+            ['账号','密码/Token'],['用户会话','权限配置'],1,null,'done'),
+          mkStep('workspace','🏠','工作台','个人/团队工作空间',
+            '登录后进入工作台，用户可查看我的项目、任务列表、消息通知及系统公告，选择进入相应功能模块。',
+            ['查看首页项目卡片','点击"新建项目"或选择已有项目','设置项目基本信息（名称、描述、成员）','进入项目详情页'],
+            ['用户会话'],['项目上下文'],2,null,'done'),
+          mkStep('upload','📂','数据接入','本地/数据库/API',
+            '用户将原始医疗数据导入平台，支持本地文件上传、外部数据库连接及第三方API对接，系统自动进行格式解析与初步校验。',
+            ['点击"数据接入"菜单','选择数据来源（本地文件/数据库/API）','配置连接参数或上传文件','点击"开始接入"，等待数据导入完成','查看接入日志，确认数据记录数'],
+            ['原始数据文件','数据库连接配置'],['原始数据集','接入日志'],3,'上传',  'done'),
+          mkStep('verify','🔍','数据校验','格式&完整性检查',
+            '系统自动对接入数据进行格式校验、完整性检查和重复数据检测，用户可查看校验报告并手动处理异常数据。',
+            ['查看校验报告摘要','筛选并下载异常数据列表','手动标注或忽略异常记录','点击"通过校验"确认数据有效性'],
+            ['原始数据集'],['校验报告','有效数据集'],4,'校验'),
+        ],
+      },
+      {
+        id: 'process', name: '数据处理阶段', color: '#52c41a',
+        desc: '对原始数据进行清洗、脱敏与标注',
+        nextLabel: '进入模型训练阶段',
+        swimlanes: [
+          {
+            id: 'clean', name: '数据清洗',
+            steps: [
+              mkStep('clean1','🧹','缺失值处理','填充/删除/插值',
+                '对数据集中的缺失值进行处理，支持均值/众数填充、前向后向填充、插值估算或直接删除含缺失值的记录，用户可通过可视化界面配置策略。',
+                ['打开算子广场，搜索"缺失值处理"算子','将算子拖拽到工作流画布','双击算子，配置填充策略（均值/众数/插值）','预览处理效果，确认无误后保存'],
+                ['含缺失值数据集'],['清洗后数据集'],5,'处理'),
+              mkStep('clean2','🔀','数据标准化','归一化/标准化',
+                '对数值型特征进行归一化（Min-Max）或标准化（Z-Score）处理，消除量纲差异对模型训练的影响。',
+                ['选择"数据标准化"算子','配置目标字段和标准化方法','运行预览，查看特征分布变化','确认后保存标准化参数'],
+                ['原始数值特征'],['标准化特征','归一化参数'],6),
+              mkStep('clean3','🔗','数据合并','多表关联融合',
+                '将多个数据源（如门诊、住院、检验数据）按患者ID进行关联合并，生成宽表数据集。',
+                ['选择"数据合并"算子','配置关联键（如患者ID）','选择关联方式（内连接/左连接）','预览合并结果，检查数据量'],
+                ['多表原始数据'],['宽表数据集'],7),
+            ],
+          },
+          {
+            id: 'desensitize', name: '数据脱敏',
+            steps: [
+              mkStep('desens1','🛡️','隐私脱敏','姓名/ID/地址',
+                '对数据中的个人隐私信息（姓名、身份证号、手机号、住址等）进行脱敏处理，支持掩码、哈希、泛化等方式，确保数据合规。',
+                ['进入"数据脱敏"功能页','扫描并识别敏感字段','选择脱敏策略（掩码/哈希/泛化）','执行脱敏，下载脱敏报告'],
+                ['含隐私数据集'],['脱敏数据集','脱敏映射表'],8,'脱敏'),
+              mkStep('desens2','🔒','访问审计','操作日志记录',
+                '系统全程记录数据访问和操作日志，供合规审计使用，用户可查看自己的操作历史。',
+                ['查看"操作日志"页面','按时间/用户/操作类型筛选','导出审计报告（PDF/Excel）'],
+                ['系统操作事件'],['审计日志报告'],9),
+            ],
+          },
+          {
+            id: 'label', name: '数据标注',
+            steps: [
+              mkStep('label1','🏷️','标注任务','分发标注任务',
+                '项目管理员创建标注任务，配置标注规范，将数据分发给标注人员，支持医学影像标注、文本实体标注等场景。',
+                ['进入"数据标注"模块','新建标注任务，上传标注规范文档','分配标注员和审核员','发布任务，发送通知'],
+                ['原始数据集','标注规范'],['标注任务列表'],10,'分发'),
+              mkStep('label2','✏️','执行标注','标注员操作',
+                '标注员在专用标注工具中对数据进行标注，系统支持快捷键操作、标注历史回退、标注进度统计等功能。',
+                ['登录标注平台，进入任务列表','打开待标注数据','使用工具栏选择标注类别','标注完成后点击"提交"'],
+                ['原始数据','标注规范'],['标注结果'],11),
+              mkStep('label3','✅','质量审核','双盲审核机制',
+                '审核员对标注结果进行质量审查，系统计算一致性指标（Kappa系数），不合格的标注退回重新标注。',
+                ['进入审核队列','逐条查看标注结果','标记通过或退回，填写审核意见','查看整体一致性统计报告'],
+                ['标注结果'],['通过审核的标注集','Kappa报告'],12),
+            ],
+          },
+        ],
+      },
+      {
+        id: 'train', name: '模型训练阶段', color: '#722ed1',
+        desc: '配置算子、构建工作流并训练模型',
+        nextLabel: '进入模型应用阶段',
+        steps: [
+          mkStep('operator','🧩','算子配置','拖拽式工作流搭建',
+            '用户在算子广场中选择所需算法算子，通过拖拽方式在工作流画布上组装处理流程，配置各算子的超参数。',
+            ['进入算子广场，浏览算子分类','搜索或筛选目标算子','拖拽算子到工作流画布','连接算子节点，定义数据流向','双击节点配置超参数'],
+            ['标注数据集','算子库'],['工作流配置文件'],13,null,'active'),
+          mkStep('experiment','🧪','实验管理','多版本对比实验',
+            '用户在实验管理模块中创建训练实验，配置训练参数（学习率、批大小、轮数等），系统记录每次实验的参数和结果。',
+            ['进入"实验管理"页面','新建实验，填写实验名称和描述','选择数据集版本和模型架构','配置超参数（学习率、Epoch等）','点击"启动训练"'],
+            ['工作流配置','标注数据集'],['实验记录','训练日志'],14),
+          mkStep('monitor','📊','训练监控','实时指标可视化',
+            '训练过程中，系统实时展示损失曲线、准确率、AUC等指标，用户可随时暂停、继续或中止训练任务。',
+            ['在训练监控页查看实时损失曲线','对比多实验指标走势','发现异常时点击"暂停训练"','调整参数后点击"继续训练"'],
+            ['训练日志流'],['监控报表'],15,'监控'),
+          mkStep('evaluate','📈','模型评估','指标&报告生成',
+            '训练完成后，系统自动在测试集上评估模型性能，生成详细评估报告（混淆矩阵、ROC曲线、F1分数等）。',
+            ['进入"模型评估"页面','查看各类评估指标','下载评估报告（PDF）','对比历史版本性能变化'],
+            ['训练好的模型','测试数据集'],['评估报告','模型版本记录'],16),
+        ],
+      },
+      {
+        id: 'apply', name: '模型应用阶段', color: '#fa8c16',
+        desc: '模型部署上线并对接业务系统',
+        nextLabel: '进入结果输出阶段',
+        steps: [
+          mkStep('register','📋','模型注册','版本管理&审批',
+            '评估通过的模型需经过管理员审批后方可注册到模型仓库，系统保存模型文件、参数快照及评估报告，实现版本溯源。',
+            ['提交模型注册申请，填写版本说明','等待管理员审批（审批邮件通知）','审批通过后模型进入模型仓库'],
+            ['训练好的模型','评估报告'],['模型版本条目'],17),
+          mkStep('deploy','🚀','模型部署','一键发布推理服务',
+            '用户选择已注册的模型版本，配置推理服务参数（实例数、内存、并发），一键发布为REST API服务，支持蓝绿发布和灰度发布。',
+            ['进入"模型部署"页面','选择模型版本','配置服务资源（实例数/内存）','选择发布策略（全量/灰度）','点击"发布"，等待服务启动'],
+            ['模型版本','服务配置'],['推理服务API','服务监控面板'],18),
+          mkStep('apitest','🔌','接口联调','API集成测试',
+            '开发人员使用系统提供的Swagger文档或在线测试工具，对推理API进行联调测试，确认接口响应格式和性能满足业务要求。',
+            ['查看API文档页面','复制Bearer Token','使用在线工具发送测试请求','检查响应结构和推理结果','确认延迟指标达标'],
+            ['测试用例','API Token'],['联调报告','接口文档'],19),
+          mkStep('monitor2','🩺','服务监控','调用量&性能跟踪',
+            '上线后持续监控API调用量、响应时延、错误率等指标，异常时自动告警并触发运维流程。',
+            ['查看监控大盘','配置告警阈值','查看历史调用日志','定期生成服务报告'],
+            ['实时调用数据'],['监控大盘','告警通知'],20),
+        ],
+      },
+      {
+        id: 'output', name: '结果输出阶段', color: '#13c2c2',
+        desc: '生成分析报告并导出结果',
+        steps: [
+          mkStep('report','📑','报告生成','自定义报告模板',
+            '系统根据分析结果自动生成医疗报告，用户可选择报告模板、自定义章节内容，支持图表嵌入和多语言输出。',
+            ['进入"报告中心"','选择报告模板（标准/自定义）','配置报告包含的指标和图表','点击"生成报告"，预览效果','确认无误后发布'],
+            ['分析结果','报告模板'],['医疗分析报告（PDF/Word）'],21,null),
+          mkStep('export','📤','数据导出','多格式导出下载',
+            '用户可将处理后的数据集、模型预测结果、统计报告以CSV、Excel、JSON、HL7 FHIR等格式导出，用于下游系统对接。',
+            ['进入"数据导出"页面','选择导出内容（数据集/报告/模型结果）','选择导出格式','配置字段映射（可选）','点击"导出"，下载文件'],
+            ['分析结果数据','报告'],['导出文件（CSV/Excel/JSON）'],22),
+          mkStep('share','🔗','成果共享','团队协作&权限管理',
+            '用户可将分析成果（数据集、模型、报告）共享给团队成员或外部合作方，系统支持细粒度权限控制（查看/编辑/下载）。',
+            ['进入成果详情页','点击"共享"按钮','添加被共享人员或团队','设置访问权限级别','发送共享邀请链接'],
+            ['分析成果','用户列表'],['共享链接','权限记录'],23),
+          mkStep('archive','🗃️','归档管理','项目结案归档',
+            '项目完成后执行结案归档，系统将项目数据、模型、报告打包存储，设置保留策略，满足医疗数据的合规保存要求（≥10年）。',
+            ['确认项目所有任务已完成','点击"提交归档"','填写归档说明和保留期限','管理员审批后自动归档'],
+            ['项目全量数据'],['归档包','归档记录'],24),
+        ],
+      },
+    ]);
+
+    const visiblePhases = computed(() => {
+      if (activePhaseFilter.value === 'all') return phases.value;
+      return phases.value.filter(p => p.id === activePhaseFilter.value);
+    });
+
+    const totalSteps = computed(() => {
+      let n = 0;
+      for (const p of phases.value) {
+        if (p.swimlanes) {
+          for (const l of p.swimlanes) n += l.steps.length;
+        } else {
+          n += (p.steps || []).length;
+        }
+      }
+      return n;
+    });
+
+    function selectStep(step, phase) {
+      selectedStep.value = step;
+      selectedPhase.value = phase;
+      if (!panelOpen.value) panelOpen.value = true;
+    }
+
+    function togglePanel() {
+      panelOpen.value = !panelOpen.value;
+    }
+
+    function statusLabel(s) {
+      return { pending:'待处理', active:'进行中', done:'已完成', error:'异常' }[s] || s;
+    }
+    function statusChipClass(s) {
+      return {
+        pending: 'chip',
+        active: 'chip chip-blue',
+        done: 'chip chip-green',
+        error: 'chip chip-red',
+      }[s] || 'chip';
+    }
+
+    function scrollToPhase(id) {
+      const el = document.getElementById('phase-' + id);
+      if (el && canvasRef.value) {
+        canvasRef.value.scrollTo({ top: el.offsetTop - 20, behavior: 'smooth' });
+      }
+    }
+
+    let demoTimer = null;
+    function resetDemo() {
+      clearInterval(demoTimer);
+      for (const p of phases.value) {
+        const allSteps = p.swimlanes
+          ? p.swimlanes.flatMap(l => l.steps)
+          : (p.steps || []);
+        for (const s of allSteps) {
+          if (s.status !== 'pending') s.status = 'pending';
+        }
+      }
+      selectedStep.value = null;
+    }
+
+    function runDemo() {
+      resetDemo();
+      const allSteps = [];
+      for (const p of phases.value) {
+        const steps = p.swimlanes
+          ? p.swimlanes.flatMap(l => l.steps)
+          : (p.steps || []);
+        for (const s of steps) allSteps.push({ step: s, phase: p });
+      }
+      let i = 0;
+      function next() {
+        if (i > 0) allSteps[i - 1].step.status = 'done';
+        if (i >= allSteps.length) return;
+        const { step, phase } = allSteps[i];
+        step.status = 'active';
+        selectStep(step, phase);
+        i++;
+        demoTimer = setTimeout(next, 900);
+      }
+      next();
+    }
+
+    return {
+      canvasRef, panelOpen, activePhaseFilter, phases, visiblePhases,
+      totalSteps, phaseTabs, selectedStep, selectedPhase,
+      iconOptions, colorOptions, statusOptions,
+      selectStep, togglePanel, statusLabel, statusChipClass,
+      scrollToPhase, resetDemo, runDemo,
+    };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
