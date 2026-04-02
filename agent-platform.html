@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>智能体广场 · 医疗AI智能体平台</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+                   'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      color: #262626;
+      background: #f0f2f5;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; outline: none; }
+    input, textarea, select { font-family: inherit; outline: none; border: none; }
+
+    /* ─── App Shell ────────────────────────────────── */
+    #app { height: 100vh; display: flex; flex-direction: column; }
+
+    /* ─── Header ───────────────────────────────────── */
+    .header {
+      height: 60px;
+      background: #001529;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 20px;
+      flex-shrink: 0;
+      z-index: 200;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      color: #fff; font-size: 17px; font-weight: 700;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #1677ff, #36cfc9);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.15); }
+    .logo-sub { font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 400; }
+    .header-search {
+      flex: 1; max-width: 480px; position: relative;
+    }
+    .header-search input {
+      width: 100%; height: 36px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 0 40px 0 16px;
+      color: #fff; font-size: 13px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .header-search input::placeholder { color: rgba(255,255,255,0.35); }
+    .header-search input:focus {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.35);
+    }
+    .search-icon {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.35); font-size: 14px;
+      pointer-events: none;
+    }
+    .header-stats {
+      margin-left: auto; display: flex; gap: 24px; flex-shrink: 0;
+    }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 20px; font-weight: 700; color: #40a9ff; line-height: 1; }
+    .stat-label { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .btn-create {
+      padding: 0 18px; height: 36px;
+      background: linear-gradient(135deg, #1677ff, #36cfc9);
+      color: #fff; border-radius: 18px;
+      font-size: 13px; font-weight: 600;
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 6px;
+      transition: opacity 0.15s;
+    }
+    .btn-create:hover { opacity: 0.88; }
+
+    /* ─── Sub Nav ───────────────────────────────────── */
+    .subnav {
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 0 24px;
+      display: flex; align-items: center; gap: 0;
+      flex-shrink: 0;
+      height: 46px;
+    }
+    .subnav-tab {
+      padding: 0 18px; height: 46px;
+      display: flex; align-items: center;
+      font-size: 14px; color: #595959;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .subnav-tab:hover { color: #1677ff; }
+    .subnav-tab.active { color: #1677ff; border-bottom-color: #1677ff; font-weight: 600; }
+    .subnav-count {
+      margin-left: 5px;
+      font-size: 11px; background: #f0f0f0; color: #8c8c8c;
+      padding: 1px 6px; border-radius: 10px;
+    }
+    .subnav-tab.active .subnav-count { background: #cce4ff; color: #1677ff; }
+    .subnav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .sort-select {
+      height: 32px; padding: 0 10px;
+      border: 1px solid #d9d9d9; border-radius: 4px;
+      font-size: 12px; color: #595959;
+      background: #fff; cursor: pointer;
+    }
+    .view-toggle { display: flex; gap: 2px; }
+    .view-btn {
+      width: 32px; height: 32px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      background: #fff; border: 1px solid #d9d9d9;
+      color: #595959; font-size: 14px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .view-btn.active, .view-btn:hover { border-color: #1677ff; color: #1677ff; background: #e8f4ff; }
+
+    /* ─── Main Layout ───────────────────────────────── */
+    .main-body { flex: 1; display: flex; overflow: hidden; }
+
+    /* ─── Sidebar ───────────────────────────────────── */
+    .sidebar {
+      width: 220px; background: #fff;
+      border-right: 1px solid #f0f0f0;
+      display: flex; flex-direction: column;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .sidebar-section {
+      padding: 14px 16px 6px;
+      font-size: 11px; color: #8c8c8c; font-weight: 500; letter-spacing: 0.5px;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding-bottom: 12px; }
+    .cat-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px;
+      cursor: pointer; border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .cat-item:hover  { background: #f5f7ff; }
+    .cat-item.active { background: #e8f4ff; border-left-color: #1677ff; }
+    .cat-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .cat-label {
+      flex: 1; font-size: 13px; font-weight: 500; color: #262626;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cat-item.active .cat-label { color: #1677ff; }
+    .cat-count {
+      font-size: 11px; padding: 1px 6px;
+      border-radius: 10px; background: #f5f5f5; color: #8c8c8c; flex-shrink: 0;
+    }
+    .cat-item.active .cat-count { background: #cce4ff; color: #1677ff; }
+
+    /* ─── Content ───────────────────────────────────── */
+    .content { flex: 1; overflow-y: auto; padding: 20px 20px 24px; }
+    .toolbar {
+      display: flex; align-items: center;
+      margin-bottom: 18px; gap: 10px;
+    }
+    .toolbar-title { font-size: 15px; font-weight: 600; color: #262626; }
+    .toolbar-count { font-size: 13px; color: #8c8c8c; }
+
+    /* ─── Agent Cards Grid ──────────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .agent-card {
+      background: #fff; border-radius: 12px;
+      border: 1px solid #f0f0f0;
+      padding: 0;
+      display: flex; flex-direction: column;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      overflow: hidden; position: relative;
+    }
+    .agent-card:hover {
+      border-color: #4096ff;
+      box-shadow: 0 6px 24px rgba(22,119,255,0.12);
+      transform: translateY(-2px);
+    }
+    .card-header {
+      padding: 18px 18px 14px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .agent-avatar {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+    }
+    .agent-info { flex: 1; min-width: 0; }
+    .agent-name {
+      font-size: 15px; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 5px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .agent-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .agent-tag {
+      font-size: 11px; padding: 1px 8px; border-radius: 4px;
+      font-weight: 500;
+    }
+    .tag-category { background: #e8f4ff; color: #1677ff; }
+    .tag-status-published { background: #f6ffed; color: #52c41a; }
+    .tag-status-draft     { background: #fff7e6; color: #fa8c16; }
+    .tag-status-review    { background: #fff1f0; color: #ff4d4f; }
+    .card-menu {
+      position: absolute; top: 12px; right: 12px;
+      display: none;
+    }
+    .agent-card:hover .card-menu { display: flex; gap: 4px; }
+    .card-menu-btn {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.9); border: 1px solid #e8e8e8;
+      font-size: 13px; cursor: pointer; color: #595959;
+      transition: all 0.15s;
+    }
+    .card-menu-btn:hover { background: #f0f7ff; border-color: #1677ff; color: #1677ff; }
+    .card-menu-btn.danger:hover { background: #fff1f0; border-color: #ff4d4f; color: #ff4d4f; }
+    .card-desc {
+      padding: 0 18px 14px;
+      font-size: 12px; color: #595959; line-height: 1.7;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+      flex: 1;
+    }
+    .card-meta {
+      padding: 10px 18px;
+      border-top: 1px solid #f5f5f5;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .meta-stats { display: flex; gap: 14px; }
+    .meta-stat { font-size: 11px; color: #8c8c8c; display: flex; align-items: center; gap: 3px; }
+    .meta-stat span { color: #262626; font-weight: 600; }
+    .card-footer {
+      padding: 12px 18px;
+      border-top: 1px solid #f5f5f5;
+      display: flex; gap: 8px;
+    }
+    .btn-chat {
+      flex: 1; padding: 7px 0;
+      background: linear-gradient(135deg, #1677ff, #36cfc9);
+      color: #fff; border-radius: 6px;
+      font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      transition: opacity 0.15s;
+    }
+    .btn-chat:hover { opacity: 0.88; }
+    .btn-sm {
+      padding: 7px 12px;
+      border: 1px solid #e8e8e8; border-radius: 6px;
+      font-size: 12px; color: #595959; background: #fff;
+      display: flex; align-items: center; gap: 4px;
+      transition: all 0.15s;
+    }
+    .btn-sm:hover { border-color: #1677ff; color: #1677ff; background: #f0f7ff; }
+
+    /* ─── List View ─────────────────────────────────── */
+    .cards-list { display: flex; flex-direction: column; gap: 8px; }
+    .agent-row {
+      background: #fff; border: 1px solid #f0f0f0; border-radius: 8px;
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .agent-row:hover { border-color: #4096ff; box-shadow: 0 2px 10px rgba(22,119,255,0.08); }
+    .agent-row .agent-avatar { width: 44px; height: 44px; font-size: 22px; }
+    .agent-row-name { font-size: 14px; font-weight: 700; color: #1a1a1a; width: 160px; flex-shrink: 0; }
+    .agent-row-desc { flex: 1; font-size: 12px; color: #595959; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .agent-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    /* ─── Empty ─────────────────────────────────────── */
+    .empty { text-align: center; padding: 80px 20px; color: #8c8c8c; }
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-title { font-size: 16px; font-weight: 600; color: #434343; margin-bottom: 8px; }
+    .empty-desc { font-size: 13px; margin-bottom: 20px; }
+    .btn-empty-create {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 22px; border-radius: 6px;
+      background: #1677ff; color: #fff; font-size: 14px; font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .btn-empty-create:hover { opacity: 0.85; }
+
+    /* ─── Search highlight ──────────────────────────── */
+    mark { background: #fff566; color: inherit; border-radius: 2px; padding: 0 1px; }
+
+    /* ─── Scrollbars ────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
+
+    /* ─── Modal Overlay ─────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal {
+      background: #fff; border-radius: 12px;
+      padding: 28px;
+      width: 520px; max-width: 96vw;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .modal-title {
+      font-size: 17px; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-close {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      background: #f5f5f5; cursor: pointer; font-size: 16px; color: #595959;
+      transition: all 0.15s;
+    }
+    .modal-close:hover { background: #fff1f0; color: #ff4d4f; }
+    .form-group { margin-bottom: 18px; }
+    .form-label {
+      font-size: 13px; font-weight: 600; color: #434343;
+      margin-bottom: 7px; display: flex; align-items: center; gap: 4px;
+    }
+    .form-label .required { color: #ff4d4f; }
+    .form-input {
+      width: 100%; height: 36px; padding: 0 12px;
+      border: 1px solid #d9d9d9; border-radius: 6px;
+      font-size: 13px; color: #262626;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus { border-color: #1677ff; }
+    .form-textarea {
+      width: 100%; padding: 10px 12px; min-height: 80px;
+      border: 1px solid #d9d9d9; border-radius: 6px;
+      font-size: 13px; color: #262626; resize: vertical;
+      transition: border-color 0.15s;
+    }
+    .form-textarea:focus { border-color: #1677ff; }
+    .form-select {
+      width: 100%; height: 36px; padding: 0 12px;
+      border: 1px solid #d9d9d9; border-radius: 6px;
+      font-size: 13px; color: #262626; background: #fff; cursor: pointer;
+    }
+    .icon-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .icon-opt {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .icon-opt:hover  { transform: scale(1.12); }
+    .icon-opt.active { border-color: #1677ff; box-shadow: 0 0 0 3px rgba(22,119,255,0.15); }
+    .modal-footer {
+      display: flex; justify-content: flex-end; gap: 10px;
+      margin-top: 24px; padding-top: 18px; border-top: 1px solid #f0f0f0;
+    }
+    .btn-cancel {
+      padding: 8px 20px; border-radius: 6px;
+      border: 1px solid #d9d9d9; background: #fff; color: #595959;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-cancel:hover { border-color: #4096ff; color: #4096ff; }
+    .btn-confirm {
+      padding: 8px 24px; border-radius: 6px;
+      background: #1677ff; color: #fff;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-confirm:hover { opacity: 0.88; }
+    .btn-danger-confirm {
+      padding: 8px 24px; border-radius: 6px;
+      background: #ff4d4f; color: #fff;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-danger-confirm:hover { opacity: 0.88; }
+
+    /* ─── Chat Modal ────────────────────────────────── */
+    .chat-modal {
+      width: 680px; max-width: 96vw; padding: 0;
+      display: flex; flex-direction: column;
+      height: 80vh; max-height: 700px;
+    }
+    .chat-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex; align-items: center; gap: 14px;
+      flex-shrink: 0;
+    }
+    .chat-agent-avatar {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .chat-agent-name { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+    .chat-agent-desc { font-size: 12px; color: #8c8c8c; }
+    .chat-body {
+      flex: 1; overflow-y: auto; padding: 20px 22px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .chat-msg { display: flex; gap: 10px; max-width: 85%; }
+    .chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .chat-msg.bot  { align-self: flex-start; }
+    .msg-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0; margin-top: 2px;
+    }
+    .msg-avatar.user-av { background: linear-gradient(135deg, #1677ff, #36cfc9); }
+    .msg-avatar.bot-av  { background: #f5f5f5; }
+    .msg-bubble {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px; line-height: 1.7; color: #262626;
+    }
+    .chat-msg.user .msg-bubble { background: linear-gradient(135deg, #1677ff, #36cfc9); color: #fff; border-radius: 10px 2px 10px 10px; }
+    .chat-msg.bot  .msg-bubble { background: #f5f5f5; border-radius: 2px 10px 10px 10px; }
+    .msg-time { font-size: 11px; color: #bfbfbf; margin-top: 4px; text-align: right; }
+    .chat-msg.bot .msg-time { text-align: left; }
+    .chat-input-area {
+      padding: 14px 22px;
+      border-top: 1px solid #f0f0f0;
+      display: flex; gap: 10px; align-items: flex-end;
+      flex-shrink: 0;
+    }
+    .chat-input {
+      flex: 1; padding: 10px 14px; max-height: 120px;
+      border: 1px solid #d9d9d9; border-radius: 8px;
+      font-size: 13px; resize: none; color: #262626;
+      transition: border-color 0.15s; line-height: 1.6;
+    }
+    .chat-input:focus { border-color: #1677ff; }
+    .chat-send {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: #1677ff; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer; flex-shrink: 0;
+      transition: opacity 0.15s;
+    }
+    .chat-send:hover { opacity: 0.85; }
+    .chat-send:disabled { background: #d9d9d9; cursor: not-allowed; opacity: 1; }
+    .thinking { display: flex; align-items: center; gap: 5px; padding: 8px 0; }
+    .thinking-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #1677ff;
+      animation: blink 1.2s infinite ease-in-out;
+    }
+    .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+    /* ─── Share Modal ───────────────────────────────── */
+    .share-url-box {
+      display: flex; gap: 8px; margin-top: 6px;
+    }
+    .share-url-input {
+      flex: 1; height: 36px; padding: 0 12px;
+      border: 1px solid #d9d9d9; border-radius: 6px;
+      font-size: 12px; color: #8c8c8c; background: #fafafa;
+    }
+    .btn-copy-url {
+      padding: 0 16px; height: 36px; border-radius: 6px;
+      background: #1677ff; color: #fff; font-size: 13px; font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .btn-copy-url:hover { opacity: 0.88; }
+    .share-qr {
+      width: 120px; height: 120px; border-radius: 10px;
+      background: linear-gradient(135deg, #e8f4ff, #e6fffb);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 16px auto 0;
+      border: 1px solid #d9f7be;
+    }
+    .share-qr-icon { font-size: 48px; }
+    .share-qr-label { font-size: 11px; color: #8c8c8c; margin-top: 6px; }
+
+    /* ─── Toast ─────────────────────────────────────── */
+    .toast {
+      position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.75); color: #fff;
+      padding: 10px 22px; border-radius: 24px;
+      font-size: 13px; z-index: 2000;
+      transition: opacity 0.3s;
+    }
+
+    /* ─── Transition ────────────────────────────────── */
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.18s; }
+    .fade-enter-from, .fade-leave-to { opacity: 0; }
+    .slide-up-enter-active, .slide-up-leave-active { transition: all 0.22s cubic-bezier(.4,0,.2,1); }
+    .slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(20px); }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Toast ────────────────────────────────────────── -->
+  <transition name="fade">
+    <div v-if="toast.show" class="toast">{{ toast.msg }}</div>
+  </transition>
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🤖</div>
+      <div>
+        <div>智能体广场</div>
+        <div class="logo-sub">医疗AI智能体平台</div>
+      </div>
+    </div>
+    <div class="logo-divider"></div>
+    <div class="header-search">
+      <input v-model="searchText" placeholder="搜索智能体名称、描述…" />
+      <span class="search-icon">🔍</span>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-num">{{ agents.length }}</div>
+        <div class="stat-label">智能体总数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ publishedCount }}</div>
+        <div class="stat-label">已发布</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ totalChats }}</div>
+        <div class="stat-label">累计对话</div>
+      </div>
+    </div>
+    <button class="btn-create" @click="openCreate">
+      <span>＋</span> 创建智能体
+    </button>
+  </header>
+
+  <!-- ── Sub Nav ──────────────────────────────────────── -->
+  <nav class="subnav">
+    <div
+      v-for="tab in statusTabs" :key="tab.key"
+      class="subnav-tab"
+      :class="{ active: activeTab === tab.key }"
+      @click="activeTab = tab.key"
+    >
+      {{ tab.label }}
+      <span class="subnav-count">{{ tabCount(tab.key) }}</span>
+    </div>
+    <div class="subnav-right">
+      <select class="sort-select" v-model="sortBy">
+        <option value="updated">最近更新</option>
+        <option value="chats">对话最多</option>
+        <option value="name">名称 A-Z</option>
+        <option value="created">最新创建</option>
+      </select>
+      <div class="view-toggle">
+        <button class="view-btn" :class="{ active: listView==='grid' }" @click="listView='grid'" title="卡片视图">⊞</button>
+        <button class="view-btn" :class="{ active: listView==='list' }" @click="listView='list'" title="列表视图">≡</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main Body ────────────────────────────────────── -->
+  <div class="main-body">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+        <div class="sidebar-section">应用场景</div>
+        <div
+          v-for="cat in categories" :key="cat.key"
+          class="cat-item"
+          :class="{ active: activeCategory === cat.key }"
+          @click="activeCategory = cat.key"
+        >
+          <div class="cat-icon" :style="{ background: cat.bg }">{{ cat.icon }}</div>
+          <span class="cat-label">{{ cat.label }}</span>
+          <span class="cat-count">{{ catCount(cat.key) }}</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+      <div class="toolbar">
+        <span class="toolbar-title">
+          {{ activeCategory === 'all' ? '全部智能体' : categories.find(c=>c.key===activeCategory)?.label }}
+        </span>
+        <span class="toolbar-count">共 {{ filteredAgents.length }} 个</span>
+      </div>
+
+      <!-- Grid View -->
+      <div v-if="listView === 'grid'" class="cards-grid">
+        <template v-if="filteredAgents.length">
+          <div
+            v-for="agent in filteredAgents"
+            :key="agent.id"
+            class="agent-card"
+          >
+            <!-- quick actions overlay -->
+            <div class="card-menu">
+              <button class="card-menu-btn" title="复制" @click="copyAgent(agent)">⧉</button>
+              <button class="card-menu-btn" title="分享" @click="openShare(agent)">↗</button>
+              <button class="card-menu-btn danger" title="删除" @click="openDelete(agent)">🗑</button>
+            </div>
+            <div class="card-header">
+              <div class="agent-avatar" :style="{ background: agent.bg }">{{ agent.icon }}</div>
+              <div class="agent-info">
+                <div class="agent-name" v-html="highlight(agent.name)"></div>
+                <div class="agent-tags">
+                  <span class="agent-tag tag-category">{{ agent.category }}</span>
+                  <span class="agent-tag" :class="statusClass(agent.status)">{{ agent.status }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-desc" v-html="highlight(agent.desc)"></div>
+            <div class="card-meta">
+              <div class="meta-stats">
+                <div class="meta-stat">💬 <span>{{ agent.chats }}</span> 次对话</div>
+                <div class="meta-stat">👤 <span>{{ agent.users }}</span> 用户</div>
+              </div>
+              <div class="meta-stat">🕐 {{ agent.updated }}</div>
+            </div>
+            <div class="card-footer">
+              <button class="btn-chat" @click="openChat(agent)">💬 体验对话</button>
+              <button class="btn-sm" @click="copyAgent(agent)">⧉ 复制</button>
+              <button class="btn-sm" @click="openShare(agent)">↗ 分享</button>
+            </div>
+          </div>
+        </template>
+        <div v-else class="empty" style="grid-column:1/-1">
+          <div class="empty-icon">🤖</div>
+          <div class="empty-title">暂无智能体</div>
+          <div class="empty-desc">{{ searchText ? '没有找到匹配的智能体，换个关键词试试' : '还没有创建智能体，立即开始吧' }}</div>
+          <button v-if="!searchText" class="btn-empty-create" @click="openCreate">＋ 创建第一个智能体</button>
+        </div>
+      </div>
+
+      <!-- List View -->
+      <div v-else class="cards-list">
+        <template v-if="filteredAgents.length">
+          <div
+            v-for="agent in filteredAgents"
+            :key="agent.id"
+            class="agent-row"
+          >
+            <div class="agent-avatar" :style="{ background: agent.bg }">{{ agent.icon }}</div>
+            <div class="agent-row-name" v-html="highlight(agent.name)"></div>
+            <div class="agent-row-desc" v-html="highlight(agent.desc)"></div>
+            <div class="agent-tags" style="flex-shrink:0;gap:5px;display:flex">
+              <span class="agent-tag tag-category">{{ agent.category }}</span>
+              <span class="agent-tag" :class="statusClass(agent.status)">{{ agent.status }}</span>
+            </div>
+            <div class="agent-row-right">
+              <div class="meta-stat">💬 <span>{{ agent.chats }}</span></div>
+              <button class="btn-chat" style="padding:6px 14px;border-radius:6px;flex:none" @click="openChat(agent)">体验对话</button>
+              <button class="btn-sm" @click="copyAgent(agent)" title="复制">⧉</button>
+              <button class="btn-sm" @click="openShare(agent)" title="分享">↗</button>
+              <button class="btn-sm" style="color:#ff4d4f;border-color:#ffccc7" @click="openDelete(agent)" title="删除">🗑</button>
+            </div>
+          </div>
+        </template>
+        <div v-else class="empty">
+          <div class="empty-icon">🤖</div>
+          <div class="empty-title">暂无智能体</div>
+          <div class="empty-desc">{{ searchText ? '没有找到匹配的智能体' : '还没有创建智能体' }}</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ══════════ Modals ══════════ -->
+
+  <!-- Create Agent Modal -->
+  <transition name="fade">
+    <div v-if="createModal.show" class="modal-overlay" @click.self="createModal.show=false">
+      <transition name="slide-up">
+        <div v-if="createModal.show" class="modal">
+          <div class="modal-title">
+            ✨ 创建新智能体
+            <span class="modal-close" @click="createModal.show=false">✕</span>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="required">*</span> 智能体名称</div>
+            <input class="form-input" v-model="createModal.name" placeholder="请输入智能体名称，如：门诊导诊助手" maxlength="20" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="required">*</span> 应用场景</div>
+            <select class="form-select" v-model="createModal.category">
+              <option v-for="cat in categories.filter(c=>c.key!=='all')" :key="cat.key" :value="cat.label">{{ cat.label }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">选择图标</div>
+            <div class="icon-picker">
+              <div
+                v-for="opt in iconOptions" :key="opt.icon"
+                class="icon-opt"
+                :class="{ active: createModal.icon === opt.icon }"
+                :style="{ background: opt.bg }"
+                @click="createModal.icon = opt.icon; createModal.bg = opt.bg"
+              >{{ opt.icon }}</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">智能体描述</div>
+            <textarea class="form-textarea" v-model="createModal.desc" placeholder="请简要描述该智能体的功能和适用场景…" rows="3" maxlength="200"></textarea>
+          </div>
+          <div class="form-group">
+            <div class="form-label">开场白</div>
+            <input class="form-input" v-model="createModal.greeting" placeholder="请输入智能体的开场白，如：您好！我是您的医疗助手…" maxlength="80" />
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="createModal.show=false">取消</button>
+            <button class="btn-confirm" @click="submitCreate">创建智能体</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+  <!-- Chat Modal -->
+  <transition name="fade">
+    <div v-if="chatModal.show" class="modal-overlay" @click.self="chatModal.show=false">
+      <transition name="slide-up">
+        <div v-if="chatModal.show" class="modal chat-modal">
+          <div class="chat-header">
+            <div class="chat-agent-avatar" :style="{ background: chatModal.agent?.bg }">{{ chatModal.agent?.icon }}</div>
+            <div style="flex:1;min-width:0">
+              <div class="chat-agent-name">{{ chatModal.agent?.name }}</div>
+              <div class="chat-agent-desc">{{ chatModal.agent?.category }} · {{ chatModal.agent?.desc?.slice(0,30) }}…</div>
+            </div>
+            <span class="modal-close" @click="chatModal.show=false">✕</span>
+          </div>
+          <div class="chat-body" ref="chatBodyRef">
+            <div v-for="msg in chatModal.messages" :key="msg.id" class="chat-msg" :class="msg.role">
+              <div class="msg-avatar" :class="msg.role === 'user' ? 'user-av' : 'bot-av'">
+                {{ msg.role === 'user' ? '👤' : chatModal.agent?.icon }}
+              </div>
+              <div>
+                <div class="msg-bubble">{{ msg.content }}</div>
+                <div class="msg-time">{{ msg.time }}</div>
+              </div>
+            </div>
+            <div v-if="chatModal.thinking" class="chat-msg bot">
+              <div class="msg-avatar bot-av">{{ chatModal.agent?.icon }}</div>
+              <div class="msg-bubble" style="background:#f5f5f5">
+                <div class="thinking">
+                  <div class="thinking-dot"></div>
+                  <div class="thinking-dot"></div>
+                  <div class="thinking-dot"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <textarea
+              class="chat-input"
+              v-model="chatModal.input"
+              placeholder="输入您的问题，按 Enter 发送…"
+              rows="2"
+              @keydown.enter.exact.prevent="sendChat"
+            ></textarea>
+            <button class="chat-send" @click="sendChat" :disabled="!chatModal.input.trim()">➤</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+  <!-- Share Modal -->
+  <transition name="fade">
+    <div v-if="shareModal.show" class="modal-overlay" @click.self="shareModal.show=false">
+      <transition name="slide-up">
+        <div v-if="shareModal.show" class="modal" style="width:420px">
+          <div class="modal-title">
+            ↗ 分享智能体
+            <span class="modal-close" @click="shareModal.show=false">✕</span>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Web 访问链接</div>
+            <div class="share-url-box">
+              <input class="share-url-input" :value="shareModal.url" readonly />
+              <button class="btn-copy-url" @click="copyShareUrl">复制</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">二维码分享</div>
+            <div class="share-qr">
+              <div class="share-qr-icon">📱</div>
+              <div class="share-qr-label">扫码访问</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="shareModal.show=false">关闭</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+  <!-- Delete Confirm Modal -->
+  <transition name="fade">
+    <div v-if="deleteModal.show" class="modal-overlay" @click.self="deleteModal.show=false">
+      <transition name="slide-up">
+        <div v-if="deleteModal.show" class="modal" style="width:380px">
+          <div class="modal-title">
+            ⚠️ 确认删除
+            <span class="modal-close" @click="deleteModal.show=false">✕</span>
+          </div>
+          <p style="font-size:14px;color:#595959;line-height:1.7">
+            确定要删除智能体 <strong style="color:#1a1a1a">「{{ deleteModal.agent?.name }}」</strong> 吗？
+            <br />删除后将无法恢复，且相关的对话记录也将被清除。
+          </p>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="deleteModal.show=false">取消</button>
+            <button class="btn-danger-confirm" @click="confirmDelete">确认删除</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+</div>
+
+<script>
+const { createApp, ref, computed, nextTick } = Vue
+
+/* ─── Agent Categories ──────────────────────────────── */
+const categories = [
+  { key: 'all',      icon: '🏠', label: '全部',       bg: '#e8f4ff' },
+  { key: 'consult',  icon: '🩺', label: '问诊导诊',   bg: '#fff1f0' },
+  { key: 'doc',      icon: '📋', label: '医疗文书',   bg: '#f6ffed' },
+  { key: 'report',   icon: '🔬', label: '报告解读',   bg: '#e6fffb' },
+  { key: 'drug',     icon: '💊', label: '用药指导',   bg: '#fff7e6' },
+  { key: 'nurse',    icon: '🩹', label: '护理助手',   bg: '#f9f0ff' },
+  { key: 'research', icon: '📚', label: '医学科研',   bg: '#fff0f6' },
+  { key: 'manage',   icon: '🏥', label: '医院管理',   bg: '#e8f4ff' },
+  { key: 'health',   icon: '💪', label: '健康管理',   bg: '#fcffe6' },
+]
+
+/* ─── Icon Options for create form ─────────────────── */
+const iconOptions = [
+  { icon: '🤖', bg: '#e8f4ff' },
+  { icon: '🩺', bg: '#fff1f0' },
+  { icon: '💊', bg: '#fff7e6' },
+  { icon: '📋', bg: '#f6ffed' },
+  { icon: '🔬', bg: '#e6fffb' },
+  { icon: '🧠', bg: '#f9f0ff' },
+  { icon: '❤️', bg: '#fff1f0' },
+  { icon: '🏥', bg: '#e8f4ff' },
+  { icon: '📊', bg: '#fcffe6' },
+  { icon: '👨‍⚕️', bg: '#e6fffb' },
+  { icon: '🩻', bg: '#f0f5ff' },
+  { icon: '💉', bg: '#fff7e6' },
+]
+
+/* ─── Simulated Bot Responses ───────────────────────── */
+const botResponses = {
+  default: [
+    '您好！感谢您的提问。根据您描述的情况，建议您先进行详细的问诊，以便给出更准确的建议。',
+    '这是一个很好的问题。根据医学文献和临床经验，通常建议从以下几个方面考虑……',
+    '根据您的描述，可能涉及到多个方面的因素。建议您提供更详细的信息，例如症状持续时间、发病部位等。',
+    '感谢您的信任！我会尽力为您提供专业的医疗咨询服务。请注意，AI 建议仅供参考，最终诊断请以临床医生为准。',
+    '已收到您的信息。根据相关指南和临床经验，目前可以考虑以下处理方案……请您结合实际情况与主治医生沟通。',
+  ],
+  '问诊导诊': [
+    '您好！我是您的智能导诊助手。请问您目前有哪些不适症状？我会为您推荐合适的就诊科室。',
+    '根据您描述的症状，建议您优先前往内科或消化科就诊。同时建议空腹前往，方便医生开展相关检查。',
+    '您的症状可能与多个系统疾病相关，建议先挂号内科进行初步评估，医生会根据检查结果引导您到专科就诊。',
+  ],
+  '报告解读': [
+    '已收到您的报告信息。请问您需要解读哪项检查结果？我会为您提供详细的专业解读。',
+    '根据您提供的检验值，各项指标均在正常参考范围内。如有疑问，建议结合临床症状与医生进一步沟通。',
+    '该报告中有几项指标偏高，可能提示存在炎症反应，建议复查并结合临床情况综合判断。',
+  ],
+  '用药指导': [
+    '您好！我是用药指导助手。请问您需要了解哪种药物的用法用量或注意事项？',
+    '该药物的标准用量为每日两次，每次一片，饭后服用。服药期间建议避免饮酒，注意监测肝肾功能。',
+    '您提到的两种药物之间存在相互作用，建议间隔至少 2 小时服用，并请告知您的主治医生。',
+  ],
+}
+
+/* ─── Sample Agents Data ────────────────────────────── */
+let nextId = 100
+const sampleAgents = [
+  { id:1,  name:'门诊导诊助手',   category:'问诊导诊', icon:'🩺', bg:'#fff1f0', status:'已发布', chats:1283, users:456, updated:'今天 10:32', desc:'基于医院科室信息与患者症状描述，智能推荐就诊科室，提供导诊服务，支持多轮对话深度问诊。', greeting:'您好！我是门诊导诊助手，请告诉我您的不适症状，我来帮您推荐合适的就诊科室。' },
+  { id:2,  name:'住院病历生成器',  category:'医疗文书', icon:'📋', bg:'#f6ffed', status:'已发布', chats:876,  users:312, updated:'昨天 16:20', desc:'支持生成标准化入院记录、病程记录、出院小结等医疗文书，符合卫健委电子病历规范，大幅提升文书效率。', greeting:'欢迎使用住院病历生成器，请提供患者基本信息和诊疗情况，我将为您生成规范化病历文书。' },
+  { id:3,  name:'检验报告解读',    category:'报告解读', icon:'🔬', bg:'#e6fffb', status:'已发布', chats:2105, users:890, updated:'2天前',    desc:'自动识别并解读血常规、生化、肿瘤标志物等各类检验报告，提供异常值预警和临床意义说明。', greeting:'您好！请上传或粘贴您的检验报告内容，我将为您进行专业解读。' },
+  { id:4,  name:'合理用药顾问',    category:'用药指导', icon:'💊', bg:'#fff7e6', status:'已发布', chats:1560, users:623, updated:'3天前',    desc:'结合患者病史、过敏史、合并用药，智能审核处方合理性，提供用药方案建议，支持药物相互作用查询。', greeting:'您好！我是合理用药顾问，请告诉我您正在使用的药物或想了解的用药问题。' },
+  { id:5,  name:'护理计划制定助手', category:'护理助手', icon:'🩹', bg:'#f9f0ff', status:'已发布', chats:734,  users:285, updated:'4天前',    desc:'根据患者诊断、护理评估结果，自动生成个性化护理计划，涵盖护理诊断、目标、措施及评价指标。', greeting:'欢迎使用护理计划助手，请提供患者的护理评估信息，我将为您制定专业护理计划。' },
+  { id:6,  name:'医学文献摘要',    category:'医学科研', icon:'📚', bg:'#fff0f6', status:'已发布', chats:445,  users:178, updated:'5天前',    desc:'快速提取医学文献核心信息，生成结构化摘要，支持临床研究设计建议，助力医学科研工作。', greeting:'您好！请提供医学文献内容或研究问题，我将为您提供专业的科研支持。' },
+  { id:7,  name:'医院绩效分析',    category:'医院管理', icon:'🏥', bg:'#e8f4ff', status:'草稿',   chats:0,    users:0,   updated:'1周前',    desc:'整合医院运营数据，自动生成绩效分析报告，支持科室对比、趋势分析，辅助管理决策。', greeting:'您好！我是医院绩效分析助手，请输入您需要分析的数据或管理问题。' },
+  { id:8,  name:'慢病健康管理',    category:'健康管理', icon:'💪', bg:'#fcffe6', status:'已发布', chats:988,  users:402, updated:'2天前',    desc:'为高血压、糖尿病等慢性病患者提供个性化健康管理方案，包括饮食指导、运动建议、复诊提醒等服务。', greeting:'您好！我是慢病健康管理助手，请告诉我您的病情信息，我来为您制定个性化管理方案。' },
+  { id:9,  name:'影像诊断辅助',    category:'报告解读', icon:'🩻', bg:'#f0f5ff', status:'审核中', chats:312,  users:134, updated:'昨天 09:15', desc:'辅助分析CT、MRI、X光等影像报告描述，结合临床信息提供鉴别诊断建议，支持影像诊断质控。', greeting:'您好！请描述影像报告中的主要发现或贴入报告内容，我将协助您进行诊断分析。' },
+  { id:10, name:'手术记录生成',    category:'医疗文书', icon:'✂️', bg:'#fff1f0', status:'已发布', chats:521,  users:198, updated:'3天前',    desc:'基于手术信息快速生成规范化手术记录，支持多种手术类型模板，符合病历书写规范要求。', greeting:'欢迎使用手术记录生成助手，请提供手术基本信息，我将为您生成规范化手术记录。' },
+  { id:11, name:'患者健康宣教',    category:'健康管理', icon:'❤️', bg:'#fff1f0', status:'草稿',   chats:0,    users:0,   updated:'1周前',    desc:'针对不同疾病提供个性化健康宣教内容，帮助患者了解疾病知识、注意事项及康复指导。', greeting:'您好！请告诉我您想了解的疾病或健康知识，我将为您提供专业的健康宣教内容。' },
+  { id:12, name:'儿科问诊助手',    category:'问诊导诊', icon:'👶', bg:'#e6fffb', status:'已发布', chats:1124, users:475, updated:'今天 08:45', desc:'专注儿科疾病问诊，根据儿童年龄、症状体征进行智能评估，提供儿科用药剂量换算和护理建议。', greeting:'您好！我是儿科问诊助手，请告诉我孩子的年龄和不适情况，我来帮助您评估。' },
+]
+
+createApp({
+  setup() {
+    const searchText    = ref('')
+    const activeTab     = ref('all')
+    const activeCategory = ref('all')
+    const listView      = ref('grid')
+    const sortBy        = ref('updated')
+
+    const agents = ref([...sampleAgents])
+
+    /* ─── Toast ─── */
+    const toast = ref({ show: false, msg: '' })
+    let toastTimer = null
+    function showToast(msg) {
+      if (toastTimer) clearTimeout(toastTimer)
+      toast.value = { show: true, msg }
+      toastTimer = setTimeout(() => { toast.value.show = false }, 2200)
+    }
+
+    /* ─── Computed counts ─── */
+    const publishedCount = computed(() => agents.value.filter(a => a.status === '已发布').length)
+    const totalChats     = computed(() => agents.value.reduce((s, a) => s + a.chats, 0))
+
+    const statusTabs = [
+      { key: 'all',       label: '全部智能体' },
+      { key: 'mine',      label: '我的创建'   },
+      { key: '已发布',    label: '已发布'     },
+      { key: '草稿',      label: '草稿'       },
+      { key: '审核中',    label: '审核中'     },
+    ]
+
+    function tabCount(key) {
+      if (key === 'all')  return agents.value.length
+      if (key === 'mine') return agents.value.length
+      return agents.value.filter(a => a.status === key).length
+    }
+
+    function catCount(key) {
+      let list = agents.value
+      if (activeTab.value !== 'all' && activeTab.value !== 'mine') {
+        list = list.filter(a => a.status === activeTab.value)
+      }
+      if (key === 'all') return list.length
+      return list.filter(a => {
+        const c = categories.find(cat => cat.key === key)
+        return c && a.category === c.label
+      }).length
+    }
+
+    const filteredAgents = computed(() => {
+      let res = agents.value
+      if (activeTab.value !== 'all' && activeTab.value !== 'mine') {
+        res = res.filter(a => a.status === activeTab.value)
+      }
+      if (activeCategory.value !== 'all') {
+        const c = categories.find(cat => cat.key === activeCategory.value)
+        if (c) res = res.filter(a => a.category === c.label)
+      }
+      const s = searchText.value.trim().toLowerCase()
+      if (s) {
+        res = res.filter(a =>
+          a.name.toLowerCase().includes(s) || a.desc.toLowerCase().includes(s)
+        )
+      }
+      return [...res].sort((a, b) => {
+        if (sortBy.value === 'chats') return b.chats - a.chats
+        if (sortBy.value === 'name')  return a.name.localeCompare(b.name, 'zh')
+        if (sortBy.value === 'created') return b.id - a.id
+        return b.id - a.id   // 'updated' default
+      })
+    })
+
+    function highlight(text) {
+      const s = searchText.value.trim()
+      if (!s) return text
+      const escaped = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      return text.replace(new RegExp(escaped, 'gi'), m => `<mark>${m}</mark>`)
+    }
+
+    function statusClass(status) {
+      if (status === '已发布') return 'tag-status-published'
+      if (status === '审核中') return 'tag-status-review'
+      return 'tag-status-draft'
+    }
+
+    /* ─── Copy Agent ─── */
+    function copyAgent(agent) {
+      const copy = {
+        ...agent,
+        id: ++nextId,
+        name: agent.name + '（副本）',
+        status: '草稿',
+        chats: 0,
+        users: 0,
+        updated: '刚刚',
+      }
+      agents.value.unshift(copy)
+      showToast('✅ 智能体已复制，已保存为草稿')
+    }
+
+    /* ─── Create Modal ─── */
+    const createModal = ref({
+      show: false, name: '', category: '问诊导诊',
+      icon: '🤖', bg: '#e8f4ff', desc: '', greeting: '',
+    })
+    function openCreate() {
+      createModal.value = {
+        show: true, name: '', category: '问诊导诊',
+        icon: '🤖', bg: '#e8f4ff', desc: '', greeting: '',
+      }
+    }
+    function submitCreate() {
+      if (!createModal.value.name.trim()) {
+        showToast('⚠️ 请填写智能体名称')
+        return
+      }
+      agents.value.unshift({
+        id: ++nextId,
+        name:     createModal.value.name.trim(),
+        category: createModal.value.category,
+        icon:     createModal.value.icon,
+        bg:       createModal.value.bg,
+        status:   '草稿',
+        chats:    0,
+        users:    0,
+        updated:  '刚刚',
+        desc:     createModal.value.desc.trim() || '暂无描述',
+        greeting: createModal.value.greeting.trim() || `您好！我是${createModal.value.name}，有什么可以帮助您的吗？`,
+      })
+      createModal.value.show = false
+      showToast('🎉 智能体创建成功，已保存为草稿')
+    }
+
+    /* ─── Share Modal ─── */
+    const shareModal = ref({ show: false, agent: null, url: '' })
+    function openShare(agent) {
+      shareModal.value = {
+        show: true,
+        agent,
+        url: `https://medical-ai.example.com/agent/${agent.id}/chat?token=xxxxxxxx`,
+      }
+    }
+    function copyShareUrl() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareModal.value.url)
+          .then(() => showToast('✅ 链接已复制到剪贴板'))
+          .catch(() => showToast('⚠️ 复制失败，请手动选中链接后复制'))
+      } else {
+        showToast('⚠️ 当前浏览器不支持自动复制，请手动选中链接后复制')
+      }
+    }
+
+    /* ─── Delete Modal ─── */
+    const deleteModal = ref({ show: false, agent: null })
+    function openDelete(agent) {
+      deleteModal.value = { show: true, agent }
+    }
+    function confirmDelete() {
+      const id = deleteModal.value.agent?.id
+      agents.value = agents.value.filter(a => a.id !== id)
+      deleteModal.value.show = false
+      showToast('🗑 智能体已删除')
+    }
+
+    /* ─── Chat Modal ─── */
+    let msgId = 0
+    const chatBodyRef = ref(null)
+    const chatModal   = ref({ show: false, agent: null, messages: [], input: '', thinking: false })
+
+    function now() {
+      const d = new Date()
+      return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`
+    }
+
+    function openChat(agent) {
+      chatModal.value = {
+        show: true,
+        agent,
+        messages: [
+          { id: msgId++, role: 'bot', content: agent.greeting || `您好！我是${agent.name}，有什么可以帮助您的吗？`, time: now() },
+        ],
+        input: '',
+        thinking: false,
+      }
+    }
+
+    async function sendChat() {
+      const text = chatModal.value.input.trim()
+      if (!text) return
+      chatModal.value.messages.push({ id: msgId++, role: 'user', content: text, time: now() })
+      chatModal.value.input = ''
+      chatModal.value.thinking = true
+      await nextTick()
+      if (chatBodyRef.value) chatBodyRef.value.scrollTop = chatBodyRef.value.scrollHeight
+
+      setTimeout(async () => {
+        const cat = chatModal.value.agent?.category
+        const pool = botResponses[cat] || botResponses.default
+        const reply = pool[Math.floor(Math.random() * pool.length)]
+        chatModal.value.thinking = false
+        chatModal.value.messages.push({ id: msgId++, role: 'bot', content: reply, time: now() })
+        await nextTick()
+        if (chatBodyRef.value) chatBodyRef.value.scrollTop = chatBodyRef.value.scrollHeight
+      }, 900 + Math.random() * 800)
+    }
+
+    return {
+      searchText, activeTab, activeCategory, listView, sortBy,
+      agents, toast, publishedCount, totalChats,
+      statusTabs, categories, iconOptions,
+      tabCount, catCount, filteredAgents, highlight, statusClass,
+      copyAgent,
+      createModal, openCreate, submitCreate,
+      shareModal, openShare, copyShareUrl,
+      deleteModal, openDelete, confirmDelete,
+      chatModal, chatBodyRef, openChat, sendChat,
+    }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>
