@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>插件管理 · 医疗AI智能体平台</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+                   'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px; color: #262626; background: #f0f2f5;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; outline: none; }
+    input, textarea, select { font-family: inherit; outline: none; border: none; }
+    #app { height: 100vh; display: flex; flex-direction: column; }
+
+    /* ─── Header ───────────────────────────────────── */
+    .header {
+      height: 60px; background: #001529;
+      display: flex; align-items: center; padding: 0 24px; gap: 20px;
+      flex-shrink: 0; z-index: 200;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; color: #fff; font-size: 17px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #fa8c16, #ffc53d); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .logo-sub { font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 400; }
+    .logo-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.15); }
+    .header-search { flex: 1; max-width: 480px; position: relative; }
+    .header-search input { width: 100%; height: 36px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; padding: 0 40px 0 16px; color: #fff; font-size: 13px; transition: all 0.2s; }
+    .header-search input::placeholder { color: rgba(255,255,255,0.35); }
+    .header-search input:focus { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); }
+    .search-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.35); font-size: 14px; pointer-events: none; }
+    .header-stats { margin-left: auto; display: flex; gap: 24px; flex-shrink: 0; }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 20px; font-weight: 700; color: #ffc53d; line-height: 1; }
+    .stat-label { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .btn-create { padding: 0 18px; height: 36px; background: linear-gradient(135deg, #fa8c16, #ffc53d); color: #fff; border-radius: 18px; font-size: 13px; font-weight: 600; flex-shrink: 0; display: flex; align-items: center; gap: 6px; transition: opacity 0.15s; }
+    .btn-create:hover { opacity: 0.88; }
+
+    /* ─── Platform Nav ──────────────────────────────── */
+    .platform-nav { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 0 24px; display: flex; gap: 0; flex-shrink: 0; height: 40px; align-items: center; }
+    .platform-nav-item { padding: 0 14px; height: 40px; display: flex; align-items: center; font-size: 13px; color: #595959; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.15s; gap: 5px; }
+    .platform-nav-item:hover { color: #1677ff; }
+    .platform-nav-item.active { color: #fa8c16; border-bottom-color: #fa8c16; font-weight: 600; }
+
+    /* ─── Sub Nav ───────────────────────────────────── */
+    .subnav { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 0 24px; display: flex; align-items: center; flex-shrink: 0; height: 46px; }
+    .subnav-tab { padding: 0 18px; height: 46px; display: flex; align-items: center; font-size: 14px; color: #595959; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+    .subnav-tab:hover { color: #fa8c16; }
+    .subnav-tab.active { color: #fa8c16; border-bottom-color: #fa8c16; font-weight: 600; }
+    .subnav-count { margin-left: 5px; font-size: 11px; background: #f0f0f0; color: #8c8c8c; padding: 1px 6px; border-radius: 10px; }
+    .subnav-tab.active .subnav-count { background: #fff7e6; color: #fa8c16; }
+    .subnav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .sort-select { height: 32px; padding: 0 10px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; color: #595959; background: #fff; cursor: pointer; }
+    .view-toggle { display: flex; gap: 2px; }
+    .view-btn { width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #d9d9d9; color: #595959; font-size: 14px; cursor: pointer; transition: all 0.15s; }
+    .view-btn.active, .view-btn:hover { border-color: #fa8c16; color: #fa8c16; background: #fff7e6; }
+
+    /* ─── Main Layout ───────────────────────────────── */
+    .main-body { flex: 1; display: flex; overflow: hidden; }
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #f0f0f0; display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding-bottom: 12px; }
+    .sidebar-section { padding: 14px 16px 6px; font-size: 11px; color: #8c8c8c; font-weight: 500; letter-spacing: 0.5px; }
+    .cat-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; }
+    .cat-item:hover { background: #fff7e6; }
+    .cat-item.active { background: #fff7e6; border-left-color: #fa8c16; }
+    .cat-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .cat-label { flex: 1; font-size: 13px; font-weight: 500; color: #262626; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cat-item.active .cat-label { color: #fa8c16; }
+    .cat-count { font-size: 11px; padding: 1px 6px; border-radius: 10px; background: #f5f5f5; color: #8c8c8c; flex-shrink: 0; }
+    .cat-item.active .cat-count { background: #fff7e6; color: #fa8c16; }
+
+    /* ─── Content ───────────────────────────────────── */
+    .content { flex: 1; overflow-y: auto; padding: 20px 20px 24px; }
+    .toolbar { display: flex; align-items: center; margin-bottom: 18px; gap: 10px; }
+    .toolbar-title { font-size: 15px; font-weight: 600; color: #262626; }
+    .toolbar-count { font-size: 13px; color: #8c8c8c; }
+
+    /* ─── Plugin Cards ──────────────────────────────── */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .plugin-card { background: #fff; border-radius: 12px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; transition: all 0.2s; overflow: hidden; position: relative; }
+    .plugin-card:hover { border-color: #ffa940; box-shadow: 0 6px 24px rgba(250,140,22,0.1); transform: translateY(-2px); }
+    .card-header { padding: 16px 18px 12px; display: flex; gap: 12px; align-items: flex-start; }
+    .plugin-avatar { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .plugin-info { flex: 1; min-width: 0; }
+    .plugin-name { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .plugin-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .p-tag { font-size: 11px; padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+    .p-tag-category { background: #fff7e6; color: #fa8c16; }
+    .p-tag-type-rest  { background: #e8f4ff; color: #1677ff; }
+    .p-tag-type-local { background: #f6ffed; color: #52c41a; }
+    .p-tag-type-ext   { background: #f9f0ff; color: #722ed1; }
+    .p-tag-status-enabled  { background: #f6ffed; color: #52c41a; }
+    .p-tag-status-disabled { background: #f5f5f5; color: #8c8c8c; }
+    .p-tag-status-dev      { background: #fff0f6; color: #eb2f96; }
+    .card-menu { position: absolute; top: 12px; right: 12px; display: none; }
+    .plugin-card:hover .card-menu { display: flex; gap: 4px; }
+    .card-menu-btn { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border: 1px solid #e8e8e8; font-size: 12px; cursor: pointer; color: #595959; transition: all 0.15s; }
+    .card-menu-btn:hover { background: #fff7e6; border-color: #fa8c16; color: #fa8c16; }
+    .card-menu-btn.danger:hover { background: #fff1f0; border-color: #ff4d4f; color: #ff4d4f; }
+    .card-desc { padding: 0 18px 14px; font-size: 12px; color: #595959; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+    .card-endpoint { padding: 0 18px 12px; font-size: 11px; color: #8c8c8c; display: flex; align-items: center; gap: 5px; }
+    .endpoint-url { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1677ff; font-family: monospace; }
+    .card-meta { padding: 10px 18px; border-top: 1px solid #f5f5f5; display: flex; align-items: center; justify-content: space-between; }
+    .meta-stat { font-size: 11px; color: #8c8c8c; display: flex; align-items: center; gap: 3px; }
+    .meta-stat span { color: #262626; font-weight: 600; }
+    .card-footer { padding: 12px 18px; border-top: 1px solid #f5f5f5; display: flex; gap: 8px; }
+    .btn-toggle { flex: 1; padding: 7px 0; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s; }
+    .btn-toggle-enable  { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+    .btn-toggle-enable:hover  { background: #52c41a; color: #fff; border-color: #52c41a; }
+    .btn-toggle-disable { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+    .btn-toggle-disable:hover { background: #fff1f0; color: #ff4d4f; border-color: #ffccc7; }
+    .btn-sm { padding: 7px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 12px; color: #595959; background: #fff; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
+    .btn-sm:hover { border-color: #fa8c16; color: #fa8c16; background: #fff7e6; }
+
+    /* ─── List View ─────────────────────────────────── */
+    .cards-list { display: flex; flex-direction: column; gap: 8px; }
+    .plugin-row { background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; transition: all 0.15s; }
+    .plugin-row:hover { border-color: #ffa940; box-shadow: 0 2px 10px rgba(250,140,22,0.08); }
+    .plugin-row .plugin-avatar { width: 40px; height: 40px; border-radius: 10px; font-size: 20px; }
+    .plugin-row-name { font-size: 14px; font-weight: 700; color: #1a1a1a; width: 150px; flex-shrink: 0; }
+    .plugin-row-desc { flex: 1; font-size: 12px; color: #595959; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .plugin-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    /* ─── Empty ─────────────────────────────────────── */
+    .empty { text-align: center; padding: 80px 20px; color: #8c8c8c; }
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-title { font-size: 16px; font-weight: 600; color: #434343; margin-bottom: 8px; }
+    .empty-desc { font-size: 13px; }
+
+    /* ─── Search highlight ──────────────────────────── */
+    mark { background: #ffe58f; color: inherit; border-radius: 2px; padding: 0 1px; }
+
+    /* ─── Scrollbars ────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
+
+    /* ─── Modal ─────────────────────────────────────── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+    .modal { background: #fff; border-radius: 12px; padding: 28px; width: 560px; max-width: 96vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; }
+    .modal-title { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .modal-close { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; cursor: pointer; font-size: 16px; color: #595959; transition: all 0.15s; }
+    .modal-close:hover { background: #fff1f0; color: #ff4d4f; }
+    .form-group { margin-bottom: 18px; }
+    .form-label { font-size: 13px; font-weight: 600; color: #434343; margin-bottom: 7px; display: flex; align-items: center; gap: 4px; }
+    .form-label .required { color: #ff4d4f; }
+    .form-input { width: 100%; height: 36px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: #262626; transition: border-color 0.15s; }
+    .form-input:focus { border-color: #fa8c16; }
+    .form-textarea { width: 100%; padding: 10px 12px; min-height: 80px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: #262626; resize: vertical; transition: border-color 0.15s; }
+    .form-textarea:focus { border-color: #fa8c16; }
+    .form-select { width: 100%; height: 36px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: #262626; background: #fff; cursor: pointer; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-hint { font-size: 11px; color: #8c8c8c; margin-top: 5px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #f0f0f0; }
+    .btn-cancel { padding: 8px 20px; border-radius: 6px; border: 1px solid #d9d9d9; background: #fff; color: #595959; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .btn-cancel:hover { border-color: #fa8c16; color: #fa8c16; }
+    .btn-confirm { padding: 8px 24px; border-radius: 6px; background: linear-gradient(135deg, #fa8c16, #ffc53d); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+    .btn-confirm:hover { opacity: 0.88; }
+    .btn-danger-confirm { padding: 8px 24px; border-radius: 6px; background: #ff4d4f; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+    .btn-danger-confirm:hover { opacity: 0.88; }
+    .params-editor { width: 100%; padding: 10px 12px; min-height: 100px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 12px; color: #262626; resize: vertical; transition: border-color 0.15s; font-family: 'Courier New', monospace; background: #fafafa; }
+    .params-editor:focus { border-color: #fa8c16; }
+    /* detail modal */
+    .detail-section { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid #f5f5f5; }
+    .detail-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .detail-label { font-size: 12px; color: #8c8c8c; margin-bottom: 4px; }
+    .detail-value { font-size: 13px; color: #262626; line-height: 1.6; word-break: break-all; }
+    .detail-code { font-family: monospace; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; font-size: 12px; color: #1677ff; }
+
+    /* ─── Toast ─────────────────────────────────────── */
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 22px; border-radius: 24px; font-size: 13px; z-index: 2000; transition: opacity 0.3s; }
+
+    /* ─── Transitions ───────────────────────────────── */
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.18s; }
+    .fade-enter-from, .fade-leave-to { opacity: 0; }
+    .slide-up-enter-active, .slide-up-leave-active { transition: all 0.22s cubic-bezier(.4,0,.2,1); }
+    .slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(20px); }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Toast -->
+  <transition name="fade">
+    <div v-if="toast.show" class="toast">{{ toast.msg }}</div>
+  </transition>
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🔌</div>
+      <div>
+        <div>插件管理</div>
+        <div class="logo-sub">医疗AI智能体平台</div>
+      </div>
+    </div>
+    <div class="logo-divider"></div>
+    <div class="header-search">
+      <input v-model="searchText" placeholder="搜索插件名称、描述…" />
+      <span class="search-icon">🔍</span>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-num">{{ plugins.length }}</div>
+        <div class="stat-label">插件总数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ enabledCount }}</div>
+        <div class="stat-label">已启用</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ totalCalls }}</div>
+        <div class="stat-label">累计调用</div>
+      </div>
+    </div>
+    <button class="btn-create" @click="openCreate()">＋ 创建插件</button>
+  </header>
+
+  <!-- ── Platform Nav ──────────────────────────────────── -->
+  <div class="platform-nav">
+    <a class="platform-nav-item" href="agent-platform.html">🤖 智能体广场</a>
+    <a class="platform-nav-item active" href="plugin-manager.html">🔌 插件管理</a>
+    <a class="platform-nav-item" href="rag-kb.html">📚 知识库管理</a>
+  </div>
+
+  <!-- ── Sub Nav ──────────────────────────────────────── -->
+  <nav class="subnav">
+    <div v-for="tab in statusTabs" :key="tab.key" class="subnav-tab" :class="{ active: activeTab===tab.key }" @click="activeTab=tab.key">
+      {{ tab.label }}<span class="subnav-count">{{ tabCount(tab.key) }}</span>
+    </div>
+    <div class="subnav-right">
+      <select class="sort-select" v-model="sortBy">
+        <option value="calls">调用最多</option>
+        <option value="name">名称 A-Z</option>
+        <option value="created">最新创建</option>
+      </select>
+      <div class="view-toggle">
+        <button class="view-btn" :class="{active:listView==='grid'}" @click="listView='grid'" title="卡片视图">⊞</button>
+        <button class="view-btn" :class="{active:listView==='list'}" @click="listView='list'" title="列表视图">≡</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main Body ────────────────────────────────────── -->
+  <div class="main-body">
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+        <div class="sidebar-section">插件类别</div>
+        <div v-for="cat in categories" :key="cat.key" class="cat-item" :class="{active:activeCategory===cat.key}" @click="activeCategory=cat.key">
+          <div class="cat-icon" :style="{background:cat.bg}">{{ cat.icon }}</div>
+          <span class="cat-label">{{ cat.label }}</span>
+          <span class="cat-count">{{ catCount(cat.key) }}</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="toolbar">
+        <span class="toolbar-title">{{ activeCategory==='all' ? '全部插件' : categories.find(c=>c.key===activeCategory)?.label }}</span>
+        <span class="toolbar-count">共 {{ filteredPlugins.length }} 个</span>
+      </div>
+
+      <!-- Grid view -->
+      <div v-if="listView==='grid'" class="cards-grid">
+        <template v-if="filteredPlugins.length">
+          <div v-for="p in filteredPlugins" :key="p.id" class="plugin-card">
+            <div class="card-menu">
+              <button class="card-menu-btn" title="编辑" @click="openEdit(p)">✏️</button>
+              <button class="card-menu-btn danger" title="删除" @click="openDelete(p)">🗑</button>
+            </div>
+            <div class="card-header">
+              <div class="plugin-avatar" :style="{background:p.bg}">{{ p.icon }}</div>
+              <div class="plugin-info">
+                <div class="plugin-name" v-html="highlight(p.name)"></div>
+                <div class="plugin-tags">
+                  <span class="p-tag p-tag-category">{{ p.category }}</span>
+                  <span class="p-tag" :class="typeClass(p.type)">{{ p.type }}</span>
+                  <span class="p-tag" :class="statusClass(p.status)">{{ p.status }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-desc" v-html="highlight(p.desc)"></div>
+            <div v-if="p.endpoint" class="card-endpoint">
+              <span>🔗</span>
+              <span class="endpoint-url">{{ p.endpoint }}</span>
+            </div>
+            <div class="card-meta">
+              <div class="meta-stat">⚡ 调用 <span>{{ p.calls }}</span> 次</div>
+              <div class="meta-stat">🕐 {{ p.updated }}</div>
+            </div>
+            <div class="card-footer">
+              <button class="btn-toggle" :class="p.status==='已启用' ? 'btn-toggle-disable' : 'btn-toggle-enable'" @click="toggleStatus(p)">
+                {{ p.status==='已启用' ? '⏸ 停用' : '▶ 启用' }}
+              </button>
+              <button class="btn-sm" @click="openEdit(p)">✏️ 编辑</button>
+              <button class="btn-sm" @click="openDetail(p)">👁 详情</button>
+            </div>
+          </div>
+        </template>
+        <div v-else class="empty" style="grid-column:1/-1">
+          <div class="empty-icon">🔌</div>
+          <div class="empty-title">暂无插件</div>
+          <div class="empty-desc">{{ searchText ? '没有找到匹配的插件' : '还没有创建插件，立即开始吧' }}</div>
+        </div>
+      </div>
+
+      <!-- List view -->
+      <div v-else class="cards-list">
+        <template v-if="filteredPlugins.length">
+          <div v-for="p in filteredPlugins" :key="p.id" class="plugin-row">
+            <div class="plugin-avatar" :style="{background:p.bg}">{{ p.icon }}</div>
+            <div class="plugin-row-name" v-html="highlight(p.name)"></div>
+            <div class="plugin-row-desc" v-html="highlight(p.desc)"></div>
+            <div style="display:flex;gap:5px;flex-shrink:0">
+              <span class="p-tag p-tag-category">{{ p.category }}</span>
+              <span class="p-tag" :class="typeClass(p.type)">{{ p.type }}</span>
+              <span class="p-tag" :class="statusClass(p.status)">{{ p.status }}</span>
+            </div>
+            <div class="plugin-row-right">
+              <div class="meta-stat">⚡ <span>{{ p.calls }}</span></div>
+              <button class="btn-sm" @click="toggleStatus(p)">{{ p.status==='已启用' ? '⏸ 停用' : '▶ 启用' }}</button>
+              <button class="btn-sm" @click="openEdit(p)">✏️</button>
+              <button class="btn-sm" style="color:#ff4d4f;border-color:#ffccc7" @click="openDelete(p)">🗑</button>
+            </div>
+          </div>
+        </template>
+        <div v-else class="empty">
+          <div class="empty-icon">🔌</div>
+          <div class="empty-title">暂无插件</div>
+          <div class="empty-desc">{{ searchText ? '没有找到匹配的插件' : '还没有创建插件' }}</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ══ Create/Edit Modal ══ -->
+  <transition name="fade">
+    <div v-if="editModal.show" class="modal-overlay" @click.self="editModal.show=false">
+      <transition name="slide-up">
+        <div v-if="editModal.show" class="modal">
+          <div class="modal-title">
+            {{ editModal.isEdit ? '✏️ 编辑插件' : '🔌 创建新插件' }}
+            <span class="modal-close" @click="editModal.show=false">✕</span>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label"><span class="required">*</span> 插件名称</div>
+              <input class="form-input" v-model="editModal.name" placeholder="如：医学知识搜索" maxlength="20" />
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label"><span class="required">*</span> 插件类别</div>
+              <select class="form-select" v-model="editModal.category">
+                <option v-for="c in categories.filter(c=>c.key!=='all')" :key="c.key" :value="c.label">{{ c.label }}</option>
+              </select>
+            </div>
+          </div>
+          <div style="height:18px"></div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label"><span class="required">*</span> 插件类型</div>
+              <select class="form-select" v-model="editModal.type">
+                <option>REST API</option>
+                <option>本地函数</option>
+                <option>外部API</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label">状态</div>
+              <select class="form-select" v-model="editModal.status">
+                <option>已启用</option>
+                <option>已禁用</option>
+                <option>开发中</option>
+              </select>
+            </div>
+          </div>
+          <div style="height:18px"></div>
+          <div class="form-group">
+            <div class="form-label">插件描述</div>
+            <textarea class="form-textarea" v-model="editModal.desc" placeholder="描述该插件的功能和使用场景…" rows="2" maxlength="200"></textarea>
+          </div>
+          <div v-if="editModal.type==='REST API' || editModal.type==='外部API'" class="form-group">
+            <div class="form-label">接口地址</div>
+            <input class="form-input" v-model="editModal.endpoint" placeholder="https://api.example.com/v1/endpoint" />
+          </div>
+          <div v-if="editModal.type==='REST API' || editModal.type==='外部API'" class="form-group">
+            <div class="form-label">认证方式</div>
+            <select class="form-select" v-model="editModal.auth">
+              <option>无认证</option>
+              <option>API Key</option>
+              <option>Bearer Token</option>
+              <option>Basic Auth</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">请求参数（JSON格式）</div>
+            <textarea class="params-editor" v-model="editModal.params" placeholder='{"query": "string", "top_k": 5}' rows="4"></textarea>
+            <div class="form-hint">定义插件的输入参数结构，智能体将按此格式传递参数</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">返回值说明</div>
+            <input class="form-input" v-model="editModal.returnDesc" placeholder="如：返回 JSON 数组，包含 title、content、score 字段" />
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="editModal.show=false">取消</button>
+            <button class="btn-confirm" @click="submitEdit">{{ editModal.isEdit ? '保存修改' : '创建插件' }}</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+  <!-- ══ Detail Modal ══ -->
+  <transition name="fade">
+    <div v-if="detailModal.show" class="modal-overlay" @click.self="detailModal.show=false">
+      <transition name="slide-up">
+        <div v-if="detailModal.show" class="modal" style="width:500px">
+          <div class="modal-title">
+            👁 插件详情
+            <span class="modal-close" @click="detailModal.show=false">✕</span>
+          </div>
+          <div v-if="detailModal.plugin" style="display:flex;gap:14px;align-items:flex-start;margin-bottom:20px">
+            <div class="plugin-avatar" :style="{background:detailModal.plugin.bg}">{{ detailModal.plugin.icon }}</div>
+            <div>
+              <div style="font-size:17px;font-weight:700;color:#1a1a1a;margin-bottom:6px">{{ detailModal.plugin.name }}</div>
+              <div style="display:flex;gap:6px">
+                <span class="p-tag p-tag-category">{{ detailModal.plugin.category }}</span>
+                <span class="p-tag" :class="typeClass(detailModal.plugin.type)">{{ detailModal.plugin.type }}</span>
+                <span class="p-tag" :class="statusClass(detailModal.plugin.status)">{{ detailModal.plugin.status }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">插件描述</div>
+            <div class="detail-value">{{ detailModal.plugin?.desc }}</div>
+          </div>
+          <div v-if="detailModal.plugin?.endpoint" class="detail-section">
+            <div class="detail-label">接口地址</div>
+            <div class="detail-code">{{ detailModal.plugin.endpoint }}</div>
+          </div>
+          <div v-if="detailModal.plugin?.auth" class="detail-section">
+            <div class="detail-label">认证方式</div>
+            <div class="detail-value">{{ detailModal.plugin.auth }}</div>
+          </div>
+          <div v-if="detailModal.plugin?.params" class="detail-section">
+            <div class="detail-label">请求参数</div>
+            <div class="detail-code" style="white-space:pre-wrap">{{ detailModal.plugin.params }}</div>
+          </div>
+          <div v-if="detailModal.plugin?.returnDesc" class="detail-section">
+            <div class="detail-label">返回值说明</div>
+            <div class="detail-value">{{ detailModal.plugin.returnDesc }}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">调用统计</div>
+            <div class="detail-value">累计调用 <strong>{{ detailModal.plugin?.calls }}</strong> 次 · 最后更新 {{ detailModal.plugin?.updated }}</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="detailModal.show=false">关闭</button>
+            <button class="btn-confirm" @click="openEdit(detailModal.plugin); detailModal.show=false">编辑插件</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+  <!-- ══ Delete Modal ══ -->
+  <transition name="fade">
+    <div v-if="deleteModal.show" class="modal-overlay" @click.self="deleteModal.show=false">
+      <transition name="slide-up">
+        <div v-if="deleteModal.show" class="modal" style="width:380px">
+          <div class="modal-title">
+            ⚠️ 确认删除
+            <span class="modal-close" @click="deleteModal.show=false">✕</span>
+          </div>
+          <p style="font-size:14px;color:#595959;line-height:1.7">
+            确定要删除插件 <strong style="color:#1a1a1a">「{{ deleteModal.plugin?.name }}」</strong> 吗？<br/>
+            删除后已使用该插件的智能体将无法调用此功能。
+          </p>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="deleteModal.show=false">取消</button>
+            <button class="btn-danger-confirm" @click="confirmDelete">确认删除</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+</div>
+
+<script>
+const { createApp, ref, computed } = Vue
+
+const categories = [
+  { key: 'all',     icon: '🏠', label: '全部',     bg: '#fff7e6' },
+  { key: 'search',  icon: '🔍', label: '知识搜索', bg: '#e8f4ff' },
+  { key: 'calc',    icon: '📊', label: '数据计算', bg: '#f6ffed' },
+  { key: 'medical', icon: '🏥', label: '医疗工具', bg: '#fff1f0' },
+  { key: 'ext',     icon: '🌐', label: '外部API',  bg: '#f9f0ff' },
+  { key: 'process', icon: '⚙️', label: '数据处理', bg: '#e6fffb' },
+]
+
+let nextId = 100
+const samplePlugins = [
+  { id:'p1', name:'医学知识搜索',   category:'知识搜索', type:'REST API',  icon:'🔍', bg:'#e8f4ff', status:'已启用', desc:'检索医学知识库，支持疾病、症状、药品等多维度搜索，返回相关文档片段。',     endpoint:'https://api.medical-ai.com/v1/search',  auth:'API Key',      params:'{"query":"string","top_k":5,"domain":"string"}',        returnDesc:'JSON数组，包含 title、content、score 字段', calls:8420, updated:'今天 09:12' },
+  { id:'p2', name:'药品说明书查询', category:'医疗工具', type:'REST API',  icon:'💊', bg:'#fff7e6', status:'已启用', desc:'根据药品名称或通用名查询完整说明书内容，包含用法用量、禁忌和不良反应。', endpoint:'https://api.medical-ai.com/v1/drug',     auth:'API Key',      params:'{"drug_name":"string","format":"full|brief"}',          returnDesc:'药品说明书对象，含 name、dosage、contraindication 字段', calls:5631, updated:'昨天 14:30' },
+  { id:'p3', name:'检验值参考范围', category:'数据计算', type:'本地函数',  icon:'📊', bg:'#f6ffed', status:'已启用', desc:'查询各类临床检验指标的正常参考范围及临床意义，支持年龄和性别分层。',     endpoint:'',                                      auth:'无认证',       params:'{"indicator":"string","age":20,"gender":"male|female"}', returnDesc:'含 normal_range、unit、clinical_meaning 字段', calls:3205, updated:'2天前' },
+  { id:'p4', name:'病历OCR识别',   category:'数据处理', type:'REST API',  icon:'📝', bg:'#fff1f0', status:'已启用', desc:'识别手写及电子病历文本，提取结构化诊疗信息，支持多种病历格式。',           endpoint:'https://api.medical-ai.com/v1/ocr',      auth:'Bearer Token', params:'{"image_url":"string","extract_fields":["diagnosis"]}',  returnDesc:'结构化病历对象，含诊断、用药、检查结果等字段', calls:1894, updated:'3天前' },
+  { id:'p5', name:'挂号系统查询',  category:'外部API',  type:'外部API',   icon:'📅', bg:'#e6fffb', status:'已启用', desc:'查询医院各科室可预约号源，返回实时排班信息、医生简介和剩余号数。',       endpoint:'https://his.hospital.com/api/appointment',auth:'Basic Auth',   params:'{"dept":"string","date":"YYYY-MM-DD","doctor_id":"?string"}', returnDesc:'排班列表，含医生信息、时间段、剩余号数', calls:2773, updated:'今天 08:00' },
+  { id:'p6', name:'症状自查工具',  category:'医疗工具', type:'本地函数',  icon:'🩺', bg:'#fff1f0', status:'已启用', desc:'根据用户描述的症状组合推测可能的疾病类型，提供初步参考，不作为诊断依据。', endpoint:'',                                      auth:'无认证',       params:'{"symptoms":["string"],"duration":"string","severity":"mild|moderate|severe"}', returnDesc:'可能疾病列表，含 disease、probability、recommendation 字段', calls:6102, updated:'昨天 11:20' },
+  { id:'p7', name:'医保费用计算',  category:'数据计算', type:'本地函数',  icon:'💰', bg:'#fcffe6', status:'已禁用', desc:'根据诊疗项目、费用金额和患者参保类型计算医保报销金额及自费部分。',         endpoint:'',                                      auth:'无认证',       params:'{"items":[{"code":"string","amount":0}],"insurance_type":"string"}', returnDesc:'报销明细，含自费金额、报销金额、报销比例', calls:411,  updated:'1周前' },
+  { id:'p8', name:'影像报告解析',  category:'数据处理', type:'REST API',  icon:'🩻', bg:'#f0f5ff', status:'开发中', desc:'解析影像科室结构化报告，提取病灶位置、形态描述和影像学诊断结论。',         endpoint:'https://api.medical-ai.com/v1/radiology', auth:'Bearer Token', params:'{"report_text":"string","modality":"CT|MRI|XR|US"}',    returnDesc:'结构化影像报告，含 findings、impression、modality 字段', calls:0,    updated:'2天前' },
+]
+
+createApp({
+  setup() {
+    const searchText     = ref('')
+    const activeTab      = ref('all')
+    const activeCategory = ref('all')
+    const listView       = ref('grid')
+    const sortBy         = ref('calls')
+
+    const plugins = ref([...samplePlugins])
+
+    const toast = ref({ show: false, msg: '' })
+    let toastTimer = null
+    function showToast(msg) {
+      if (toastTimer) clearTimeout(toastTimer)
+      toast.value = { show: true, msg }
+      toastTimer = setTimeout(() => { toast.value.show = false }, 2200)
+    }
+
+    const enabledCount = computed(() => plugins.value.filter(p => p.status === '已启用').length)
+    const totalCalls   = computed(() => plugins.value.reduce((s, p) => s + p.calls, 0))
+
+    const statusTabs = [
+      { key: 'all',   label: '全部插件' },
+      { key: '已启用', label: '已启用'   },
+      { key: '已禁用', label: '已禁用'   },
+      { key: '开发中', label: '开发中'   },
+    ]
+
+    function tabCount(key) {
+      if (key === 'all') return plugins.value.length
+      return plugins.value.filter(p => p.status === key).length
+    }
+
+    function catCount(key) {
+      let list = plugins.value
+      if (activeTab.value !== 'all') list = list.filter(p => p.status === activeTab.value)
+      if (key === 'all') return list.length
+      const c = categories.find(cat => cat.key === key)
+      return c ? list.filter(p => p.category === c.label).length : 0
+    }
+
+    const filteredPlugins = computed(() => {
+      let res = plugins.value
+      if (activeTab.value !== 'all') res = res.filter(p => p.status === activeTab.value)
+      if (activeCategory.value !== 'all') {
+        const c = categories.find(cat => cat.key === activeCategory.value)
+        if (c) res = res.filter(p => p.category === c.label)
+      }
+      const s = searchText.value.trim().toLowerCase()
+      if (s) res = res.filter(p => p.name.toLowerCase().includes(s) || p.desc.toLowerCase().includes(s))
+      return [...res].sort((a, b) => {
+        if (sortBy.value === 'calls')   return b.calls - a.calls
+        if (sortBy.value === 'name')    return a.name.localeCompare(b.name, 'zh')
+        return b.id < a.id ? 1 : -1
+      })
+    })
+
+    function highlight(text) {
+      const s = searchText.value.trim()
+      if (!s) return text
+      const esc = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      return text.replace(new RegExp(esc, 'gi'), m => `<mark>${m}</mark>`)
+    }
+
+    function typeClass(type) {
+      if (type === 'REST API') return 'p-tag-type-rest'
+      if (type === '外部API')  return 'p-tag-type-ext'
+      return 'p-tag-type-local'
+    }
+
+    function statusClass(s) {
+      if (s === '已启用') return 'p-tag-status-enabled'
+      if (s === '已禁用') return 'p-tag-status-disabled'
+      return 'p-tag-status-dev'
+    }
+
+    function toggleStatus(p) {
+      if (p.status === '开发中') { showToast('⚠️ 开发中的插件暂不能启用'); return }
+      p.status = p.status === '已启用' ? '已禁用' : '已启用'
+      showToast(p.status === '已启用' ? `✅ 插件「${p.name}」已启用` : `⏸ 插件「${p.name}」已停用`)
+    }
+
+    /* ── Edit Modal ── */
+    const editModal = ref({ show: false, isEdit: false, id: null, name: '', category: '知识搜索', type: 'REST API', status: '已启用', desc: '', endpoint: '', auth: '无认证', params: '', returnDesc: '' })
+
+    function blankEdit() {
+      return { show: true, isEdit: false, id: null, name: '', category: '知识搜索', type: 'REST API', status: '已启用', desc: '', endpoint: '', auth: '无认证', params: '', returnDesc: '' }
+    }
+
+    function openCreate() { editModal.value = blankEdit() }
+
+    function openEdit(p) {
+      editModal.value = { show: true, isEdit: true, id: p.id, name: p.name, category: p.category, type: p.type, status: p.status, desc: p.desc, endpoint: p.endpoint || '', auth: p.auth || '无认证', params: p.params || '', returnDesc: p.returnDesc || '' }
+    }
+
+    function submitEdit() {
+      if (!editModal.value.name.trim()) { showToast('⚠️ 请填写插件名称'); return }
+      const iconMap = { '知识搜索':'🔍', '数据计算':'📊', '医疗工具':'🏥', '外部API':'🌐', '数据处理':'⚙️' }
+      const bgMap   = { '知识搜索':'#e8f4ff', '数据计算':'#f6ffed', '医疗工具':'#fff1f0', '外部API':'#f9f0ff', '数据处理':'#e6fffb' }
+      if (editModal.value.isEdit) {
+        const idx = plugins.value.findIndex(p => p.id === editModal.value.id)
+        if (idx >= 0) {
+          plugins.value[idx] = { ...plugins.value[idx], name: editModal.value.name.trim(), category: editModal.value.category, type: editModal.value.type, status: editModal.value.status, desc: editModal.value.desc.trim(), endpoint: editModal.value.endpoint.trim(), auth: editModal.value.auth, params: editModal.value.params.trim(), returnDesc: editModal.value.returnDesc.trim(), updated: '刚刚', icon: iconMap[editModal.value.category] || '🔌', bg: bgMap[editModal.value.category] || '#fff7e6' }
+        }
+        showToast('✅ 插件信息已更新')
+      } else {
+        plugins.value.unshift({ id: 'p' + (++nextId), name: editModal.value.name.trim(), category: editModal.value.category, type: editModal.value.type, status: editModal.value.status, desc: editModal.value.desc.trim(), endpoint: editModal.value.endpoint.trim(), auth: editModal.value.auth, params: editModal.value.params.trim(), returnDesc: editModal.value.returnDesc.trim(), calls: 0, updated: '刚刚', icon: iconMap[editModal.value.category] || '🔌', bg: bgMap[editModal.value.category] || '#fff7e6' })
+        showToast('🎉 插件创建成功')
+      }
+      editModal.value.show = false
+    }
+
+    /* ── Detail Modal ── */
+    const detailModal = ref({ show: false, plugin: null })
+    function openDetail(p) { detailModal.value = { show: true, plugin: p } }
+
+    /* ── Delete Modal ── */
+    const deleteModal = ref({ show: false, plugin: null })
+    function openDelete(p) { deleteModal.value = { show: true, plugin: p } }
+    function confirmDelete() {
+      plugins.value = plugins.value.filter(p => p.id !== deleteModal.value.plugin?.id)
+      deleteModal.value.show = false
+      showToast('🗑 插件已删除')
+    }
+
+    return {
+      searchText, activeTab, activeCategory, listView, sortBy,
+      plugins, toast, enabledCount, totalCalls,
+      statusTabs, categories,
+      tabCount, catCount, filteredPlugins, highlight, typeClass, statusClass,
+      toggleStatus,
+      editModal, openCreate, openEdit, submitEdit,
+      detailModal, openDetail,
+      deleteModal, openDelete, confirmDelete,
+    }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>

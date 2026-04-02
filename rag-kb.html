@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>知识库管理 · 医疗AI智能体平台</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+                   'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px; color: #262626; background: #f0f2f5;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; outline: none; }
+    input, textarea, select { font-family: inherit; outline: none; border: none; }
+    #app { height: 100vh; display: flex; flex-direction: column; }
+
+    /* ─── Header ───────────────────────────────────── */
+    .header { height: 60px; background: #001529; display: flex; align-items: center; padding: 0 24px; gap: 20px; flex-shrink: 0; z-index: 200; }
+    .logo { display: flex; align-items: center; gap: 10px; color: #fff; font-size: 17px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #597ef7, #36cfc9); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .logo-sub { font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 400; }
+    .logo-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.15); }
+    .header-search { flex: 1; max-width: 480px; position: relative; }
+    .header-search input { width: 100%; height: 36px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; padding: 0 40px 0 16px; color: #fff; font-size: 13px; transition: all 0.2s; }
+    .header-search input::placeholder { color: rgba(255,255,255,0.35); }
+    .header-search input:focus { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); }
+    .search-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.35); font-size: 14px; pointer-events: none; }
+    .header-stats { margin-left: auto; display: flex; gap: 24px; flex-shrink: 0; }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 20px; font-weight: 700; color: #85a5ff; line-height: 1; }
+    .stat-label { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .btn-create { padding: 0 18px; height: 36px; background: linear-gradient(135deg, #597ef7, #36cfc9); color: #fff; border-radius: 18px; font-size: 13px; font-weight: 600; flex-shrink: 0; display: flex; align-items: center; gap: 6px; transition: opacity 0.15s; }
+    .btn-create:hover { opacity: 0.88; }
+
+    /* ─── Platform Nav ──────────────────────────────── */
+    .platform-nav { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 0 24px; display: flex; gap: 0; flex-shrink: 0; height: 40px; align-items: center; }
+    .platform-nav-item { padding: 0 14px; height: 40px; display: flex; align-items: center; font-size: 13px; color: #595959; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.15s; gap: 5px; }
+    .platform-nav-item:hover { color: #1677ff; }
+    .platform-nav-item.active { color: #597ef7; border-bottom-color: #597ef7; font-weight: 600; }
+
+    /* ─── Sub Nav ───────────────────────────────────── */
+    .subnav { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 0 24px; display: flex; align-items: center; flex-shrink: 0; height: 46px; }
+    .subnav-tab { padding: 0 18px; height: 46px; display: flex; align-items: center; font-size: 14px; color: #595959; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+    .subnav-tab:hover { color: #597ef7; }
+    .subnav-tab.active { color: #597ef7; border-bottom-color: #597ef7; font-weight: 600; }
+    .subnav-count { margin-left: 5px; font-size: 11px; background: #f0f0f0; color: #8c8c8c; padding: 1px 6px; border-radius: 10px; }
+    .subnav-tab.active .subnav-count { background: #f0f5ff; color: #597ef7; }
+    .subnav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .sort-select { height: 32px; padding: 0 10px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; color: #595959; background: #fff; cursor: pointer; }
+    .view-toggle { display: flex; gap: 2px; }
+    .view-btn { width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #d9d9d9; color: #595959; font-size: 14px; cursor: pointer; transition: all 0.15s; }
+    .view-btn.active, .view-btn:hover { border-color: #597ef7; color: #597ef7; background: #f0f5ff; }
+
+    /* ─── Main Layout ───────────────────────────────── */
+    .main-body { flex: 1; display: flex; overflow: hidden; }
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #f0f0f0; display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding-bottom: 12px; }
+    .sidebar-section { padding: 14px 16px 6px; font-size: 11px; color: #8c8c8c; font-weight: 500; letter-spacing: 0.5px; }
+    .cat-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; }
+    .cat-item:hover { background: #f0f5ff; }
+    .cat-item.active { background: #f0f5ff; border-left-color: #597ef7; }
+    .cat-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .cat-label { flex: 1; font-size: 13px; font-weight: 500; color: #262626; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cat-item.active .cat-label { color: #597ef7; }
+    .cat-count { font-size: 11px; padding: 1px 6px; border-radius: 10px; background: #f5f5f5; color: #8c8c8c; flex-shrink: 0; }
+    .cat-item.active .cat-count { background: #f0f5ff; color: #597ef7; }
+
+    /* ─── Content ───────────────────────────────────── */
+    .content { flex: 1; overflow-y: auto; padding: 20px 20px 24px; }
+    .toolbar { display: flex; align-items: center; margin-bottom: 18px; gap: 10px; }
+    .toolbar-title { font-size: 15px; font-weight: 600; color: #262626; }
+    .toolbar-count { font-size: 13px; color: #8c8c8c; }
+
+    /* ─── KB Cards ──────────────────────────────────── */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
+    .kb-card { background: #fff; border-radius: 12px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; transition: all 0.2s; overflow: hidden; position: relative; }
+    .kb-card:hover { border-color: #85a5ff; box-shadow: 0 6px 24px rgba(89,126,247,0.1); transform: translateY(-2px); }
+    .card-header { padding: 16px 18px 12px; display: flex; gap: 12px; align-items: flex-start; }
+    .kb-avatar { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .kb-info { flex: 1; min-width: 0; }
+    .kb-name { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kb-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .k-tag { font-size: 11px; padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+    .k-tag-type   { background: #f0f5ff; color: #597ef7; }
+    .k-tag-ready  { background: #f6ffed; color: #52c41a; }
+    .k-tag-index  { background: #fff7e6; color: #fa8c16; }
+    .k-tag-update { background: #e6fffb; color: #13c2c2; }
+    .card-menu { position: absolute; top: 12px; right: 12px; display: none; }
+    .kb-card:hover .card-menu { display: flex; gap: 4px; }
+    .card-menu-btn { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border: 1px solid #e8e8e8; font-size: 12px; cursor: pointer; color: #595959; transition: all 0.15s; }
+    .card-menu-btn:hover { background: #f0f5ff; border-color: #597ef7; color: #597ef7; }
+    .card-menu-btn.danger:hover { background: #fff1f0; border-color: #ff4d4f; color: #ff4d4f; }
+    .card-desc { padding: 0 18px 14px; font-size: 12px; color: #595959; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+    .card-stats { padding: 0 18px 12px; display: flex; gap: 16px; }
+    .kb-stat { font-size: 11px; color: #8c8c8c; display: flex; flex-direction: column; gap: 2px; }
+    .kb-stat-num { font-size: 15px; font-weight: 700; color: #262626; }
+    .kb-stat-label { font-size: 10px; color: #8c8c8c; }
+    .card-model { padding: 0 18px 12px; font-size: 11px; color: #8c8c8c; display: flex; align-items: center; gap: 5px; }
+    .model-badge { background: #f0f5ff; color: #597ef7; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; font-family: monospace; }
+    .card-meta { padding: 10px 18px; border-top: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
+    .card-footer { padding: 12px 18px; border-top: 1px solid #f5f5f5; display: flex; gap: 8px; }
+    .btn-primary { flex: 1; padding: 7px 0; background: linear-gradient(135deg, #597ef7, #36cfc9); color: #fff; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; transition: opacity 0.15s; }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-sm { padding: 7px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 12px; color: #595959; background: #fff; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
+    .btn-sm:hover { border-color: #597ef7; color: #597ef7; background: #f0f5ff; }
+
+    /* ─── List View ─────────────────────────────────── */
+    .cards-list { display: flex; flex-direction: column; gap: 8px; }
+    .kb-row { background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; transition: all 0.15s; }
+    .kb-row:hover { border-color: #85a5ff; box-shadow: 0 2px 10px rgba(89,126,247,0.08); }
+    .kb-row .kb-avatar { width: 40px; height: 40px; border-radius: 10px; font-size: 20px; }
+    .kb-row-name { font-size: 14px; font-weight: 700; color: #1a1a1a; width: 170px; flex-shrink: 0; }
+    .kb-row-desc { flex: 1; font-size: 12px; color: #595959; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kb-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    /* ─── Progress bar ──────────────────────────────── */
+    .progress-wrap { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .progress-bar { flex: 1; height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(135deg, #597ef7, #36cfc9); transition: width 0.3s; }
+    .progress-label { font-size: 11px; color: #8c8c8c; white-space: nowrap; }
+
+    /* ─── Empty ─────────────────────────────────────── */
+    .empty { text-align: center; padding: 80px 20px; color: #8c8c8c; }
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-title { font-size: 16px; font-weight: 600; color: #434343; margin-bottom: 8px; }
+    .empty-desc { font-size: 13px; }
+
+    /* ─── Scrollbars ────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
+
+    /* ─── Search highlight ──────────────────────────── */
+    mark { background: #b5f5ec; color: inherit; border-radius: 2px; padding: 0 1px; }
+
+    /* ─── Modal ─────────────────────────────────────── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+    .modal { background: #fff; border-radius: 12px; padding: 28px; width: 540px; max-width: 96vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; }
+    .modal-title { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .modal-close { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; cursor: pointer; font-size: 16px; color: #595959; transition: all 0.15s; }
+    .modal-close:hover { background: #fff1f0; color: #ff4d4f; }
+    .form-group { margin-bottom: 18px; }
+    .form-label { font-size: 13px; font-weight: 600; color: #434343; margin-bottom: 7px; display: flex; align-items: center; gap: 4px; }
+    .form-label .required { color: #ff4d4f; }
+    .form-input { width: 100%; height: 36px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: #262626; transition: border-color 0.15s; }
+    .form-input:focus { border-color: #597ef7; }
+    .form-textarea { width: 100%; padding: 10px 12px; min-height: 72px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: #262626; resize: vertical; transition: border-color 0.15s; }
+    .form-textarea:focus { border-color: #597ef7; }
+    .form-select { width: 100%; height: 36px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: #262626; background: #fff; cursor: pointer; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-hint { font-size: 11px; color: #8c8c8c; margin-top: 5px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #f0f0f0; }
+    .btn-cancel { padding: 8px 20px; border-radius: 6px; border: 1px solid #d9d9d9; background: #fff; color: #595959; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .btn-cancel:hover { border-color: #597ef7; color: #597ef7; }
+    .btn-confirm { padding: 8px 24px; border-radius: 6px; background: linear-gradient(135deg, #597ef7, #36cfc9); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+    .btn-confirm:hover { opacity: 0.88; }
+    .btn-danger-confirm { padding: 8px 24px; border-radius: 6px; background: #ff4d4f; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+    .btn-danger-confirm:hover { opacity: 0.88; }
+
+    /* ─── Docs Modal ────────────────────────────────── */
+    .docs-modal { width: 640px; }
+    .docs-header-info { display: flex; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0f0f0; margin-bottom: 16px; }
+    .docs-header-stats { display: flex; gap: 20px; margin-left: auto; }
+    .docs-stat { text-align: center; }
+    .docs-stat-num { font-size: 18px; font-weight: 700; color: #597ef7; }
+    .docs-stat-label { font-size: 11px; color: #8c8c8c; }
+    .docs-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .docs-search { flex: 1; height: 34px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 12px; color: #262626; }
+    .docs-search:focus { border-color: #597ef7; }
+    .btn-upload { padding: 0 16px; height: 34px; background: #597ef7; color: #fff; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: opacity 0.15s; }
+    .btn-upload:hover { opacity: 0.88; }
+    .doc-list { max-height: 300px; overflow-y: auto; }
+    .doc-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-bottom: 6px; transition: border-color 0.15s; }
+    .doc-item:hover { border-color: #85a5ff; }
+    .doc-icon { font-size: 22px; flex-shrink: 0; }
+    .doc-info { flex: 1; min-width: 0; }
+    .doc-name { font-size: 13px; font-weight: 600; color: #262626; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-meta { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .doc-status { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; flex-shrink: 0; }
+    .doc-status-done { background: #f6ffed; color: #52c41a; }
+    .doc-status-ing  { background: #fff7e6; color: #fa8c16; }
+    .doc-del { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; background: #fff; border: 1px solid #e8e8e8; cursor: pointer; color: #595959; flex-shrink: 0; transition: all 0.15s; }
+    .doc-del:hover { background: #fff1f0; border-color: #ff4d4f; color: #ff4d4f; }
+    .upload-area { border: 2px dashed #d9d9d9; border-radius: 8px; padding: 24px; text-align: center; color: #8c8c8c; font-size: 13px; transition: border-color 0.15s; margin-top: 12px; cursor: pointer; }
+    .upload-area:hover { border-color: #597ef7; color: #597ef7; }
+    .upload-area-icon { font-size: 32px; margin-bottom: 8px; }
+
+    /* ─── Query Modal ───────────────────────────────── */
+    .query-modal { width: 640px; max-height: 90vh; display: flex; flex-direction: column; }
+    .query-input-area { display: flex; gap: 10px; margin-bottom: 18px; }
+    .query-input { flex: 1; height: 40px; padding: 0 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 13px; color: #262626; }
+    .query-input:focus { border-color: #597ef7; }
+    .btn-query { padding: 0 20px; height: 40px; background: linear-gradient(135deg, #597ef7, #36cfc9); color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600; transition: opacity 0.15s; }
+    .btn-query:hover { opacity: 0.88; }
+    .query-results { flex: 1; overflow-y: auto; }
+    .query-result-item { background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; transition: border-color 0.15s; }
+    .query-result-item:hover { border-color: #85a5ff; }
+    .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .result-rank { font-size: 11px; font-weight: 700; color: #597ef7; background: #f0f5ff; padding: 2px 8px; border-radius: 4px; }
+    .result-score { font-size: 11px; color: #8c8c8c; }
+    .score-bar { display: inline-block; height: 6px; border-radius: 3px; background: linear-gradient(135deg, #597ef7, #36cfc9); margin: 0 6px; vertical-align: middle; }
+    .result-source { font-size: 11px; color: #8c8c8c; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .result-content { font-size: 13px; color: #434343; line-height: 1.7; }
+    .query-empty { text-align: center; padding: 40px 0; color: #8c8c8c; }
+    .query-hint { font-size: 12px; color: #8c8c8c; margin-bottom: 12px; }
+    .thinking { display: flex; align-items: center; gap: 5px; justify-content: center; padding: 30px 0; }
+    .thinking-dot { width: 8px; height: 8px; border-radius: 50%; background: #597ef7; animation: blink 1.2s infinite ease-in-out; }
+    .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+    /* ─── Toast ─────────────────────────────────────── */
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 22px; border-radius: 24px; font-size: 13px; z-index: 2000; }
+
+    /* ─── Transitions ───────────────────────────────── */
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.18s; }
+    .fade-enter-from, .fade-leave-to { opacity: 0; }
+    .slide-up-enter-active, .slide-up-leave-active { transition: all 0.22s cubic-bezier(.4,0,.2,1); }
+    .slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(20px); }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <transition name="fade">
+    <div v-if="toast.show" class="toast">{{ toast.msg }}</div>
+  </transition>
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">📚</div>
+      <div>
+        <div>知识库管理</div>
+        <div class="logo-sub">医疗AI智能体平台</div>
+      </div>
+    </div>
+    <div class="logo-divider"></div>
+    <div class="header-search">
+      <input v-model="searchText" placeholder="搜索知识库名称、描述…" />
+      <span class="search-icon">🔍</span>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-num">{{ kbs.length }}</div>
+        <div class="stat-label">知识库总数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ totalDocs }}</div>
+        <div class="stat-label">文档总量</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ totalChunks }}</div>
+        <div class="stat-label">向量块总量</div>
+      </div>
+    </div>
+    <button class="btn-create" @click="openCreate()">＋ 创建知识库</button>
+  </header>
+
+  <!-- ── Platform Nav ──────────────────────────────────── -->
+  <div class="platform-nav">
+    <a class="platform-nav-item" href="agent-platform.html">🤖 智能体广场</a>
+    <a class="platform-nav-item" href="plugin-manager.html">🔌 插件管理</a>
+    <a class="platform-nav-item active" href="rag-kb.html">📚 知识库管理</a>
+  </div>
+
+  <!-- ── Sub Nav ──────────────────────────────────────── -->
+  <nav class="subnav">
+    <div v-for="tab in statusTabs" :key="tab.key" class="subnav-tab" :class="{active:activeTab===tab.key}" @click="activeTab=tab.key">
+      {{ tab.label }}<span class="subnav-count">{{ tabCount(tab.key) }}</span>
+    </div>
+    <div class="subnav-right">
+      <select class="sort-select" v-model="sortBy">
+        <option value="docs">文档最多</option>
+        <option value="chunks">向量最多</option>
+        <option value="name">名称 A-Z</option>
+        <option value="created">最新创建</option>
+      </select>
+      <div class="view-toggle">
+        <button class="view-btn" :class="{active:listView==='grid'}" @click="listView='grid'" title="卡片视图">⊞</button>
+        <button class="view-btn" :class="{active:listView==='list'}" @click="listView='list'" title="列表视图">≡</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main Body ────────────────────────────────────── -->
+  <div class="main-body">
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+        <div class="sidebar-section">知识库类型</div>
+        <div v-for="cat in categories" :key="cat.key" class="cat-item" :class="{active:activeCategory===cat.key}" @click="activeCategory=cat.key">
+          <div class="cat-icon" :style="{background:cat.bg}">{{ cat.icon }}</div>
+          <span class="cat-label">{{ cat.label }}</span>
+          <span class="cat-count">{{ catCount(cat.key) }}</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="toolbar">
+        <span class="toolbar-title">{{ activeCategory==='all' ? '全部知识库' : categories.find(c=>c.key===activeCategory)?.label }}</span>
+        <span class="toolbar-count">共 {{ filteredKbs.length }} 个</span>
+      </div>
+
+      <!-- Grid view -->
+      <div v-if="listView==='grid'" class="cards-grid">
+        <template v-if="filteredKbs.length">
+          <div v-for="k in filteredKbs" :key="k.id" class="kb-card">
+            <div class="card-menu">
+              <button class="card-menu-btn" title="管理文档" @click="openDocs(k)">📄</button>
+              <button class="card-menu-btn" title="查询测试" @click="openQuery(k)">🔎</button>
+              <button class="card-menu-btn danger" title="删除" @click="openDelete(k)">🗑</button>
+            </div>
+            <div class="card-header">
+              <div class="kb-avatar" :style="{background:k.bg}">{{ k.icon }}</div>
+              <div class="kb-info">
+                <div class="kb-name" v-html="highlight(k.name)"></div>
+                <div class="kb-tags">
+                  <span class="k-tag k-tag-type">{{ k.type }}</span>
+                  <span class="k-tag" :class="statusClass(k.status)">{{ k.status }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-desc" v-html="highlight(k.desc)"></div>
+            <div class="card-stats">
+              <div class="kb-stat">
+                <div class="kb-stat-num">{{ k.docs }}</div>
+                <div class="kb-stat-label">文档</div>
+              </div>
+              <div class="kb-stat">
+                <div class="kb-stat-num">{{ k.chunks.toLocaleString() }}</div>
+                <div class="kb-stat-label">向量块</div>
+              </div>
+              <div class="kb-stat" style="margin-left:auto;text-align:right">
+                <div style="font-size:13px;color:#8c8c8c">嵌入模型</div>
+                <div><span class="model-badge">{{ k.model }}</span></div>
+              </div>
+            </div>
+            <div v-if="k.status==='索引中'" class="card-stats" style="padding-top:0">
+              <div style="flex:1">
+                <div class="progress-wrap">
+                  <div class="progress-bar"><div class="progress-fill" :style="{width: k.progress+'%'}"></div></div>
+                  <span class="progress-label">{{ k.progress }}%</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-meta">
+              <div style="font-size:11px;color:#8c8c8c">🕐 {{ k.updated }}</div>
+              <div style="font-size:11px;color:#8c8c8c">分块策略：{{ k.chunkStrategy }}</div>
+            </div>
+            <div class="card-footer">
+              <button class="btn-primary" @click="openDocs(k)">📄 管理文档</button>
+              <button class="btn-sm" @click="openQuery(k)">🔎 查询测试</button>
+              <button class="btn-sm" style="color:#ff4d4f;border-color:#ffccc7" @click="openDelete(k)">🗑</button>
+            </div>
+          </div>
+        </template>
+        <div v-else class="empty" style="grid-column:1/-1">
+          <div class="empty-icon">📚</div>
+          <div class="empty-title">暂无知识库</div>
+          <div class="empty-desc">{{ searchText ? '没有找到匹配的知识库' : '还没有创建知识库，立即开始吧' }}</div>
+        </div>
+      </div>
+
+      <!-- List view -->
+      <div v-else class="cards-list">
+        <template v-if="filteredKbs.length">
+          <div v-for="k in filteredKbs" :key="k.id" class="kb-row">
+            <div class="kb-avatar" :style="{background:k.bg}">{{ k.icon }}</div>
+            <div class="kb-row-name" v-html="highlight(k.name)"></div>
+            <div class="kb-row-desc" v-html="highlight(k.desc)"></div>
+            <div style="display:flex;gap:5px;flex-shrink:0">
+              <span class="k-tag k-tag-type">{{ k.type }}</span>
+              <span class="k-tag" :class="statusClass(k.status)">{{ k.status }}</span>
+            </div>
+            <div class="kb-row-right">
+              <div style="font-size:11px;color:#8c8c8c">📄 <span style="color:#262626;font-weight:600">{{ k.docs }}</span></div>
+              <div style="font-size:11px;color:#8c8c8c">⬡ <span style="color:#262626;font-weight:600">{{ k.chunks.toLocaleString() }}</span></div>
+              <button class="btn-sm" @click="openDocs(k)">📄 管理</button>
+              <button class="btn-sm" @click="openQuery(k)">🔎 测试</button>
+              <button class="btn-sm" style="color:#ff4d4f;border-color:#ffccc7" @click="openDelete(k)">🗑</button>
+            </div>
+          </div>
+        </template>
+        <div v-else class="empty">
+          <div class="empty-icon">📚</div>
+          <div class="empty-title">暂无知识库</div>
+          <div class="empty-desc">{{ searchText ? '没有找到匹配的知识库' : '还没有创建知识库' }}</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ══ Create Modal ══ -->
+  <transition name="fade">
+    <div v-if="createModal.show" class="modal-overlay" @click.self="createModal.show=false">
+      <transition name="slide-up">
+        <div v-if="createModal.show" class="modal">
+          <div class="modal-title">
+            📚 创建新知识库
+            <span class="modal-close" @click="createModal.show=false">✕</span>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="required">*</span> 知识库名称</div>
+            <input class="form-input" v-model="createModal.name" placeholder="如：中国临床诊疗指南库" maxlength="24" />
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label"><span class="required">*</span> 知识库类型</div>
+              <select class="form-select" v-model="createModal.type">
+                <option v-for="c in categories.filter(c=>c.key!=='all')" :key="c.key" :value="c.label">{{ c.label }}</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label">嵌入模型</div>
+              <select class="form-select" v-model="createModal.model">
+                <option>bge-m3</option>
+                <option>text-embedding-ada-002</option>
+                <option>bge-large-zh</option>
+                <option>m3e-base</option>
+              </select>
+            </div>
+          </div>
+          <div style="height:18px"></div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label">分块策略</div>
+              <select class="form-select" v-model="createModal.chunkStrategy">
+                <option>固定长度分块</option>
+                <option>语义分割</option>
+                <option>段落分块</option>
+                <option>句子分块</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label">分块大小（Token）</div>
+              <input class="form-input" v-model="createModal.chunkSize" type="number" placeholder="512" min="128" max="2048" />
+            </div>
+          </div>
+          <div style="height:18px"></div>
+          <div class="form-group">
+            <div class="form-label">知识库描述</div>
+            <textarea class="form-textarea" v-model="createModal.desc" placeholder="描述该知识库收录的内容范围和用途…" rows="2" maxlength="200"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="createModal.show=false">取消</button>
+            <button class="btn-confirm" @click="submitCreate">创建知识库</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+  <!-- ══ Docs Modal ══ -->
+  <transition name="fade">
+    <div v-if="docsModal.show" class="modal-overlay" @click.self="docsModal.show=false">
+      <transition name="slide-up">
+        <div v-if="docsModal.show" class="modal docs-modal">
+          <div class="modal-title">
+            📄 管理文档 — {{ docsModal.kb?.name }}
+            <span class="modal-close" @click="docsModal.show=false">✕</span>
+          </div>
+          <div class="docs-header-info">
+            <span class="k-tag k-tag-type">{{ docsModal.kb?.type }}</span>
+            <span class="k-tag" :class="statusClass(docsModal.kb?.status)">{{ docsModal.kb?.status }}</span>
+            <div class="docs-header-stats">
+              <div class="docs-stat"><div class="docs-stat-num">{{ docsModal.docs.length }}</div><div class="docs-stat-label">文档数</div></div>
+              <div class="docs-stat"><div class="docs-stat-num">{{ docsModal.docs.filter(d=>d.status==='已索引').length }}</div><div class="docs-stat-label">已索引</div></div>
+            </div>
+          </div>
+          <div class="docs-toolbar">
+            <input class="docs-search" v-model="docsModal.search" placeholder="搜索文档名称…" />
+            <button class="btn-upload" @click="simulateUpload">⬆ 上传文档</button>
+          </div>
+          <div class="doc-list">
+            <div v-for="doc in filteredDocs" :key="doc.id" class="doc-item">
+              <div class="doc-icon">{{ docIcon(doc.ext) }}</div>
+              <div class="doc-info">
+                <div class="doc-name">{{ doc.name }}</div>
+                <div class="doc-meta">{{ doc.size }} · {{ doc.chunks }} 个向量块 · 上传于 {{ doc.uploaded }}</div>
+              </div>
+              <span class="doc-status" :class="doc.status==='已索引'?'doc-status-done':'doc-status-ing'">{{ doc.status }}</span>
+              <button class="doc-del" title="删除" @click="deleteDoc(doc)">✕</button>
+            </div>
+            <div v-if="!filteredDocs.length" style="text-align:center;padding:20px 0;color:#8c8c8c;font-size:13px">暂无文档</div>
+          </div>
+          <div class="upload-area" @click="simulateUpload">
+            <div class="upload-area-icon">📥</div>
+            <div>点击或拖拽文件至此上传</div>
+            <div style="font-size:11px;margin-top:4px">支持 PDF、Word、TXT、Markdown 格式，单文件不超过 50MB</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="docsModal.show=false">关闭</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+  <!-- ══ Query Modal ══ -->
+  <transition name="fade">
+    <div v-if="queryModal.show" class="modal-overlay" @click.self="queryModal.show=false">
+      <transition name="slide-up">
+        <div v-if="queryModal.show" class="modal query-modal">
+          <div class="modal-title">
+            🔎 查询测试 — {{ queryModal.kb?.name }}
+            <span class="modal-close" @click="queryModal.show=false">✕</span>
+          </div>
+          <div class="query-hint">输入问题测试知识库检索效果，返回 Top-{{ queryModal.topK }} 相关文档片段</div>
+          <div class="query-input-area">
+            <input class="query-input" v-model="queryModal.input" placeholder="请输入检索问题，如：高血压的一线用药有哪些？" @keydown.enter="runQuery" />
+            <select style="height:40px;padding:0 10px;border:1px solid #d9d9d9;border-radius:8px;font-size:12px;color:#595959;background:#fff;cursor:pointer" v-model="queryModal.topK">
+              <option :value="3">Top-3</option>
+              <option :value="5">Top-5</option>
+              <option :value="10">Top-10</option>
+            </select>
+            <button class="btn-query" @click="runQuery" :disabled="!queryModal.input.trim()">检索</button>
+          </div>
+          <div class="query-results">
+            <div v-if="queryModal.searching" class="thinking">
+              <div class="thinking-dot"></div>
+              <div class="thinking-dot"></div>
+              <div class="thinking-dot"></div>
+            </div>
+            <template v-else-if="queryModal.results.length">
+              <div v-for="r in queryModal.results" :key="r.rank" class="query-result-item">
+                <div class="result-header">
+                  <span class="result-rank">第 {{ r.rank }} 名</span>
+                  <span class="result-score">
+                    相似度
+                    <span class="score-bar" :style="{width: (r.score * 80) + 'px'}"></span>
+                    {{ (r.score * 100).toFixed(1) }}%
+                  </span>
+                </div>
+                <div class="result-source">📄 {{ r.source }} · 第 {{ r.chunk }} 块</div>
+                <div class="result-content">{{ r.content }}</div>
+              </div>
+            </template>
+            <div v-else-if="queryModal.queried" class="query-empty">
+              <div style="font-size:36px;margin-bottom:10px">🤔</div>
+              <div>未找到相关内容，请尝试调整检索问题或扩大 Top-K 范围</div>
+            </div>
+            <div v-else class="query-empty" style="color:#bfbfbf">
+              <div style="font-size:36px;margin-bottom:10px">🔍</div>
+              <div>输入问题后点击「检索」查看结果</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="queryModal.show=false">关闭</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+  <!-- ══ Delete Modal ══ -->
+  <transition name="fade">
+    <div v-if="deleteModal.show" class="modal-overlay" @click.self="deleteModal.show=false">
+      <transition name="slide-up">
+        <div v-if="deleteModal.show" class="modal" style="width:380px">
+          <div class="modal-title">
+            ⚠️ 确认删除
+            <span class="modal-close" @click="deleteModal.show=false">✕</span>
+          </div>
+          <p style="font-size:14px;color:#595959;line-height:1.7">
+            确定要删除知识库 <strong style="color:#1a1a1a">「{{ deleteModal.kb?.name }}」</strong> 吗？<br/>
+            删除后所有索引数据将被清除，使用该知识库的智能体将受到影响。
+          </p>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="deleteModal.show=false">取消</button>
+            <button class="btn-danger-confirm" @click="confirmDelete">确认删除</button>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
+</div>
+
+<script>
+const { createApp, ref, computed } = Vue
+
+const categories = [
+  { key: 'all',     icon: '🏠', label: '全部',       bg: '#f0f5ff' },
+  { key: 'guide',   icon: '📖', label: '医学指南',   bg: '#e8f4ff' },
+  { key: 'drug',    icon: '💊', label: '药品手册',   bg: '#fff7e6' },
+  { key: 'case',    icon: '📋', label: '病例数据库', bg: '#f6ffed' },
+  { key: 'edu',     icon: '📚', label: '教材资料',   bg: '#fff0f6' },
+  { key: 'rule',    icon: '📜', label: '医院规范',   bg: '#f9f0ff' },
+]
+
+let nextId = 100
+let nextDocId = 1000
+
+/* sample docs per KB */
+const sampleDocs = {
+  'k1': [
+    { id:'d1',  name:'中国高血压防治指南2023版.pdf',    ext:'pdf',  size:'3.2 MB',  chunks:320,  status:'已索引', uploaded:'3天前' },
+    { id:'d2',  name:'中国2型糖尿病防治指南2022版.pdf', ext:'pdf',  size:'4.1 MB',  chunks:410,  status:'已索引', uploaded:'3天前' },
+    { id:'d3',  name:'急性心肌梗死诊疗指南2023.pdf',    ext:'pdf',  size:'2.8 MB',  chunks:280,  status:'已索引', uploaded:'1周前' },
+    { id:'d4',  name:'慢性阻塞性肺疾病诊治指南.pdf',    ext:'pdf',  size:'2.4 MB',  chunks:240,  status:'已索引', uploaded:'1周前' },
+  ],
+  'k2': [
+    { id:'d5',  name:'国家基本药物目录2022年版.pdf',     ext:'pdf',  size:'8.6 MB',  chunks:2100, status:'已索引', uploaded:'1周前' },
+    { id:'d6',  name:'阿莫西林说明书合集.docx',         ext:'docx', size:'1.2 MB',  chunks:240,  status:'已索引', uploaded:'2周前' },
+    { id:'d7',  name:'降压药品说明书数据库.xlsx',        ext:'xlsx', size:'5.4 MB',  chunks:1080, status:'已索引', uploaded:'2周前' },
+  ],
+  'k3': [
+    { id:'d8',  name:'内科住院病历样本集_v1.jsonl',      ext:'json', size:'12.4 MB', chunks:3200, status:'已索引', uploaded:'昨天' },
+    { id:'d9',  name:'外科住院病历样本集_v1.jsonl',      ext:'json', size:'9.8 MB',  chunks:2560, status:'已索引', uploaded:'昨天' },
+    { id:'d10', name:'急诊病历样本集.jsonl',             ext:'json', size:'6.2 MB',  chunks:1840, status:'已索引', uploaded:'2天前' },
+  ],
+  'k4': [
+    { id:'d11', name:'静脉输液护理操作规程.pdf',         ext:'pdf',  size:'1.1 MB',  chunks:110,  status:'已索引', uploaded:'今天' },
+    { id:'d12', name:'压疮护理评估与预防.docx',          ext:'docx', size:'0.8 MB',  chunks:80,   status:'索引中', uploaded:'今天' },
+    { id:'d13', name:'气道管理护理操作规范.pdf',         ext:'pdf',  size:'1.4 MB',  chunks:140,  status:'索引中', uploaded:'今天' },
+  ],
+  'k5': [
+    { id:'d14', name:'内科学第九版精华摘录.pdf',         ext:'pdf',  size:'6.8 MB',  chunks:1200, status:'已索引', uploaded:'5天前' },
+    { id:'d15', name:'内科学病例解析.pdf',               ext:'pdf',  size:'3.2 MB',  chunks:640,  status:'已索引', uploaded:'5天前' },
+  ],
+  'k6': [
+    { id:'d16', name:'儿科疾病诊治要点2023.pdf',         ext:'pdf',  size:'4.2 MB',  chunks:840,  status:'已索引', uploaded:'2天前' },
+    { id:'d17', name:'小儿用药剂量手册.pdf',             ext:'pdf',  size:'2.1 MB',  chunks:420,  status:'已索引', uploaded:'2天前' },
+    { id:'d18', name:'儿童预防接种指南.docx',            ext:'docx', size:'1.6 MB',  chunks:320,  status:'已索引', uploaded:'3天前' },
+  ],
+}
+
+/* simulated retrieval passages per KB type */
+const retrievalData = {
+  '医学指南': [
+    { source:'中国高血压防治指南2023版.pdf', content:'高血压一线药物治疗包括：钙通道拮抗剂（CCB）、血管紧张素转换酶抑制剂（ACEI）、血管紧张素受体拮抗剂（ARB）、利尿剂和β受体拮抗剂五大类。对于大多数高血压患者，建议以上述任一类药物单药起始治疗，收缩压≥160mmHg或高于目标血压20mmHg以上者，应考虑联合用药。' },
+    { source:'中国2型糖尿病防治指南2022版.pdf', content:'2型糖尿病患者血糖管理目标：HbA1c < 7%（一般目标），对于病程短、预期寿命长、无并发症者可控制在 < 6.5%；老年患者或有严重低血糖风险者可放宽至 < 8%。二甲双胍是2型糖尿病一线首选药物，除非有禁忌证或不耐受，否则应贯穿全程治疗。' },
+    { source:'急性心肌梗死诊疗指南2023.pdf', content:'急性ST段抬高型心肌梗死（STEMI）的再灌注治疗：发病12小时内，若能在90分钟内完成经皮冠状动脉介入治疗（PCI），首选直接PCI；若PCI不能在120分钟内完成，应给予溶栓治疗，推荐使用阿替普酶或替奈普酶。' },
+  ],
+  '药品手册': [
+    { source:'国家基本药物目录2022年版.pdf', content:'阿莫西林为广谱青霉素类抗生素，适用于敏感菌所致的呼吸道感染、泌尿道感染、皮肤软组织感染等。成人用量：0.5g/次，3次/日；儿童按体重25mg/kg/日，分3次服用。青霉素过敏者禁用，用药前需进行皮试。' },
+    { source:'降压药品说明书数据库.xlsx', content:'氨氯地平为长效二氢吡啶类钙通道拮抗剂，适用于高血压及稳定型心绞痛。常用剂量：初始剂量5mg/日，必要时可增至10mg/日。主要不良反应为踝部水肿、头痛、面色潮红。与西柚汁同服可增加血药浓度，应避免。' },
+  ],
+  '病例数据库': [
+    { source:'内科住院病历样本集_v1.jsonl', content:'主诉：反复胸痛3天，加重2小时。现病史：患者3天前活动后出现胸前区压榨样疼痛，持续约5分钟自行缓解。2小时前休息时再发，伴大汗、恶心，持续不缓解，急诊就诊。查体：BP 140/90mmHg，心率96次/分，律齐，双肺未闻及啰音。心电图：V1-V4导联ST段抬高0.3-0.5mV。' },
+    { source:'急诊病历样本集.jsonl', content:'患者，男，68岁。主诉：突发意识丧失10分钟。急救人员到达时患者心跳停止，立即行CPR。入院后查ECG示室颤，予以200J直流电除颤一次后转窦性心律。急查肌钙蛋白升高。诊断：急性广泛前壁心肌梗死并室颤。' },
+  ],
+  '教材资料': [
+    { source:'内科学第九版精华摘录.pdf', content:'冠状动脉粥样硬化性心脏病（冠心病）是最常见的心脏病类型，其病理基础为冠状动脉粥样硬化斑块导致管腔狭窄或闭塞，引起心肌缺血缺氧。临床分型包括：慢性冠脉病（稳定型心绞痛）、急性冠脉综合征（不稳定型心绞痛、NSTEMI、STEMI）。' },
+    { source:'内科学病例解析.pdf', content:'肝硬化失代偿期主要并发症包括：腹水（最常见）、食管胃底静脉曲张破裂出血（最危险）、肝性脑病（最严重）、自发性细菌性腹膜炎和肝肾综合征。Child-Pugh评分系统用于评估肝功能储备，A级（5-6分）、B级（7-9分）、C级（10-15分）。' },
+  ],
+  '医院规范': [
+    { source:'静脉输液护理操作规程.pdf', content:'静脉留置针操作规程：1.评估穿刺部位皮肤及血管情况；2.选择合适型号留置针（成人一般选20-22G）；3.消毒范围≥8cm×8cm，待干后穿刺；4.见回血后降低角度推进导管；5.退出针芯后连接输液器；6.固定并记录穿刺时间，留置针保留时间一般不超过72-96小时。' },
+  ],
+  '全部': [
+    { source:'综合知识库', content:'检索到相关内容。请结合患者具体情况和临床表现进行综合判断，本知识库内容仅供参考，最终诊疗决策请以主治医师意见为准。' },
+  ],
+}
+
+const sampleKbs = [
+  { id:'k1', name:'中国临床诊疗指南库', type:'医学指南',   icon:'📖', bg:'#e8f4ff', status:'已就绪', docs:256,  chunks:12800, model:'bge-m3',                  chunkStrategy:'语义分割',   chunkSize:512,  desc:'收录国家卫健委及各学会最新临床诊疗指南，覆盖内外妇儿等主要专科，定期同步更新。', updated:'3天前' },
+  { id:'k2', name:'国家基本药物手册',   type:'药品手册',   icon:'💊', bg:'#fff7e6', status:'已就绪', docs:1284, chunks:58400, model:'text-embedding-ada-002', chunkStrategy:'固定长度分块', chunkSize:512,  desc:'国家基本药物目录说明书全文，包含用法用量、禁忌症、不良反应及药物相互作用。',     updated:'1周前' },
+  { id:'k3', name:'住院病历样本库',     type:'病例数据库', icon:'📋', bg:'#f6ffed', status:'已就绪', docs:3400, chunks:89600, model:'bge-m3',                  chunkStrategy:'段落分块',   chunkSize:256,  desc:'经过脱敏处理的典型住院病历，覆盖内外妇儿等主要科室，可用于临床决策辅助。',       updated:'昨天' },
+  { id:'k4', name:'护理操作规范',       type:'医院规范',   icon:'🩹', bg:'#f9f0ff', status:'索引中', docs:89,   chunks:2340, model:'bge-m3',                  chunkStrategy:'语义分割',   chunkSize:512,  desc:'临床护理标准操作规程，包含各类护理操作步骤、评估要点和注意事项，持续更新中。',    updated:'今天',   progress:62 },
+  { id:'k5', name:'内科学教材精华',     type:'教材资料',   icon:'📚', bg:'#fff0f6', status:'已就绪', docs:178,  chunks:8900,  model:'text-embedding-ada-002', chunkStrategy:'固定长度分块', chunkSize:512,  desc:'内科学主干知识提取，适合辅助教学和临床决策支持，含典型病例和鉴别诊断要点。',      updated:'5天前' },
+  { id:'k6', name:'儿科常见病知识库',   type:'医学指南',   icon:'👶', bg:'#e6fffb', status:'已就绪', docs:145,  chunks:6200,  model:'bge-m3',                  chunkStrategy:'语义分割',   chunkSize:512,  desc:'儿科常见疾病诊治要点，含年龄分层诊断标准、用药剂量换算及预防保健指导。',          updated:'2天前' },
+]
+
+createApp({
+  setup() {
+    const searchText     = ref('')
+    const activeTab      = ref('all')
+    const activeCategory = ref('all')
+    const listView       = ref('grid')
+    const sortBy         = ref('docs')
+
+    const kbs = ref([...sampleKbs])
+    const docStore = ref(JSON.parse(JSON.stringify(sampleDocs)))
+
+    const toast = ref({ show: false, msg: '' })
+    let toastTimer = null
+    function showToast(msg) {
+      if (toastTimer) clearTimeout(toastTimer)
+      toast.value = { show: true, msg }
+      toastTimer = setTimeout(() => { toast.value.show = false }, 2200)
+    }
+
+    const totalDocs   = computed(() => kbs.value.reduce((s, k) => s + k.docs, 0))
+    const totalChunks = computed(() => kbs.value.reduce((s, k) => s + k.chunks, 0))
+
+    const statusTabs = [
+      { key: 'all',   label: '全部知识库' },
+      { key: '已就绪', label: '已就绪'    },
+      { key: '索引中', label: '索引中'    },
+      { key: '更新中', label: '更新中'    },
+    ]
+
+    function tabCount(key) {
+      if (key === 'all') return kbs.value.length
+      return kbs.value.filter(k => k.status === key).length
+    }
+
+    function catCount(key) {
+      let list = kbs.value
+      if (activeTab.value !== 'all') list = list.filter(k => k.status === activeTab.value)
+      if (key === 'all') return list.length
+      const c = categories.find(cat => cat.key === key)
+      return c ? list.filter(k => k.type === c.label).length : 0
+    }
+
+    const filteredKbs = computed(() => {
+      let res = kbs.value
+      if (activeTab.value !== 'all') res = res.filter(k => k.status === activeTab.value)
+      if (activeCategory.value !== 'all') {
+        const c = categories.find(cat => cat.key === activeCategory.value)
+        if (c) res = res.filter(k => k.type === c.label)
+      }
+      const s = searchText.value.trim().toLowerCase()
+      if (s) res = res.filter(k => k.name.toLowerCase().includes(s) || k.desc.toLowerCase().includes(s))
+      return [...res].sort((a, b) => {
+        if (sortBy.value === 'docs')   return b.docs - a.docs
+        if (sortBy.value === 'chunks') return b.chunks - a.chunks
+        if (sortBy.value === 'name')   return a.name.localeCompare(b.name, 'zh')
+        return b.id < a.id ? 1 : -1
+      })
+    })
+
+    function highlight(text) {
+      const s = searchText.value.trim()
+      if (!s) return text
+      const esc = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      return text.replace(new RegExp(esc, 'gi'), m => `<mark>${m}</mark>`)
+    }
+
+    function statusClass(s) {
+      if (s === '已就绪') return 'k-tag-ready'
+      if (s === '索引中') return 'k-tag-index'
+      return 'k-tag-update'
+    }
+
+    /* ── Create Modal ── */
+    const createModal = ref({ show: false, name: '', type: '医学指南', model: 'bge-m3', chunkStrategy: '语义分割', chunkSize: 512, desc: '' })
+    function openCreate() {
+      createModal.value = { show: true, name: '', type: '医学指南', model: 'bge-m3', chunkStrategy: '语义分割', chunkSize: 512, desc: '' }
+    }
+    const iconMap = { '医学指南':'📖', '药品手册':'💊', '病例数据库':'📋', '教材资料':'📚', '医院规范':'📜' }
+    const bgMap   = { '医学指南':'#e8f4ff', '药品手册':'#fff7e6', '病例数据库':'#f6ffed', '教材资料':'#fff0f6', '医院规范':'#f9f0ff' }
+    function submitCreate() {
+      if (!createModal.value.name.trim()) { showToast('⚠️ 请填写知识库名称'); return }
+      const newId = 'k' + (++nextId)
+      kbs.value.unshift({ id: newId, name: createModal.value.name.trim(), type: createModal.value.type, icon: iconMap[createModal.value.type] || '📚', bg: bgMap[createModal.value.type] || '#f0f5ff', status: '索引中', docs: 0, chunks: 0, model: createModal.value.model, chunkStrategy: createModal.value.chunkStrategy, chunkSize: Number(createModal.value.chunkSize) || 512, desc: createModal.value.desc.trim() || '暂无描述', updated: '刚刚', progress: 0 })
+      docStore.value[newId] = []
+      createModal.value.show = false
+      showToast('🎉 知识库创建成功，等待上传文档后开始索引')
+    }
+
+    /* ── Docs Modal ── */
+    const docsModal = ref({ show: false, kb: null, docs: [], search: '' })
+    const filteredDocs = computed(() => {
+      const s = docsModal.value.search.trim().toLowerCase()
+      if (!s) return docsModal.value.docs
+      return docsModal.value.docs.filter(d => d.name.toLowerCase().includes(s))
+    })
+    function openDocs(kb) {
+      docsModal.value = { show: true, kb, docs: [...(docStore.value[kb.id] || [])], search: '' }
+    }
+    function docIcon(ext) {
+      const map = { pdf: '📕', docx: '📘', xlsx: '📗', json: '📒', jsonl: '📒', txt: '📄', md: '📝' }
+      return map[ext] || '📄'
+    }
+    function simulateUpload() {
+      const names = ['临床路径汇编.pdf', '医疗质量管理规范.docx', '诊疗常规手册.pdf', '用药指导文件.pdf', '操作规程补充版.docx']
+      const name = names[Math.floor(Math.random() * names.length)]
+      const ext = name.split('.').pop()
+      const newDoc = { id: 'd' + (++nextDocId), name, ext, size: (Math.random() * 5 + 0.5).toFixed(1) + ' MB', chunks: Math.floor(Math.random() * 300 + 50), status: '索引中', uploaded: '刚刚' }
+      docsModal.value.docs.unshift(newDoc)
+      docStore.value[docsModal.value.kb.id] = [...docsModal.value.docs]
+      const kb = kbs.value.find(k => k.id === docsModal.value.kb.id)
+      if (kb) { kb.docs++; kb.status = '索引中'; kb.progress = kb.progress || 10; kb.updated = '刚刚' }
+      showToast(`⬆ 「${name}」上传成功，索引中…`)
+      setTimeout(() => {
+        const d = docsModal.value.docs.find(d => d.id === newDoc.id)
+        if (d) d.status = '已索引'
+        const k = kbs.value.find(k => k.id === docsModal.value.kb.id)
+        if (k && k.status === '索引中') { k.status = '已就绪'; k.chunks += newDoc.chunks }
+      }, 2500)
+    }
+    function deleteDoc(doc) {
+      docsModal.value.docs = docsModal.value.docs.filter(d => d.id !== doc.id)
+      docStore.value[docsModal.value.kb.id] = [...docsModal.value.docs]
+      const kb = kbs.value.find(k => k.id === docsModal.value.kb.id)
+      if (kb && kb.docs > 0) { kb.docs--; kb.chunks = Math.max(0, kb.chunks - doc.chunks) }
+      showToast('🗑 文档已删除')
+    }
+
+    /* ── Query Modal ── */
+    const queryModal = ref({ show: false, kb: null, input: '', topK: 5, results: [], searching: false, queried: false })
+    function openQuery(kb) {
+      queryModal.value = { show: true, kb, input: '', topK: 5, results: [], searching: false, queried: false }
+    }
+    function runQuery() {
+      if (!queryModal.value.input.trim()) return
+      queryModal.value.searching = true
+      queryModal.value.results = []
+      queryModal.value.queried = false
+      setTimeout(() => {
+        const type = queryModal.value.kb?.type || '全部'
+        const pool = retrievalData[type] || retrievalData['全部']
+        const k = queryModal.value.topK
+        const results = []
+        for (let i = 0; i < Math.min(k, pool.length * 2); i++) {
+          const src = pool[i % pool.length]
+          results.push({ rank: i + 1, source: src.source, chunk: Math.floor(Math.random() * 100 + 1), content: src.content, score: 0.95 - i * 0.07 - Math.random() * 0.02 })
+        }
+        queryModal.value.results = results.slice(0, k)
+        queryModal.value.searching = false
+        queryModal.value.queried = true
+      }, 1200 + Math.random() * 600)
+    }
+
+    /* ── Delete Modal ── */
+    const deleteModal = ref({ show: false, kb: null })
+    function openDelete(kb) { deleteModal.value = { show: true, kb } }
+    function confirmDelete() {
+      kbs.value = kbs.value.filter(k => k.id !== deleteModal.value.kb?.id)
+      deleteModal.value.show = false
+      showToast('🗑 知识库已删除')
+    }
+
+    return {
+      searchText, activeTab, activeCategory, listView, sortBy,
+      kbs, toast, totalDocs, totalChunks,
+      statusTabs, categories,
+      tabCount, catCount, filteredKbs, highlight, statusClass,
+      createModal, openCreate, submitCreate,
+      docsModal, filteredDocs, openDocs, docIcon, simulateUpload, deleteDoc,
+      queryModal, openQuery, runQuery,
+      deleteModal, openDelete, confirmDelete,
+    }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>

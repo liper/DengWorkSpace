@@ -507,6 +507,31 @@
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     .slide-up-enter-active, .slide-up-leave-active { transition: all 0.22s cubic-bezier(.4,0,.2,1); }
     .slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(20px); }
+
+    /* ─── Platform Nav ──────────────────────────────── */
+    .platform-nav { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 0 24px; display: flex; gap: 0; flex-shrink: 0; height: 40px; align-items: center; }
+    .platform-nav-item { padding: 0 14px; height: 40px; display: flex; align-items: center; font-size: 13px; color: #595959; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.15s; gap: 5px; }
+    .platform-nav-item:hover { color: #1677ff; }
+    .platform-nav-item.active { color: #1677ff; border-bottom-color: #1677ff; font-weight: 600; }
+
+    /* ─── Capability Selection (create modal) ───────── */
+    .cap-section-label { font-size: 11px; color: #8c8c8c; margin-bottom: 8px; }
+    .cap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 2px; }
+    .cap-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; border: 1px solid #e8e8e8; cursor: pointer; transition: all 0.15s; background: #fff; }
+    .cap-item:hover { border-color: #1677ff; background: #f0f7ff; }
+    .cap-item.selected { border-color: #1677ff; background: #e8f4ff; }
+    .cap-item-icon { font-size: 16px; flex-shrink: 0; }
+    .cap-item-info { flex: 1; min-width: 0; }
+    .cap-item-name { font-size: 12px; font-weight: 600; color: #262626; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cap-item-type { font-size: 11px; color: #8c8c8c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cap-item-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #d9d9d9; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all 0.15s; color: transparent; }
+    .cap-item.selected .cap-item-check { background: #1677ff; border-color: #1677ff; color: #fff; }
+
+    /* ─── Agent Card Capability Chips ───────────────── */
+    .agent-caps { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 18px 12px; }
+    .cap-chip { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cap-chip-plugin { background: #fff7e6; color: #fa8c16; }
+    .cap-chip-rag    { background: #f0f5ff; color: #597ef7; }
   </style>
 </head>
 <body>
@@ -549,6 +574,13 @@
       <span>＋</span> 创建智能体
     </button>
   </header>
+
+  <!-- ── Platform Nav ──────────────────────────────────── -->
+  <div class="platform-nav">
+    <a class="platform-nav-item active" href="agent-platform.html">🤖 智能体广场</a>
+    <a class="platform-nav-item" href="plugin-manager.html">🔌 插件管理</a>
+    <a class="platform-nav-item" href="rag-kb.html">📚 知识库管理</a>
+  </div>
 
   <!-- ── Sub Nav ──────────────────────────────────────── -->
   <nav class="subnav">
@@ -629,6 +661,10 @@
               </div>
             </div>
             <div class="card-desc" v-html="highlight(agent.desc)"></div>
+            <div v-if="agent.pluginIds?.length || agent.ragKbIds?.length" class="agent-caps">
+              <span v-for="pid in agent.pluginIds" :key="'p'+pid" class="cap-chip cap-chip-plugin" :title="pluginById(pid)?.name">🔌 {{ pluginById(pid)?.name }}</span>
+              <span v-for="kid in agent.ragKbIds"  :key="'k'+kid" class="cap-chip cap-chip-rag"    :title="ragKbById(kid)?.name">📚 {{ ragKbById(kid)?.name }}</span>
+            </div>
             <div class="card-meta">
               <div class="meta-stats">
                 <div class="meta-stat">💬 <span>{{ agent.chats }}</span> 次对话</div>
@@ -725,6 +761,42 @@
             <div class="form-label">开场白</div>
             <input class="form-input" v-model="createModal.greeting" placeholder="请输入智能体的开场白，如：您好！我是您的医疗助手…" maxlength="80" />
           </div>
+          <div class="form-group">
+            <div class="form-label">🔌 启用插件</div>
+            <div class="cap-section-label">选择该智能体可调用的工具插件（可不选）</div>
+            <div class="cap-grid">
+              <div
+                v-for="p in samplePluginsRef.filter(p=>p.status==='已启用')" :key="p.id"
+                class="cap-item" :class="{ selected: createModal.selectedPlugins.includes(p.id) }"
+                @click="togglePlugin(p.id)"
+              >
+                <div class="cap-item-icon">{{ p.icon }}</div>
+                <div class="cap-item-info">
+                  <div class="cap-item-name">{{ p.name }}</div>
+                  <div class="cap-item-type">{{ p.type }}</div>
+                </div>
+                <div class="cap-item-check">{{ createModal.selectedPlugins.includes(p.id) ? '✓' : '' }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">📚 关联知识库</div>
+            <div class="cap-section-label">选择该智能体可检索的 RAG 知识库（可不选）</div>
+            <div class="cap-grid">
+              <div
+                v-for="k in sampleRagKbsRef.filter(k=>k.status==='已就绪')" :key="k.id"
+                class="cap-item" :class="{ selected: createModal.selectedRagKbs.includes(k.id) }"
+                @click="toggleRagKb(k.id)"
+              >
+                <div class="cap-item-icon">{{ k.icon }}</div>
+                <div class="cap-item-info">
+                  <div class="cap-item-name">{{ k.name }}</div>
+                  <div class="cap-item-type">{{ k.docs }} 份文档 · {{ k.type }}</div>
+                </div>
+                <div class="cap-item-check">{{ createModal.selectedRagKbs.includes(k.id) ? '✓' : '' }}</div>
+              </div>
+            </div>
+          </div>
           <div class="modal-footer">
             <button class="btn-cancel" @click="createModal.show=false">取消</button>
             <button class="btn-confirm" @click="submitCreate">创建智能体</button>
@@ -744,6 +816,10 @@
             <div style="flex:1;min-width:0">
               <div class="chat-agent-name">{{ chatModal.agent?.name }}</div>
               <div class="chat-agent-desc">{{ chatModal.agent?.category }} · {{ chatModal.agent?.desc?.slice(0,30) }}…</div>
+              <div v-if="chatModal.agent?.pluginIds?.length || chatModal.agent?.ragKbIds?.length" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">
+                <span v-for="pid in chatModal.agent.pluginIds" :key="'cp'+pid" class="cap-chip cap-chip-plugin">🔌 {{ pluginById(pid)?.name }}</span>
+                <span v-for="kid in chatModal.agent.ragKbIds"  :key="'ck'+kid" class="cap-chip cap-chip-rag">📚 {{ ragKbById(kid)?.name }}</span>
+              </div>
             </div>
             <span class="modal-close" @click="chatModal.show=false">✕</span>
           </div>
@@ -896,21 +972,43 @@ const botResponses = {
   ],
 }
 
+/* ─── Shared Plugin Data ────────────────────────────── */
+const sharedPlugins = [
+  { id:'p1', name:'医学知识搜索',   category:'知识搜索', type:'REST API',  icon:'🔍', bg:'#e8f4ff', status:'已启用', calls:8420 },
+  { id:'p2', name:'药品说明书查询', category:'医疗工具', type:'REST API',  icon:'💊', bg:'#fff7e6', status:'已启用', calls:5631 },
+  { id:'p3', name:'检验值参考范围', category:'数据计算', type:'本地函数',  icon:'📊', bg:'#f6ffed', status:'已启用', calls:3205 },
+  { id:'p4', name:'病历OCR识别',   category:'数据处理', type:'REST API',  icon:'📝', bg:'#fff1f0', status:'已启用', calls:1894 },
+  { id:'p5', name:'挂号系统查询',  category:'外部API',  type:'外部API',   icon:'📅', bg:'#e6fffb', status:'已启用', calls:2773 },
+  { id:'p6', name:'症状自查工具',  category:'医疗工具', type:'本地函数',  icon:'🩺', bg:'#fff1f0', status:'已启用', calls:6102 },
+  { id:'p7', name:'医保费用计算',  category:'数据计算', type:'本地函数',  icon:'💰', bg:'#fcffe6', status:'已禁用', calls:411  },
+  { id:'p8', name:'影像报告解析',  category:'数据处理', type:'REST API',  icon:'🩻', bg:'#f0f5ff', status:'开发中', calls:0    },
+]
+
+/* ─── Shared RAG KB Data ────────────────────────────── */
+const sharedRagKbs = [
+  { id:'k1', name:'中国临床诊疗指南库', type:'医学指南',   icon:'📖', bg:'#e8f4ff', status:'已就绪', docs:256,  chunks:12800, model:'bge-m3' },
+  { id:'k2', name:'国家基本药物手册',   type:'药品手册',   icon:'💊', bg:'#fff7e6', status:'已就绪', docs:1284, chunks:58400, model:'text-embedding-ada-002' },
+  { id:'k3', name:'住院病历样本库',     type:'病例数据库', icon:'📋', bg:'#f6ffed', status:'已就绪', docs:3400, chunks:89600, model:'bge-m3' },
+  { id:'k4', name:'护理操作规范',       type:'医院规范',   icon:'🩹', bg:'#f9f0ff', status:'索引中', docs:89,   chunks:2340,  model:'bge-m3' },
+  { id:'k5', name:'内科学教材精华',     type:'教材资料',   icon:'📚', bg:'#fff0f6', status:'已就绪', docs:178,  chunks:8900,  model:'text-embedding-ada-002' },
+  { id:'k6', name:'儿科常见病知识库',   type:'医学指南',   icon:'👶', bg:'#e6fffb', status:'已就绪', docs:145,  chunks:6200,  model:'bge-m3' },
+]
+
 /* ─── Sample Agents Data ────────────────────────────── */
 let nextId = 100
 const sampleAgents = [
-  { id:1,  name:'门诊导诊助手',   category:'问诊导诊', icon:'🩺', bg:'#fff1f0', status:'已发布', chats:1283, users:456, updated:'今天 10:32', desc:'基于医院科室信息与患者症状描述，智能推荐就诊科室，提供导诊服务，支持多轮对话深度问诊。', greeting:'您好！我是门诊导诊助手，请告诉我您的不适症状，我来帮您推荐合适的就诊科室。' },
-  { id:2,  name:'住院病历生成器',  category:'医疗文书', icon:'📋', bg:'#f6ffed', status:'已发布', chats:876,  users:312, updated:'昨天 16:20', desc:'支持生成标准化入院记录、病程记录、出院小结等医疗文书，符合卫健委电子病历规范，大幅提升文书效率。', greeting:'欢迎使用住院病历生成器，请提供患者基本信息和诊疗情况，我将为您生成规范化病历文书。' },
-  { id:3,  name:'检验报告解读',    category:'报告解读', icon:'🔬', bg:'#e6fffb', status:'已发布', chats:2105, users:890, updated:'2天前',    desc:'自动识别并解读血常规、生化、肿瘤标志物等各类检验报告，提供异常值预警和临床意义说明。', greeting:'您好！请上传或粘贴您的检验报告内容，我将为您进行专业解读。' },
-  { id:4,  name:'合理用药顾问',    category:'用药指导', icon:'💊', bg:'#fff7e6', status:'已发布', chats:1560, users:623, updated:'3天前',    desc:'结合患者病史、过敏史、合并用药，智能审核处方合理性，提供用药方案建议，支持药物相互作用查询。', greeting:'您好！我是合理用药顾问，请告诉我您正在使用的药物或想了解的用药问题。' },
-  { id:5,  name:'护理计划制定助手', category:'护理助手', icon:'🩹', bg:'#f9f0ff', status:'已发布', chats:734,  users:285, updated:'4天前',    desc:'根据患者诊断、护理评估结果，自动生成个性化护理计划，涵盖护理诊断、目标、措施及评价指标。', greeting:'欢迎使用护理计划助手，请提供患者的护理评估信息，我将为您制定专业护理计划。' },
-  { id:6,  name:'医学文献摘要',    category:'医学科研', icon:'📚', bg:'#fff0f6', status:'已发布', chats:445,  users:178, updated:'5天前',    desc:'快速提取医学文献核心信息，生成结构化摘要，支持临床研究设计建议，助力医学科研工作。', greeting:'您好！请提供医学文献内容或研究问题，我将为您提供专业的科研支持。' },
-  { id:7,  name:'医院绩效分析',    category:'医院管理', icon:'🏥', bg:'#e8f4ff', status:'草稿',   chats:0,    users:0,   updated:'1周前',    desc:'整合医院运营数据，自动生成绩效分析报告，支持科室对比、趋势分析，辅助管理决策。', greeting:'您好！我是医院绩效分析助手，请输入您需要分析的数据或管理问题。' },
-  { id:8,  name:'慢病健康管理',    category:'健康管理', icon:'💪', bg:'#fcffe6', status:'已发布', chats:988,  users:402, updated:'2天前',    desc:'为高血压、糖尿病等慢性病患者提供个性化健康管理方案，包括饮食指导、运动建议、复诊提醒等服务。', greeting:'您好！我是慢病健康管理助手，请告诉我您的病情信息，我来为您制定个性化管理方案。' },
-  { id:9,  name:'影像诊断辅助',    category:'报告解读', icon:'🩻', bg:'#f0f5ff', status:'审核中', chats:312,  users:134, updated:'昨天 09:15', desc:'辅助分析CT、MRI、X光等影像报告描述，结合临床信息提供鉴别诊断建议，支持影像诊断质控。', greeting:'您好！请描述影像报告中的主要发现或贴入报告内容，我将协助您进行诊断分析。' },
-  { id:10, name:'手术记录生成',    category:'医疗文书', icon:'✂️', bg:'#fff1f0', status:'已发布', chats:521,  users:198, updated:'3天前',    desc:'基于手术信息快速生成规范化手术记录，支持多种手术类型模板，符合病历书写规范要求。', greeting:'欢迎使用手术记录生成助手，请提供手术基本信息，我将为您生成规范化手术记录。' },
-  { id:11, name:'患者健康宣教',    category:'健康管理', icon:'❤️', bg:'#fff1f0', status:'草稿',   chats:0,    users:0,   updated:'1周前',    desc:'针对不同疾病提供个性化健康宣教内容，帮助患者了解疾病知识、注意事项及康复指导。', greeting:'您好！请告诉我您想了解的疾病或健康知识，我将为您提供专业的健康宣教内容。' },
-  { id:12, name:'儿科问诊助手',    category:'问诊导诊', icon:'👶', bg:'#e6fffb', status:'已发布', chats:1124, users:475, updated:'今天 08:45', desc:'专注儿科疾病问诊，根据儿童年龄、症状体征进行智能评估，提供儿科用药剂量换算和护理建议。', greeting:'您好！我是儿科问诊助手，请告诉我孩子的年龄和不适情况，我来帮助您评估。' },
+  { id:1,  name:'门诊导诊助手',   category:'问诊导诊', icon:'🩺', bg:'#fff1f0', status:'已发布', chats:1283, users:456, updated:'今天 10:32', desc:'基于医院科室信息与患者症状描述，智能推荐就诊科室，提供导诊服务，支持多轮对话深度问诊。', greeting:'您好！我是门诊导诊助手，请告诉我您的不适症状，我来帮您推荐合适的就诊科室。', pluginIds:['p5','p6'], ragKbIds:['k1'] },
+  { id:2,  name:'住院病历生成器',  category:'医疗文书', icon:'📋', bg:'#f6ffed', status:'已发布', chats:876,  users:312, updated:'昨天 16:20', desc:'支持生成标准化入院记录、病程记录、出院小结等医疗文书，符合卫健委电子病历规范，大幅提升文书效率。', greeting:'欢迎使用住院病历生成器，请提供患者基本信息和诊疗情况，我将为您生成规范化病历文书。', pluginIds:['p4'], ragKbIds:['k3'] },
+  { id:3,  name:'检验报告解读',    category:'报告解读', icon:'🔬', bg:'#e6fffb', status:'已发布', chats:2105, users:890, updated:'2天前',    desc:'自动识别并解读血常规、生化、肿瘤标志物等各类检验报告，提供异常值预警和临床意义说明。', greeting:'您好！请上传或粘贴您的检验报告内容，我将为您进行专业解读。', pluginIds:['p1','p3'], ragKbIds:['k1','k5'] },
+  { id:4,  name:'合理用药顾问',    category:'用药指导', icon:'💊', bg:'#fff7e6', status:'已发布', chats:1560, users:623, updated:'3天前',    desc:'结合患者病史、过敏史、合并用药，智能审核处方合理性，提供用药方案建议，支持药物相互作用查询。', greeting:'您好！我是合理用药顾问，请告诉我您正在使用的药物或想了解的用药问题。', pluginIds:['p2'], ragKbIds:['k2'] },
+  { id:5,  name:'护理计划制定助手', category:'护理助手', icon:'🩹', bg:'#f9f0ff', status:'已发布', chats:734,  users:285, updated:'4天前',    desc:'根据患者诊断、护理评估结果，自动生成个性化护理计划，涵盖护理诊断、目标、措施及评价指标。', greeting:'欢迎使用护理计划助手，请提供患者的护理评估信息，我将为您制定专业护理计划。', pluginIds:[], ragKbIds:[] },
+  { id:6,  name:'医学文献摘要',    category:'医学科研', icon:'📚', bg:'#fff0f6', status:'已发布', chats:445,  users:178, updated:'5天前',    desc:'快速提取医学文献核心信息，生成结构化摘要，支持临床研究设计建议，助力医学科研工作。', greeting:'您好！请提供医学文献内容或研究问题，我将为您提供专业的科研支持。', pluginIds:['p1'], ragKbIds:['k5'] },
+  { id:7,  name:'医院绩效分析',    category:'医院管理', icon:'🏥', bg:'#e8f4ff', status:'草稿',   chats:0,    users:0,   updated:'1周前',    desc:'整合医院运营数据，自动生成绩效分析报告，支持科室对比、趋势分析，辅助管理决策。', greeting:'您好！我是医院绩效分析助手，请输入您需要分析的数据或管理问题。', pluginIds:[], ragKbIds:[] },
+  { id:8,  name:'慢病健康管理',    category:'健康管理', icon:'💪', bg:'#fcffe6', status:'已发布', chats:988,  users:402, updated:'2天前',    desc:'为高血压、糖尿病等慢性病患者提供个性化健康管理方案，包括饮食指导、运动建议、复诊提醒等服务。', greeting:'您好！我是慢病健康管理助手，请告诉我您的病情信息，我来为您制定个性化管理方案。', pluginIds:['p2','p6'], ragKbIds:['k1'] },
+  { id:9,  name:'影像诊断辅助',    category:'报告解读', icon:'🩻', bg:'#f0f5ff', status:'审核中', chats:312,  users:134, updated:'昨天 09:15', desc:'辅助分析CT、MRI、X光等影像报告描述，结合临床信息提供鉴别诊断建议，支持影像诊断质控。', greeting:'您好！请描述影像报告中的主要发现或贴入报告内容，我将协助您进行诊断分析。', pluginIds:['p8'], ragKbIds:['k1'] },
+  { id:10, name:'手术记录生成',    category:'医疗文书', icon:'✂️', bg:'#fff1f0', status:'已发布', chats:521,  users:198, updated:'3天前',    desc:'基于手术信息快速生成规范化手术记录，支持多种手术类型模板，符合病历书写规范要求。', greeting:'欢迎使用手术记录生成助手，请提供手术基本信息，我将为您生成规范化手术记录。', pluginIds:['p4'], ragKbIds:[] },
+  { id:11, name:'患者健康宣教',    category:'健康管理', icon:'❤️', bg:'#fff1f0', status:'草稿',   chats:0,    users:0,   updated:'1周前',    desc:'针对不同疾病提供个性化健康宣教内容，帮助患者了解疾病知识、注意事项及康复指导。', greeting:'您好！请告诉我您想了解的疾病或健康知识，我将为您提供专业的健康宣教内容。', pluginIds:[], ragKbIds:[] },
+  { id:12, name:'儿科问诊助手',    category:'问诊导诊', icon:'👶', bg:'#e6fffb', status:'已发布', chats:1124, users:475, updated:'今天 08:45', desc:'专注儿科疾病问诊，根据儿童年龄、症状体征进行智能评估，提供儿科用药剂量换算和护理建议。', greeting:'您好！我是儿科问诊助手，请告诉我孩子的年龄和不适情况，我来帮助您评估。', pluginIds:['p6'], ragKbIds:['k6'] },
 ]
 
 createApp({
@@ -922,6 +1020,12 @@ createApp({
     const sortBy        = ref('updated')
 
     const agents = ref([...sampleAgents])
+
+    const samplePluginsRef = ref([...sharedPlugins])
+    const sampleRagKbsRef  = ref([...sharedRagKbs])
+
+    function pluginById(id) { return samplePluginsRef.value.find(p => p.id === id) }
+    function ragKbById(id)  { return sampleRagKbsRef.value.find(k => k.id === id) }
 
     /* ─── Toast ─── */
     const toast = ref({ show: false, msg: '' })
@@ -1017,12 +1121,24 @@ createApp({
     const createModal = ref({
       show: false, name: '', category: '问诊导诊',
       icon: '🤖', bg: '#e8f4ff', desc: '', greeting: '',
+      selectedPlugins: [], selectedRagKbs: [],
     })
     function openCreate() {
       createModal.value = {
         show: true, name: '', category: '问诊导诊',
         icon: '🤖', bg: '#e8f4ff', desc: '', greeting: '',
+        selectedPlugins: [], selectedRagKbs: [],
       }
+    }
+    function togglePlugin(id) {
+      const idx = createModal.value.selectedPlugins.indexOf(id)
+      if (idx >= 0) createModal.value.selectedPlugins.splice(idx, 1)
+      else createModal.value.selectedPlugins.push(id)
+    }
+    function toggleRagKb(id) {
+      const idx = createModal.value.selectedRagKbs.indexOf(id)
+      if (idx >= 0) createModal.value.selectedRagKbs.splice(idx, 1)
+      else createModal.value.selectedRagKbs.push(id)
     }
     function submitCreate() {
       if (!createModal.value.name.trim()) {
@@ -1041,6 +1157,8 @@ createApp({
         updated:  '刚刚',
         desc:     createModal.value.desc.trim() || '暂无描述',
         greeting: createModal.value.greeting.trim() || `您好！我是${createModal.value.name}，有什么可以帮助您的吗？`,
+        pluginIds: [...createModal.value.selectedPlugins],
+        ragKbIds:  [...createModal.value.selectedRagKbs],
       })
       createModal.value.show = false
       showToast('🎉 智能体创建成功，已保存为草稿')
@@ -1123,9 +1241,10 @@ createApp({
       searchText, activeTab, activeCategory, listView, sortBy,
       agents, toast, publishedCount, totalChats,
       statusTabs, categories, iconOptions,
+      samplePluginsRef, sampleRagKbsRef, pluginById, ragKbById,
       tabCount, catCount, filteredAgents, highlight, statusClass,
       copyAgent,
-      createModal, openCreate, submitCreate,
+      createModal, openCreate, submitCreate, togglePlugin, toggleRagKb,
       shareModal, openShare, copyShareUrl,
       deleteModal, openDelete, confirmDelete,
       chatModal, chatBodyRef, openChat, sendChat,
