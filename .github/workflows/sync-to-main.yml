@@ -1,0 +1,80 @@
+name: 同步静态页面到 main 并触发部署
+
+# 当 copilot 分支推送后，自动将 HTML / Markdown 页面同步到 main，
+# 再通过 workflow_dispatch 触发 pages.yml 在 main 上运行，完成 GitHub Pages 部署。
+
+on:
+  push:
+    branches:
+      - 'copilot/**'
+
+permissions:
+  contents: write   # 允许推送到 main
+  actions: write    # 允许触发 workflow_dispatch
+
+jobs:
+  sync-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出完整历史
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 配置 Git 用户
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: 同步 HTML / Markdown 页面文件到 main
+        id: sync
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          git fetch origin main
+
+          # 找出相对 main 有变动的 HTML 和 Markdown 文件
+          CHANGED=$(git diff --name-only origin/main HEAD -- '*.html' '*.md')
+
+          if [ -z "$CHANGED" ]; then
+            echo "没有 HTML/Markdown 变更，跳过同步。"
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "待同步文件："
+          echo "$CHANGED"
+
+          # 将文件暂存到临时目录（保留相对路径结构）
+          TMPDIR=$(mktemp -d)
+          while IFS= read -r f; do
+            cp --parents "$f" "$TMPDIR/"
+          done <<< "$CHANGED"
+
+          # 切换到 main 并应用文件
+          git checkout main
+          cp -r "$TMPDIR/." .
+
+          git add .
+          if git diff --cached --quiet; then
+            echo "main 上的文件已是最新，无需提交。"
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "chore: 从 ${BRANCH} 同步页面文件到 main"
+            git push origin main
+            echo "synced=true" >> "$GITHUB_OUTPUT"
+            echo "同步完成，已推送到 main。"
+          fi
+
+      - name: 触发 GitHub Pages 部署
+        if: steps.sync.outputs.synced == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'pages.yml',
+              ref: 'main'
+            })
+            core.info('已触发 pages.yml 在 main 分支上运行，GitHub Pages 部署将在数分钟内完成。')
