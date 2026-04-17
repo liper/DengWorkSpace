@@ -275,6 +275,32 @@
     .tab-content::-webkit-scrollbar { width: 5px; }
     .tab-content::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
 
+    /* Switch */
+    .switch-field { display: flex; align-items: center; gap: 10px; }
+    .switch {
+      position: relative; width: 42px; height: 24px; flex-shrink: 0;
+      display: inline-flex; align-items: center;
+    }
+    .switch input { position: absolute; opacity: 0; pointer-events: none; }
+    .switch-slider {
+      width: 100%; height: 100%; border-radius: 999px; background: #d9d9d9;
+      transition: all 0.2s ease; position: relative;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    }
+    .switch-slider::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%; background: #fff;
+      transition: transform 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    }
+    .switch input:checked + .switch-slider {
+      background: linear-gradient(90deg, #1677ff 0%, #36cfc9 100%);
+    }
+    .switch input:checked + .switch-slider::after { transform: translateX(18px); }
+    .switch input:disabled + .switch-slider { opacity: 0.45; cursor: not-allowed; }
+    .switch-copy { display: flex; flex-direction: column; gap: 2px; }
+    .switch-title { font-size: 12px; color: #262626; font-weight: 600; }
+    .switch-desc { font-size: 11px; color: #8c8c8c; line-height: 1.5; }
+
     /* ─── Progress Bar ──────────────────────────────── */
     .progress-card {
       background: #fff; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;
@@ -418,6 +444,100 @@
     .rec-item.warning .rec-title { color: #d46b08; }
     .rec-item.danger  .rec-title { color: #cf1322; }
     .rec-text { font-size: 12px; color: #595959; line-height: 1.65; }
+
+    /* Auto tuning */
+    .tune-summary {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px;
+    }
+    .tune-card {
+      background: #fff; border-radius: 8px; padding: 12px 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
+    }
+    .tune-card-title { font-size: 11px; color: #8c8c8c; margin-bottom: 8px; }
+    .tune-card-main { display: flex; align-items: baseline; gap: 6px; }
+    .tune-card-val { font-size: 24px; font-weight: 700; color: #262626; }
+    .tune-card-unit { font-size: 12px; color: #8c8c8c; }
+    .tune-card-sub { font-size: 11px; color: #8c8c8c; margin-top: 6px; line-height: 1.5; }
+    .tune-layout {
+      display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+      gap: 12px; align-items: start; margin-bottom: 12px;
+    }
+    .tune-stack { display: flex; flex-direction: column; gap: 12px; }
+    .tune-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px;
+    }
+    .tune-title { font-size: 13px; font-weight: 600; color: #262626; }
+    .tune-subtitle { font-size: 11px; color: #8c8c8c; }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 5px; border-radius: 999px;
+      padding: 3px 8px; font-size: 11px; font-weight: 600; border: 1px solid transparent;
+    }
+    .status-pill.running { background: #e6f7ff; color: #1677ff; border-color: #91d5ff; }
+    .status-pill.completed { background: #f6ffed; color: #389e0d; border-color: #b7eb8f; }
+    .status-pill.paused { background: #fff7e6; color: #d46b08; border-color: #ffd591; }
+    .status-pill.queued { background: #fafafa; color: #8c8c8c; border-color: #e8e8e8; }
+    .status-pill.stopped { background: #fff1f0; color: #cf1322; border-color: #ffa39e; }
+    .tune-pipeline { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .trial-chip {
+      min-width: 132px; border-radius: 8px; padding: 10px 11px; border: 1px solid #f0f0f0;
+      background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%); flex-shrink: 0;
+    }
+    .trial-chip.running { border-color: #91d5ff; background: #f0f9ff; }
+    .trial-chip.completed { border-color: #b7eb8f; background: #f6ffed; }
+    .trial-chip.paused { border-color: #ffd591; background: #fff7e6; }
+    .trial-chip.stopped { border-color: #ffa39e; background: #fff1f0; }
+    .trial-chip-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .trial-chip-id { font-size: 12px; font-weight: 700; color: #262626; }
+    .trial-chip-phase { font-size: 10px; color: #8c8c8c; }
+    .trial-chip-metric { font-size: 18px; font-weight: 700; color: #1677ff; line-height: 1; }
+    .trial-chip-sub { font-size: 10px; color: #8c8c8c; margin-top: 6px; line-height: 1.5; }
+    .trial-chip-progress {
+      height: 6px; border-radius: 999px; background: rgba(0,0,0,0.06);
+      overflow: hidden; margin-top: 8px;
+    }
+    .trial-chip-progress > span {
+      display: block; height: 100%;
+      background: linear-gradient(90deg, #1677ff 0%, #36cfc9 100%);
+    }
+    .tune-chart-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; }
+    .mini-note {
+      font-size: 10px; color: #8c8c8c; line-height: 1.5; margin-top: 8px;
+      padding-top: 8px; border-top: 1px dashed #f0f0f0;
+    }
+    .trial-rank-list { display: flex; flex-direction: column; gap: 8px; }
+    .trial-rank-item {
+      display: grid; grid-template-columns: 56px 1fr auto; gap: 10px; align-items: center;
+    }
+    .trial-rank-name { font-size: 11px; color: #595959; font-weight: 600; }
+    .trial-rank-track { height: 8px; border-radius: 999px; background: #f0f0f0; overflow: hidden; }
+    .trial-rank-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #36cfc9 0%, #1677ff 100%); }
+    .trial-rank-score { font-size: 11px; color: #262626; font-weight: 600; }
+    .meta-list { display: flex; flex-direction: column; gap: 8px; }
+    .meta-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 9px 10px; border-radius: 8px; background: #fafafa; border: 1px solid #f0f0f0;
+    }
+    .meta-key { font-size: 11px; color: #8c8c8c; }
+    .meta-val { font-size: 12px; color: #262626; font-weight: 600; text-align: right; }
+    .importance-list { display: flex; flex-direction: column; gap: 9px; }
+    .importance-item { display: flex; flex-direction: column; gap: 4px; }
+    .importance-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .importance-name { font-size: 12px; color: #262626; font-weight: 600; }
+    .importance-score { font-size: 11px; color: #8c8c8c; }
+    .importance-bar { height: 8px; border-radius: 999px; background: #f0f0f0; overflow: hidden; }
+    .importance-bar > span {
+      display: block; height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, #faad14 0%, #fa8c16 100%);
+    }
+    .importance-desc { font-size: 10px; color: #8c8c8c; line-height: 1.5; }
+    .event-feed { display: flex; flex-direction: column; gap: 8px; max-height: 276px; overflow-y: auto; }
+    .event-item {
+      padding: 9px 10px; border-radius: 8px; background: #fafafa;
+      border: 1px solid #f0f0f0; font-size: 11px; line-height: 1.6;
+    }
+    .event-item-time { color: #8c8c8c; font-weight: 600; margin-bottom: 2px; }
+    .event-item-title { color: #262626; font-weight: 600; }
+    .event-item-text { color: #595959; }
 
     /* Scrollbars */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -580,6 +700,19 @@
                 </div>
               </div>
             </div>
+            <div class="form-row" style="margin-top:10px;">
+              <label class="form-label">自动调参</label>
+              <div class="switch-field">
+                <label class="switch">
+                  <input type="checkbox" v-model="cfg.autoTune" :disabled="isLocked" />
+                  <span class="switch-slider"></span>
+                </label>
+                <div class="switch-copy">
+                  <div class="switch-title">{{ cfg.autoTune ? '已开启智能搜索' : '关闭' }}</div>
+                  <div class="switch-desc">开启后启动训练会新增自动调参监控页，展示 Trial、最优参数、收敛与资源使用。</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -735,6 +868,9 @@
       <div class="tab-bar">
         <button class="tab-btn" :class="{ active: tab === 'progress' }" @click="tab = 'progress'">
           📈 训练过程
+        </button>
+        <button v-if="autoTuneVisible" class="tab-btn" :class="{ active: tab === 'autotune' }" @click="tab = 'autotune'">
+          🧪 自动调参
         </button>
         <button class="tab-btn" :class="{ active: tab === 'results' }"
                 :disabled="state !== 'completed'" @click="tab = 'results'">
@@ -975,6 +1111,218 @@
 
         </template>
 
+        <!-- ── 自动调参 Tab ──────────────────────── -->
+        <template v-else-if="tab === 'autotune' && autoTuneSession">
+
+          <div class="tune-summary">
+            <div class="tune-card">
+              <div class="tune-card-title">搜索进度</div>
+              <div class="tune-card-main">
+                <span class="tune-card-val">{{ completedAutoTuneTrials.length }}</span>
+                <span class="tune-card-unit">/ {{ autoTuneTrials.length }} Trials</span>
+              </div>
+              <div class="tune-card-sub">当前 {{ autoTuneSession.algorithm }} + {{ autoTuneSession.scheduler }}，{{ autoTuneStatusText }}</div>
+            </div>
+            <div class="tune-card">
+              <div class="tune-card-title">最优目标分数</div>
+              <div class="tune-card-main">
+                <span class="tune-card-val">{{ bestAutoTuneTrial ? bestAutoTuneTrial.objective.toFixed(3) : '--' }}</span>
+                <span class="tune-card-unit">Score</span>
+              </div>
+              <div class="tune-card-sub">{{ bestAutoTuneTrial ? `来自 ${bestAutoTuneTrial.id} · 灵敏度 ${fmtPct(bestAutoTuneTrial.sensitivity)}` : '等待首个 Trial 完成' }}</div>
+            </div>
+            <div class="tune-card">
+              <div class="tune-card-title">达标试验数</div>
+              <div class="tune-card-main">
+                <span class="tune-card-val">{{ autoTunePassCount }}</span>
+                <span class="tune-card-unit">个</span>
+              </div>
+              <div class="tune-card-sub">以高危检出率 ≥ {{ cfg.minDetectRate }}% 作为临床门槛筛选候选配置</div>
+            </div>
+            <div class="tune-card">
+              <div class="tune-card-title">资源使用</div>
+              <div class="tune-card-main">
+                <span class="tune-card-val">{{ autoTuneGpuUsage.toFixed(1) }}</span>
+                <span class="tune-card-unit">/ {{ autoTuneSession.gpuHoursBudget.toFixed(1) }} GPUh</span>
+              </div>
+              <div class="tune-card-sub">并行 worker {{ autoTuneSession.parallelWorkers }} · 早停 {{ autoTuneEarlyStoppedCount }} 个低收益 Trial</div>
+            </div>
+          </div>
+
+          <div class="tune-layout">
+            <div class="tune-stack">
+              <div class="tune-card">
+                <div class="tune-head">
+                  <div>
+                    <div class="tune-title">搜索管线监控</div>
+                    <div class="tune-subtitle">按实际项目调参看板展示排队、运行、完成与早停状态</div>
+                  </div>
+                  <span class="status-pill" :class="autoTuneStatusClass">{{ autoTuneStatusText }}</span>
+                </div>
+                <div class="tune-pipeline">
+                  <div v-for="trial in autoTuneTrials" :key="trial.id" class="trial-chip" :class="trial.status">
+                    <div class="trial-chip-hd">
+                      <span class="trial-chip-id">{{ trial.id }}</span>
+                      <span class="trial-chip-phase">{{ trial.phase }}</span>
+                    </div>
+                    <div class="trial-chip-metric">{{ trial.objective.toFixed(3) }}</div>
+                    <div class="trial-chip-sub">
+                      {{ tuneStatusLabel(trial.status) }} · {{ trial.optimizer }} / LR {{ trial.lr.toFixed(4) }}
+                    </div>
+                    <div class="trial-chip-progress"><span :style="{ width: trial.progress + '%' }"></span></div>
+                    <div class="trial-chip-sub">灵敏度 {{ fmtPct(trial.sensitivity) }} · AUC {{ trial.auc.toFixed(3) }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tune-chart-grid">
+                <div class="tune-card">
+                  <div class="tune-head">
+                    <div>
+                      <div class="tune-title">目标函数收敛趋势</div>
+                      <div class="tune-subtitle">以医疗综合评分跟踪每次 Trial 的最佳结果</div>
+                    </div>
+                    <span class="status-pill completed">Best-so-far</span>
+                  </div>
+                  <svg :viewBox="`0 0 ${CW} ${CH}`" class="chart-svg">
+                    <g v-html="gridHtml(0.70, 1, false)"></g>
+                    <polyline v-if="autoTuneObjectivePts" :points="autoTuneObjectivePts"
+                              fill="none" stroke="#1677ff" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    <polyline v-if="autoTuneBestPts" :points="autoTuneBestPts"
+                              fill="none" stroke="#52c41a" stroke-width="2"
+                              stroke-dasharray="5 3"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <div class="mini-note">蓝线为每个 Trial 的医疗综合评分，绿线为 best-so-far；评分综合考虑灵敏度、AUC、特异度和临床门槛惩罚。</div>
+                </div>
+
+                <div class="tune-card">
+                  <div class="tune-head">
+                    <div>
+                      <div class="tune-title">Trial 排名</div>
+                      <div class="tune-subtitle">优先展示已完成试验</div>
+                    </div>
+                  </div>
+                  <div class="trial-rank-list">
+                    <div v-for="trial in autoTuneTopTrials" :key="trial.id" class="trial-rank-item">
+                      <div class="trial-rank-name">{{ trial.id }}</div>
+                      <div class="trial-rank-track">
+                        <div class="trial-rank-fill" :style="{ width: (trial.objective * 100).toFixed(1) + '%' }"></div>
+                      </div>
+                      <div class="trial-rank-score">{{ trial.objective.toFixed(3) }}</div>
+                    </div>
+                  </div>
+                  <div class="mini-note">若 Trial 未达检出率目标，会在排序分数中加入临床惩罚项，避免高 AUC 但漏诊风险过高的配置被错误选为最优。</div>
+                </div>
+              </div>
+
+              <div class="section-title">试验详情</div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Trial</th>
+                    <th>状态</th>
+                    <th>学习率</th>
+                    <th>批次</th>
+                    <th>优化器</th>
+                    <th>权重衰减</th>
+                    <th>灵敏度</th>
+                    <th>AUC</th>
+                    <th>综合分</th>
+                    <th>说明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="trial in autoTuneTrials" :key="trial.id">
+                    <td><strong>{{ trial.id }}</strong></td>
+                    <td>
+                      <span class="tag" :class="trial.status === 'completed' ? 'tag-pass' : trial.status === 'stopped' ? 'tag-fail' : ''"
+                            :style="trial.status === 'running' ? 'background:#e6f7ff;color:#1677ff;border:1px solid #91d5ff;' : trial.status === 'queued' ? 'background:#fafafa;color:#8c8c8c;border:1px solid #e8e8e8;' : trial.status === 'paused' ? 'background:#fff7e6;color:#d46b08;border:1px solid #ffd591;' : ''">
+                        {{ tuneStatusLabel(trial.status) }}
+                      </span>
+                    </td>
+                    <td>{{ trial.lr.toFixed(4) }}</td>
+                    <td>{{ trial.batchSize }}</td>
+                    <td>{{ trial.optimizer }}</td>
+                    <td>{{ trial.weightDecay.toFixed(4) }}</td>
+                    <td>{{ fmtPct(trial.sensitivity) }}</td>
+                    <td>{{ trial.auc.toFixed(3) }}</td>
+                    <td>{{ trial.objective.toFixed(3) }}</td>
+                    <td style="color:#8c8c8c;font-size:11px;">{{ trial.note }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="tune-stack">
+              <div class="tune-card">
+                <div class="tune-head">
+                  <div>
+                    <div class="tune-title">当前 / 最优 Trial</div>
+                    <div class="tune-subtitle">监控当前试验参数与平台给出的推荐配置</div>
+                  </div>
+                </div>
+                <div class="meta-list">
+                  <div class="meta-item">
+                    <div class="meta-key">当前运行</div>
+                    <div class="meta-val">{{ currentAutoTuneTrial ? `${currentAutoTuneTrial.id} · ${tuneStatusLabel(currentAutoTuneTrial.status)}` : '等待调度' }}</div>
+                  </div>
+                  <div class="meta-item">
+                    <div class="meta-key">最优配置</div>
+                    <div class="meta-val">{{ bestAutoTuneTrial ? `${bestAutoTuneTrial.optimizer} / LR ${bestAutoTuneTrial.lr.toFixed(4)}` : '暂无' }}</div>
+                  </div>
+                  <div class="meta-item">
+                    <div class="meta-key">批次与衰减</div>
+                    <div class="meta-val">{{ bestAutoTuneTrial ? `${bestAutoTuneTrial.batchSize} / ${bestAutoTuneTrial.weightDecay.toFixed(4)}` : '--' }}</div>
+                  </div>
+                  <div class="meta-item">
+                    <div class="meta-key">调参目标</div>
+                    <div class="meta-val">{{ autoTuneSession.objectiveName }}</div>
+                  </div>
+                </div>
+                <div class="mini-note">{{ currentAutoTuneTrial ? currentAutoTuneTrial.note : '开启自动调参后，系统会按搜索策略自动生成候选配置并实时刷新监控数据。' }}</div>
+              </div>
+
+              <div class="tune-card">
+                <div class="tune-head">
+                  <div>
+                    <div class="tune-title">参数重要性</div>
+                    <div class="tune-subtitle">模拟真实监控页面中的 search space explainability</div>
+                  </div>
+                </div>
+                <div class="importance-list">
+                  <div v-for="item in autoTuneSession.importance" :key="item.name" class="importance-item">
+                    <div class="importance-top">
+                      <span class="importance-name">{{ item.name }}</span>
+                      <span class="importance-score">{{ item.weight }}%</span>
+                    </div>
+                    <div class="importance-bar"><span :style="{ width: item.weight + '%' }"></span></div>
+                    <div class="importance-desc">{{ item.desc }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tune-card">
+                <div class="tune-head">
+                  <div>
+                    <div class="tune-title">监控事件流</div>
+                    <div class="tune-subtitle">记录搜索调度、早停、最优模型刷新等关键事件</div>
+                  </div>
+                </div>
+                <div class="event-feed">
+                  <div v-for="event in visibleAutoTuneEvents" :key="event.id" class="event-item">
+                    <div class="event-item-time">{{ event.time }}</div>
+                    <div class="event-item-title">{{ event.title }}</div>
+                    <div class="event-item-text">{{ event.text }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </template>
+
         <!-- ── 训练结果 Tab ──────────────────────── -->
         <template v-else-if="tab === 'results' && results">
 
@@ -1128,6 +1476,7 @@ createApp({
       confThreshold:   0.50,
       highRiskWeight:  2,
       highRiskDiseases: ['肺癌', '心肌梗死', '脑卒中'],
+      autoTune:        false,
     })
 
     const allDiseases = ['肺癌', '乳腺癌', '结直肠癌', '心肌梗死', '脑卒中', '糖尿病', '肾衰竭', '白血病']
@@ -1139,6 +1488,7 @@ createApp({
     const logs     = ref([])
     const results  = ref(null)
     const tab      = ref('progress')
+    const autoTuneSession = ref(null)
     const startMs  = ref(0)
     const elapsedMs = ref(0)
     const timerId  = ref(null)
@@ -1197,6 +1547,8 @@ createApp({
       if (!latest.value) return ''
       return latest.value.sensitivity * 100 >= cfg.minDetectRate ? 'g' : 'r'
     })
+
+    const autoTuneVisible = computed(() => cfg.autoTune || !!autoTuneSession.value)
 
     /* ── Derived params: recommended model params from business params ── */
     const derivedParams = computed(() => {
@@ -1273,6 +1625,97 @@ createApp({
       return m > 0 ? `${m}分${s % 60}秒` : `${s}秒`
     })
 
+    const autoTuneTrials = computed(() => {
+      const session = autoTuneSession.value
+      if (!session) return []
+      return session.trials.map(trial => {
+        let status = 'queued'
+        let progress = 0
+        if (state.value === 'completed' || curEpoch.value >= trial.endEpoch) {
+          status = 'completed'
+          progress = 100
+        } else if (curEpoch.value >= trial.startEpoch && curEpoch.value < trial.endEpoch) {
+          status = state.value === 'paused' ? 'paused' : state.value === 'stopped' ? 'stopped' : 'running'
+          progress = Math.max(8, Math.min(96, ((curEpoch.value - trial.startEpoch + 1) / (trial.endEpoch - trial.startEpoch + 1)) * 100))
+        } else if (state.value === 'stopped' && curEpoch.value >= trial.startEpoch) {
+          status = 'stopped'
+        }
+        return { ...trial, status, progress: Number(progress.toFixed(1)) }
+      })
+    })
+
+    const completedAutoTuneTrials = computed(() =>
+      autoTuneTrials.value.filter(trial => trial.status === 'completed')
+    )
+
+    const currentAutoTuneTrial = computed(() =>
+      autoTuneTrials.value.find(trial => trial.status === 'running' || trial.status === 'paused' || trial.status === 'stopped') || null
+    )
+
+    const bestAutoTuneTrial = computed(() => {
+      const list = completedAutoTuneTrials.value.length ? completedAutoTuneTrials.value : autoTuneTrials.value.filter(trial => trial.status !== 'queued')
+      if (!list.length) return null
+      return list.reduce((best, trial) => trial.objective > best.objective ? trial : best)
+    })
+
+    const autoTunePassCount = computed(() =>
+      completedAutoTuneTrials.value.filter(trial => trial.sensitivity * 100 >= cfg.minDetectRate).length
+    )
+
+    const autoTuneEarlyStoppedCount = computed(() =>
+      completedAutoTuneTrials.value.filter(trial => trial.earlyStop).length
+    )
+
+    const autoTuneGpuUsage = computed(() => {
+      const session = autoTuneSession.value
+      if (!session) return 0
+      const ratio = cfg.epochs ? curEpoch.value / cfg.epochs : 0
+      return Math.max(0, Math.min(session.gpuHoursBudget, session.gpuHoursBudget * ratio))
+    })
+
+    const autoTuneStatusClass = computed(() => {
+      if (state.value === 'completed') return 'completed'
+      if (state.value === 'paused') return 'paused'
+      if (state.value === 'stopped') return 'stopped'
+      if (currentAutoTuneTrial.value) return 'running'
+      return 'queued'
+    })
+
+    const autoTuneStatusText = computed(() => {
+      if (state.value === 'completed') return '搜索完成'
+      if (state.value === 'paused') return '搜索暂停'
+      if (state.value === 'stopped') return '搜索中止'
+      if (currentAutoTuneTrial.value) return `运行中 · ${currentAutoTuneTrial.value.id}`
+      return '等待搜索'
+    })
+
+    const autoTuneTopTrials = computed(() => {
+      const list = (completedAutoTuneTrials.value.length ? completedAutoTuneTrials.value : autoTuneTrials.value.filter(trial => trial.status !== 'queued'))
+        .slice()
+        .sort((a, b) => b.objective - a.objective)
+      return list.slice(0, 5)
+    })
+
+    const autoTuneActiveTrials = computed(() =>
+      autoTuneTrials.value.filter(trial => trial.status !== 'queued')
+    )
+
+    const autoTuneObjectivePts = computed(() => getTrialPoints(autoTuneActiveTrials.value.map(trial => trial.objective)))
+
+    const autoTuneBestPts = computed(() => {
+      let best = 0
+      return getTrialPoints(autoTuneActiveTrials.value.map((trial, idx) => {
+        best = idx === 0 ? trial.objective : Math.max(best, trial.objective)
+        return best
+      }))
+    })
+
+    const visibleAutoTuneEvents = computed(() => {
+      const session = autoTuneSession.value
+      if (!session) return []
+      return session.events.filter(event => curEpoch.value >= event.epoch || state.value === 'completed')
+    })
+
     /* ── Chart helpers ───────────────────────────────────────────── */
     const innerW = CW - PAD_L - PAD_R
     const innerH = CH - PAD_T - PAD_B
@@ -1284,6 +1727,17 @@ createApp({
         const x = PAD_L + (d.epoch / cfg.epochs) * innerW
         const v = Math.max(yMin, Math.min(yMax, d[key]))
         const y = PAD_T + (1 - (v - yMin) / (yMax - yMin)) * innerH
+        return `${x.toFixed(1)},${y.toFixed(1)}`
+      }).join(' ')
+    }
+
+    function getTrialPoints(values) {
+      if (!values.length) return ''
+      const total = Math.max(values.length - 1, 1)
+      return values.map((value, idx) => {
+        const x = PAD_L + (idx / total) * innerW
+        const v = Math.max(0.70, Math.min(1, value))
+        const y = PAD_T + (1 - (v - 0.70) / 0.30) * innerH
         return `${x.toFixed(1)},${y.toFixed(1)}`
       }).join(' ')
     }
@@ -1395,6 +1849,97 @@ createApp({
       nextTick(() => { if (logRef.value) logRef.value.scrollTop = logRef.value.scrollHeight })
     }
 
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v))
+    }
+
+    function buildAutoTuneSession() {
+      const spans = Array.from({ length: 8 }, (_, idx) =>
+        Math.floor(((idx + 1) * cfg.epochs) / 8) - Math.floor((idx * cfg.epochs) / 8)
+      )
+      const candidates = [
+        { phase: 'Baseline', lr: cfg.lr, batchSize: cfg.batchSize, optimizer: cfg.optimizer, weightDecay: cfg.weightDecay },
+        { phase: 'Explore',  lr: clamp(cfg.lr * 1.6, 0.0001, 0.01), batchSize: Math.max(16, cfg.batchSize), optimizer: 'Adam',  weightDecay: clamp(cfg.weightDecay, 0.0001, 0.002) },
+        { phase: 'Explore',  lr: clamp(cfg.lr * 0.7, 0.0001, 0.01), batchSize: Math.max(16, cfg.batchSize / 2), optimizer: 'AdamW', weightDecay: clamp(cfg.weightDecay * 3, 0.0001, 0.002) },
+        { phase: 'Promote',  lr: derivedParams.value.lr, batchSize: derivedParams.value.batchSize, optimizer: derivedParams.value.optimizer, weightDecay: derivedParams.value.weightDecay },
+        { phase: 'Exploit',  lr: clamp((derivedParams.value.lr + cfg.lr) / 2, 0.0001, 0.01), batchSize: derivedParams.value.batchSize, optimizer: 'AdamW', weightDecay: clamp(derivedParams.value.weightDecay * 0.8, 0.0001, 0.002) },
+        { phase: 'Exploit',  lr: clamp(derivedParams.value.lr * 0.9, 0.0001, 0.01), batchSize: Math.max(16, derivedParams.value.batchSize), optimizer: 'AdamW', weightDecay: clamp(derivedParams.value.weightDecay * 1.2, 0.0001, 0.002) },
+        { phase: 'Exploit',  lr: clamp(derivedParams.value.lr * 1.1, 0.0001, 0.01), batchSize: Math.max(16, derivedParams.value.batchSize / 2), optimizer: 'Adam', weightDecay: clamp(derivedParams.value.weightDecay * 1.6, 0.0001, 0.002) },
+        { phase: 'Finalize', lr: clamp(derivedParams.value.lr * 0.85, 0.0001, 0.01), batchSize: derivedParams.value.batchSize, optimizer: 'AdamW', weightDecay: clamp(derivedParams.value.weightDecay, 0.0001, 0.002) },
+      ]
+
+      let cursor = 1
+      const trials = candidates.map((item, idx) => {
+        const startEpoch = cursor
+        const endEpoch = cursor + spans[idx] - 1
+        cursor = endEpoch + 1
+        const sens = clamp(
+          0.76 + idx * 0.017 + (cfg.minDetectRate - 85) * 0.004 + (item.optimizer === 'AdamW' ? 0.015 : 0) + (item.lr <= 0.0008 ? 0.012 : -0.008),
+          0.74, 0.97
+        )
+        const spec = clamp(
+          0.81 + (item.batchSize >= 32 ? 0.018 : -0.01) - (cfg.biasFocus > 70 ? 0.025 : 0) + idx * 0.006,
+          0.75, 0.95
+        )
+        const auc = clamp((sens + spec) / 2 + 0.05 + idx * 0.004, 0.78, 0.97)
+        const objective = clamp(auc * 0.4 + sens * 0.4 + spec * 0.2 - (sens * 100 < cfg.minDetectRate ? 0.03 : 0), 0.72, 0.98)
+        return {
+          id: `Trial-${String(idx + 1).padStart(2, '0')}`,
+          phase: item.phase,
+          startEpoch,
+          endEpoch,
+          lr: item.lr,
+          batchSize: Math.round(item.batchSize),
+          optimizer: item.optimizer,
+          weightDecay: item.weightDecay,
+          sensitivity: sens,
+          specificity: spec,
+          auc,
+          objective,
+          earlyStop: idx === 1 || idx === 6,
+          note: idx === 1 || idx === 6
+            ? '该 Trial 在中期评估中收益不足，被 ASHA 提前终止以回收计算资源。'
+            : sens * 100 >= cfg.minDetectRate
+              ? '达到临床检出率目标，进入候选最优配置池。'
+              : 'AUC 表现尚可，但灵敏度距离临床门槛仍有差距。',
+        }
+      })
+
+      return {
+        algorithm: 'Bayesian Optimization',
+        scheduler: 'ASHA',
+        objectiveName: '医疗综合评分（Recall/AUC/Specificity）',
+        parallelWorkers: 2,
+        gpuHoursBudget: Math.max(6, Number((cfg.epochs / 10).toFixed(1))),
+        trials,
+        importance: [
+          { name: '学习率', weight: 31, desc: '影响收敛稳定性与 Recall 上限，是搜索空间中最敏感的超参。' },
+          { name: '批次大小', weight: 22, desc: '决定梯度噪声与高危样本均衡效果，对泛化与显存开销均有影响。' },
+          { name: '权重衰减', weight: 17, desc: '用于抑制过拟合，在高检出率目标下对稳定性提升明显。' },
+          { name: '优化器', weight: 16, desc: 'AdamW 在医疗小样本和长尾场景下通常比 Adam 更稳健。' },
+          { name: '训练轮次', weight: 14, desc: '决定 Trial 预算长度，配合早停策略控制整体搜索成本。' },
+        ],
+        events: [
+          { id: 'e1', epoch: 1, time: 'T+00:00', title: '搜索任务初始化', text: '创建 8 个候选 Trial，使用 Bayesian Optimization 初始化搜索空间。' },
+          { id: 'e2', epoch: Math.max(2, Math.floor(cfg.epochs * 0.18)), time: 'T+00:18', title: '首轮评估完成', text: 'Trial-01 返回 baseline 指标，系统开始基于 Recall 约束更新采样分布。' },
+          { id: 'e3', epoch: Math.max(4, Math.floor(cfg.epochs * 0.34)), time: 'T+00:42', title: '触发早停', text: '低收益 Trial 被 ASHA 提前终止，释放资源给高潜力配置。' },
+          { id: 'e4', epoch: Math.max(6, Math.floor(cfg.epochs * 0.56)), time: 'T+01:04', title: '最优配置刷新', text: 'Promote 阶段 Trial 达到更高 Recall/AUC 组合，更新 best checkpoint。' },
+          { id: 'e5', epoch: Math.max(7, Math.floor(cfg.epochs * 0.78)), time: 'T+01:22', title: '进入 Exploit 阶段', text: '围绕当前最优学习率与权重衰减做局部搜索，进一步压缩搜索半径。' },
+          { id: 'e6', epoch: cfg.epochs, time: 'T+01:40', title: '搜索结束', text: '输出最优 Trial 与推荐超参，可直接回填训练配置用于正式训练。' },
+        ],
+      }
+    }
+
+    function tuneStatusLabel(status) {
+      switch (status) {
+        case 'running': return '运行中'
+        case 'completed': return '已完成'
+        case 'paused': return '已暂停'
+        case 'stopped': return '已中止'
+        default: return '排队中'
+      }
+    }
+
     function tick() {
       const epoch = curEpoch.value + 1
       if (epoch > cfg.epochs) { finishTraining(); return }
@@ -1421,15 +1966,17 @@ createApp({
       epData.value  = []
       logs.value    = []
       results.value = null
+       autoTuneSession.value = cfg.autoTune ? buildAutoTuneSession() : null
       curEpoch.value = 0
       state.value    = 'training'
       startMs.value  = Date.now()
       elapsedMs.value = 0
-      tab.value = 'progress'
+      tab.value = cfg.autoTune ? 'autotune' : 'progress'
 
       addLog(`开始训练：${cfg.modelType} | 任务：${cfg.taskType} | 轮次：${cfg.epochs}`, 'ok')
       addLog(`医疗参数 — 最低检出率: ${cfg.minDetectRate}%  优化方向: ${biasLabel.value}  高危权重: ${cfg.highRiskWeight}x`, 'ok')
       addLog(`高危疾病: ${cfg.highRiskDiseases.length ? cfg.highRiskDiseases.join('、') : '（未选择）'}`)
+      if (cfg.autoTune) addLog('自动调参已开启：Bayesian Optimization + ASHA，已生成实时监控页', 'ok')
 
       // Simulation timing (demo only — not applicable to real training pipelines).
       // Target ~14 seconds total wall-clock time regardless of epoch count.
@@ -1653,6 +2200,11 @@ createApp({
       isLocked, latest, progressPct,
       biasLabel, biasDesc, statusText, configSubText, sensCls, elapsedStr, etaStr,
       derivedParams, derivedMatchCount, derivedLrReason, applyDerived,
+      autoTuneSession, autoTuneVisible, autoTuneTrials, completedAutoTuneTrials,
+      currentAutoTuneTrial, bestAutoTuneTrial, autoTunePassCount,
+      autoTuneEarlyStoppedCount, autoTuneGpuUsage, autoTuneStatusClass,
+      autoTuneStatusText, autoTuneTopTrials, autoTuneObjectivePts,
+      autoTuneBestPts, visibleAutoTuneEvents, tuneStatusLabel,
       CW, CH, PAD_L, PAD_R, PAD_T, PAD_B,
       maxLoss,
       lossTrainPts, lossValPts, accTrainPts, accValPts,
