@@ -592,10 +592,10 @@ body{
             <td>核心指标，权重最高，反映模型临床诊断可靠性</td>
           </tr>
           <tr>
-            <td>幻觉率→可靠性（等效分）</td>
-            <td>92.2</td><td>10%</td><td>9.22</td>
-            <td><span class="badge badge-green">优秀</span></td>
-            <td>幻觉率7.8%，等效分=100-7.8，远优于行业均值</td>
+            <td>幻觉率/可靠性</td>
+            <td>88.5</td><td>10%</td><td>8.85</td>
+            <td><span class="badge badge-blue">良好</span></td>
+            <td>幻觉率7.8%（行业均15–20%），可靠性综合评分88.5</td>
           </tr>
           <tr>
             <td>诊断依据占比（可解释性）</td>
@@ -619,14 +619,14 @@ body{
             <td>AIQ 综合评分</td>
             <td style="color:#1677ff;font-size:16px">91.1</td>
             <td>100%</td>
-            <td style="color:#1677ff">91.45</td>
+            <td style="color:#1677ff">91.08</td>
             <td><span class="badge badge-green" style="font-weight:700">优秀</span></td>
-            <td>综合加权，达到临床可用标准</td>
+            <td>综合加权（≈91.1），达到临床可用标准</td>
           </tr>
         </tbody>
       </table>
       <div style="margin-top:12px;font-size:12px;color:#8c8c8c">
-        * 实际AIQ取四舍五入：91.08 ≈ <strong>91.1</strong>。权重汇总时采用各指标原始定义，幻觉率等效分（92.2）与AIQ公式中"可靠性"（88.5）有所区别，上表体现等效分以便比较。
+        * AIQ = 0.5×93.2 + 0.1×88.5 + 0.1×85.0 + 0.2×92.0 + 0.1×87.3 = 46.60+8.85+8.50+18.40+8.73 = <strong>91.08 ≈ 91.1</strong>。幻觉率原始值7.8%（等效展示分92.2）在指标详情中单独呈现，AIQ公式中"可靠性"维度综合评分为88.5。
       </div>
     </div>
   </div>
