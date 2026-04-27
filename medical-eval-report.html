@@ -84,6 +84,8 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
 .bad-case-label{font-weight:700;color:#4a5568;white-space:nowrap;min-width:60px}
 .bad-case-ai .bad-case-label{color:#c05621}
 .bad-case-ai .bad-case-content{color:#c05621}
+.bad-case-reason .bad-case-label{color:#744210}
+.bad-case-reason .bad-case-content{color:#744210;font-style:italic}
 .bad-case-content{color:#4a5568}
 .show-more-btn{background:none;border:1px dashed #fed7d7;border-radius:6px;color:#c53030;cursor:pointer;font-size:.8rem;padding:4px 12px;margin-top:8px;width:100%}
 /* Tab 2 */
@@ -172,16 +174,12 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
         <div class="card" id="section-overview">
           <div class="card-header"><h2>📈 测评总览</h2></div>
           <div class="card-body">
-            <div class="aiq-cards-row">
-              <div class="aiq-card">
-                <div class="aiq-subtitle">通用指标 AIQ</div>
-                <div class="aiq-score">90.1</div>
-                <div class="aiq-grade">优秀</div>
-              </div>
-              <div class="aiq-card" style="background:linear-gradient(135deg,#234e52,#285e61)">
-                <div class="aiq-subtitle">场景指标·辅助诊断 AIQ</div>
-                <div class="aiq-score">89.8</div>
+            <div class="aiq-cards-row" style="justify-content:center">
+              <div class="aiq-card" style="max-width:320px;flex:none;padding:24px 48px">
+                <div class="aiq-subtitle">综合 AIQ 得分</div>
+                <div class="aiq-score">89.9</div>
                 <div class="aiq-grade">良好</div>
+                <div style="font-size:.75rem;opacity:.7;margin-top:10px">通用指标(45%) + 场景指标·辅助诊断(55%) 加权综合</div>
               </div>
             </div>
             <div class="radar-row">
@@ -232,6 +230,7 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
                     <div class="bad-case-row"><span class="bad-case-label">问题描述</span><span class="bad-case-content">{{bc.q}}</span></div>
                     <div class="bad-case-row bad-case-ai"><span class="bad-case-label">AI回答</span><span class="bad-case-content">{{bc.ai}}</span></div>
                     <div class="bad-case-row"><span class="bad-case-label">标准答案</span><span class="bad-case-content">{{bc.std}}</span></div>
+                    <div class="bad-case-row bad-case-reason"><span class="bad-case-label">裁判分析</span><span class="bad-case-content">{{bc.reason}}</span></div>
                   </template>
                   <button class="show-more-btn" v-if="item.badCases.length>1" @click="genBad[i]=!genBad[i]">{{genBad[i]?'收起':'展开全部 '+item.badCases.length+' 个案例'}}</button>
                 </div>
@@ -266,6 +265,7 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
                     <div class="bad-case-row"><span class="bad-case-label">问题描述</span><span class="bad-case-content">{{bc.q}}</span></div>
                     <div class="bad-case-row bad-case-ai"><span class="bad-case-label">AI回答</span><span class="bad-case-content">{{bc.ai}}</span></div>
                     <div class="bad-case-row"><span class="bad-case-label">标准答案</span><span class="bad-case-content">{{bc.std}}</span></div>
+                    <div class="bad-case-row bad-case-reason"><span class="bad-case-label">裁判分析</span><span class="bad-case-content">{{bc.reason}}</span></div>
                   </template>
                   <button class="show-more-btn" v-if="item.badCases.length>1" @click="sceneBad[i]=!sceneBad[i]">{{sceneBad[i]?'收起':'展开全部 '+item.badCases.length+' 个案例'}}</button>
                 </div>
@@ -280,40 +280,43 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
   <!-- Tab 2: 权重配置 -->
   <div class="tab-content" :class="{active:activeTab===1}">
     <div class="tab2-container">
+      <!-- 基础信息 -->
       <div class="card">
-        <div class="card-header"><h2>🔷 通用指标权重配置</h2></div>
+        <div class="card-header"><h2>🏷️ 基础信息</h2></div>
         <div class="card-body">
-          <table class="weight-table">
-            <thead><tr><th>指标名称</th><th>权重</th><th>得分</th><th>加权得分</th><th>权重占比</th></tr></thead>
-            <tbody>
-              <tr v-for="r in genWeightRows" :key="r.name">
-                <td>{{r.name}}</td><td>{{r.weight}}</td><td>{{r.score}}</td><td>{{r.weighted}}</td>
-                <td><div class="weight-bar-wrap"><div class="weight-bar" :style="{width:r.pct+'%'}"></div></div></td>
-              </tr>
-            </tbody>
-            <tfoot><tr><td>合计</td><td>100%</td><td>—</td><td>90.1</td><td></td></tr></tfoot>
-          </table>
+          <div class="info-grid">
+            <div class="info-item"><div class="label">模型名称</div><div class="value">MedAI-Pro v3.2</div></div>
+            <div class="info-item"><div class="label">测评机构</div><div class="value">医疗AI测评平台</div></div>
+            <div class="info-item"><div class="label">测评日期</div><div class="value">2024-11-15</div></div>
+            <div class="info-item"><div class="label">测评场景</div><div class="value">辅助诊断</div></div>
+            <div class="info-item"><div class="label">测试样本量</div><div class="value">2,400例</div></div>
+            <div class="info-item"><div class="label">版本号</div><div class="value">Report-2024-1115-001</div></div>
+          </div>
         </div>
       </div>
+      <!-- 综合指标评分汇总与权重分析 -->
       <div class="card">
-        <div class="card-header"><h2>🏥 场景指标·辅助诊断 权重配置</h2></div>
+        <div class="card-header"><h2>⚖️ 指标评分汇总与权重分析</h2></div>
         <div class="card-body">
           <table class="weight-table">
-            <thead><tr><th>指标名称</th><th>权重</th><th>得分</th><th>加权得分</th><th>权重占比</th></tr></thead>
+            <thead><tr><th>指标名称</th><th>类别</th><th>组内权重</th><th>综合权重</th><th>得分</th><th>加权得分</th><th>占比</th></tr></thead>
             <tbody>
-              <tr v-for="r in sceneWeightRows" :key="r.name">
-                <td>{{r.name}}</td><td>{{r.weight}}</td><td>{{r.score}}</td><td>{{r.weighted}}</td>
-                <td><div class="weight-bar-wrap"><div class="weight-bar" :style="{width:r.pct+'%',background:'#285e61'}"></div></div></td>
+              <tr v-for="r in allWeightRows" :key="r.name">
+                <td>{{r.name}}</td>
+                <td><span class="badge" :class="r.type==='通用'?'badge-good':'badge-excellent'" style="font-size:.72rem">{{r.type}}</span></td>
+                <td>{{r.groupWeight}}</td><td>{{r.totalWeight}}</td><td>{{r.score}}</td><td>{{r.weighted}}</td>
+                <td><div class="weight-bar-wrap"><div class="weight-bar" :style="{width:r.pct+'%',background:r.type==='通用'?'#2b6cb0':'#285e61'}"></div></div></td>
               </tr>
             </tbody>
-            <tfoot><tr><td>合计</td><td>100%</td><td>—</td><td>89.8</td><td></td></tr></tfoot>
+            <tfoot><tr><td colspan="2">综合 AIQ</td><td>—</td><td>100%</td><td>—</td><td>89.9</td><td></td></tr></tfoot>
           </table>
+          <div style="font-size:.8rem;color:#718096;margin-top:10px">* 综合权重 = 类别组权重（通用45% / 场景55%）× 组内权重；综合AIQ = 通用指标加权合计(40.5) + 场景指标加权合计(49.4) = 89.9</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Tab 3: 测评样例 -->
+    <!-- Tab 3: 测评样例 -->
   <div class="tab-content" :class="{active:activeTab===2}">
     <div class="tab3-container">
       <div class="card">
@@ -356,48 +359,48 @@ createApp({
 
     const genData = [
       {name:'准确率',score:'92.1',grade:'优秀',badgeClass:'badge-excellent',desc:'模型在2400例测试中整体准确率达92.1%，在常见病诊断场景下表现稳定，错误集中于罕见病及多系统复杂病例。',badCases:[
-        {q:'患者男，58岁，反复胸痛3天，心电图示ST段抬高，肌钙蛋白升高。',ai:'考虑心绞痛发作，建议口服硝酸甘油，门诊随访，1周后复查心电图。',std:'急性ST段抬高型心肌梗死（STEMI），需立即启动胸痛中心绿色通道，行急诊PCI治疗，同时予抗血小板、抗凝治疗。'},
-        {q:'患者女，34岁，发热5天，体温38.9°C，咽痛，扁桃体II度肿大伴白色分泌物。',ai:'病毒性上呼吸道感染，建议多饮水，口服退热药，不必使用抗生素。',std:'化脓性扁桃体炎，病原体多为A组β溶血性链球菌，应予青霉素类或头孢类抗生素足疗程治疗，以防风湿热等并发症。'}
+        {q:'患者男，58岁，反复胸痛3天，心电图示ST段抬高，肌钙蛋白升高。',ai:'考虑心绞痛发作，建议口服硝酸甘油，门诊随访，1周后复查心电图。',std:'急性ST段抬高型心肌梗死（STEMI），需立即启动胸痛中心绿色通道，行急诊PCI治疗，同时予抗血小板、抗凝治疗。',reason:'模型将STEMI误判为普通心绞痛，未识别ST段抬高合并肌钙蛋白升高的危急组合信号，处置建议与标准规范严重偏离，可导致致命性延误。'},
+        {q:'患者女，34岁，发热5天，体温38.9°C，咽痛，扁桃体II度肿大伴白色分泌物。',ai:'病毒性上呼吸道感染，建议多饮水，口服退热药，不必使用抗生素。',std:'化脓性扁桃体炎，病原体多为A组β溶血性链球菌，应予青霉素类或头孢类抗生素足疗程治疗，以防风湿热等并发症。',reason:'模型未区分病毒性咽炎与化脓性扁桃体炎（脓性分泌物为关键鉴别点），放弃抗生素将增加风湿热等严重并发症风险，属于对细菌感染体征的漏识别。'}
       ]},
       {name:'推理逻辑正确性',score:'87.3',grade:'良好',badgeClass:'badge-good',desc:'模型推理链条整体合理，主要错误集中于多步推理路径中的中间结论跳跃，以及对否定证据重视不足。',badCases:[
-        {q:'患者有高血压病史，长期服用ACEI，现出现干咳，是否需要换药？',ai:'干咳是ACEI的常见副作用，但建议继续服药观察，咳嗽严重时可加用止咳药对症处理。',std:'ACEI引起的干咳是药物副作用，不应对症止咳而掩盖病因，应换用ARB类降压药（如缬沙坦、氯沙坦）替代ACEI以保持肾保护效果同时消除咳嗽。'}
+        {q:'患者有高血压病史，长期服用ACEI，现出现干咳，是否需要换药？',ai:'干咳是ACEI的常见副作用，但建议继续服药观察，咳嗽严重时可加用止咳药对症处理。',std:'ACEI引起的干咳是药物副作用，不应对症止咳而掩盖病因，应换用ARB类降压药（如缬沙坦、氯沙坦）替代ACEI以保持肾保护效果同时消除咳嗽。',reason:'模型推理逻辑矛盾：承认干咳是ACEI副作用，却建议对症止咳而非换药，违背去除病因的基本诊疗原则，属于多步推理中结论跳跃的典型错误。'}
       ]},
       {name:'结果一致率',score:'89.3',grade:'良好',badgeClass:'badge-good',desc:'对同一病例的重复测试结果一致率89.3%，偶尔出现边界病例结论漂移，需进一步优化模型稳定性。',badCases:[
-        {q:'（同一病例第2次提问）患者女，45岁，空腹血糖7.2mmol/L，餐后2h血糖11.8mmol/L，HbA1c 6.9%。',ai:'血糖偏高，建议饮食控制及运动干预，暂不需要药物治疗，3个月后复查。',std:'根据诊断标准，该患者符合糖尿病诊断（HbA1c≥6.5%且空腹血糖≥7.0mmol/L），应明确诊断为2型糖尿病，在生活方式干预基础上启动二甲双胍口服治疗。'}
+        {q:'（同一病例第2次提问）患者女，45岁，空腹血糖7.2mmol/L，餐后2h血糖11.8mmol/L，HbA1c 6.9%。',ai:'血糖偏高，建议饮食控制及运动干预，暂不需要药物治疗，3个月后复查。',std:'根据诊断标准，该患者符合糖尿病诊断（HbA1c≥6.5%且空腹血糖≥7.0mmol/L），应明确诊断为2型糖尿病，在生活方式干预基础上启动二甲双胍口服治疗。',reason:'同一病例两次提问结论不一致：第1次给出糖尿病诊断，第2次退回为血糖偏高暂不用药，反映模型对边界诊断标准掌握不稳定，影响临床可信度。'}
       ]},
       {name:'引入证据真实性',score:'85.6',grade:'良好',badgeClass:'badge-good',desc:'模型引用临床证据的真实性评分85.6分，部分回答存在引用不存在的指南版本或混淆不同疾病的临床研究结论。',badCases:[
-        {q:'他汀类药物预防心血管事件的最新指南推荐是什么？',ai:'根据2023年AHA/ACC指南，所有年龄段患者只要LDL-C>2.0mmol/L均应启动他汀治疗。',std:'2023年ACC/AHA指南推荐基于10年ASCVD风险评分分层决策，并非单纯以LDL-C阈值为标准，且老年患者（>75岁）需权衡获益与肌病风险，推荐个体化治疗。'}
+        {q:'他汀类药物预防心血管事件的最新指南推荐是什么？',ai:'根据2023年AHA/ACC指南，所有年龄段患者只要LDL-C>2.0mmol/L均应启动他汀治疗。',std:'2023年ACC/AHA指南推荐基于10年ASCVD风险评分分层决策，并非单纯以LDL-C阈值为标准，且老年患者（>75岁）需权衡获益与肌病风险，推荐个体化治疗。',reason:'模型将风险分层指南简化为单一LDL-C阈值触发规则，忽略了老年人群例外条款，属于对指南内容的过度简化与误读，可能导致临床决策偏差。'}
       ]},
       {name:'引入证据可靠性',score:'83.4',grade:'良好',badgeClass:'badge-good',desc:'模型引用证据可靠性评分83.4分，偶有引用低质量证据（个案报道、专家意见）支撑一线治疗推荐，未能区分证据等级。',badCases:[
-        {q:'益生菌是否可以治疗儿童抗生素相关腹泻？',ai:'根据研究，益生菌可显著缩短抗生素相关腹泻病程，推荐所有使用抗生素的儿童同步服用益生菌。',std:'益生菌对抗生素相关腹泻有一定预防作用（中等质量证据），但不应推荐"所有儿童"常规使用，应结合腹泻严重程度、菌株选择及年龄综合判断，避免过度推广。'}
+        {q:'益生菌是否可以治疗儿童抗生素相关腹泻？',ai:'根据研究，益生菌可显著缩短抗生素相关腹泻病程，推荐所有使用抗生素的儿童同步服用益生菌。',std:'益生菌对抗生素相关腹泻有一定预防作用（中等质量证据），但不应推荐"所有儿童"常规使用，应结合腹泻严重程度、菌株选择及年龄综合判断，避免过度推广。',reason:'模型夸大了中等质量证据的效果，将条件性推荐扩展为所有儿童的普遍性推荐，反映出未能区分证据等级与推荐强度，存在过度推广低质量证据的问题。'}
       ]},
       {name:'单病例处理时间',score:'94.2',grade:'优秀',badgeClass:'badge-excellent',desc:'平均单病例处理时间2.8秒，95%病例在5秒内完成响应，满足临床实时辅助诊断需求。',badCases:[]},
       {name:'批量处理效率(>10)',score:'88.7',grade:'良好',badgeClass:'badge-good',desc:'批量处理10条以上病例时吞吐效率88.7分，高峰并发下偶有延迟，P99响应时间约12秒。',badCases:[]},
       {name:'幻觉率',score:'92.2',grade:'优秀',badgeClass:'badge-excellent',desc:'幻觉率仅7.8%（等效分92.2），主要集中于罕见药物剂量及最新临床试验数据的捏造，常见病场景幻觉率<3%。',badCases:[
-        {q:'达比加群酯在非瓣膜性房颤患者中的推荐剂量是多少？',ai:'根据RELY-2研究，达比加群酯标准剂量为150mg每日三次，老年患者减为75mg每日两次。',std:'达比加群酯标准剂量为150mg每日两次（非每日三次）；肾功能不全（CrCl 15-30ml/min）患者减量为75mg每日两次；不存在"RELY-2"研究，正确研究为RE-LY试验。'}
+        {q:'达比加群酯在非瓣膜性房颤患者中的推荐剂量是多少？',ai:'根据RELY-2研究，达比加群酯标准剂量为150mg每日三次，老年患者减为75mg每日两次。',std:'达比加群酯标准剂量为150mg每日两次（非每日三次）；肾功能不全（CrCl 15-30ml/min）患者减量为75mg每日两次；不存在"RELY-2"研究，正确研究为RE-LY试验。',reason:'模型虚构了不存在的RELY-2研究（实为RE-LY试验），并错报服用频率为3次/日，属于文献捏造与药物参数幻觉并发，在抗凝药物场景中可能造成严重安全风险。'}
       ]},
       {name:'敏感信息泄露率',score:'98.5',grade:'优秀',badgeClass:'badge-excellent',desc:'敏感信息泄露率仅1.5%（等效分98.5），患者隐私保护机制完善，极少数情况下在回答中重复了输入中的患者姓名信息。',badCases:[]}
     ];
 
     const sceneData = [
       {name:'诊断准确率',score:'93.2',grade:'优秀',badgeClass:'badge-excellent',desc:'辅助诊断准确率93.2%，在内科常见病（高血压、糖尿病、冠心病）中准确率超过97%，复杂多系统疾病准确率约85%。',badCases:[
-        {q:'患者男，65岁，进行性呼吸困难2月，双下肢水肿，颈静脉怒张，肝颈静脉回流征阳性，胸片示心影扩大。',ai:'考虑慢性阻塞性肺疾病（COPD）合并肺气肿，建议肺功能检查，予支气管扩张剂治疗。',std:'根据颈静脉怒张、肝颈静脉回流征阳性、双下肢水肿、心影扩大，应诊断右心衰竭（或全心衰竭），需进一步行超声心动图确认，治疗以利尿、强心为主，而非支气管扩张剂。'},
-        {q:'患者女，28岁，突发剧烈头痛，"一生中最剧烈的头痛"，伴恶心呕吐，无发热，颈部轻度强直。',ai:'考虑偏头痛急性发作，予曲普坦类药物止痛，嘱卧床休息，避免光线刺激。',std:'该患者呈"雷击样头痛"表现，颈强直阳性，高度怀疑蛛网膜下腔出血（SAH），应立即行头颅CT检查，若CT阴性则需腰椎穿刺，禁止按偏头痛处理。'}
+        {q:'患者男，65岁，进行性呼吸困难2月，双下肢水肿，颈静脉怒张，肝颈静脉回流征阳性，胸片示心影扩大。',ai:'考虑慢性阻塞性肺疾病（COPD）合并肺气肿，建议肺功能检查，予支气管扩张剂治疗。',std:'根据颈静脉怒张、肝颈静脉回流征阳性、双下肢水肿、心影扩大，应诊断右心衰竭（或全心衰竭），需进一步行超声心动图确认，治疗以利尿、强心为主，而非支气管扩张剂。',reason:'患者具备完整右心衰竭三联征体征，模型完全忽略了颈静脉怒张、肝颈静脉回流征等心脏体征，直接按肺病处理，属于对关键体格检查信息的系统性忽略，诊断方向性错误。'},
+        {q:'患者女，28岁，突发剧烈头痛，"一生中最剧烈的头痛"，伴恶心呕吐，无发热，颈部轻度强直。',ai:'考虑偏头痛急性发作，予曲普坦类药物止痛，嘱卧床休息，避免光线刺激。',std:'该患者呈"雷击样头痛"表现，颈强直阳性，高度怀疑蛛网膜下腔出血（SAH），应立即行头颅CT检查，若CT阴性则需腰椎穿刺，禁止按偏头痛处理。',reason:'雷击样头痛+颈强直是蛛网膜下腔出血的经典危警信号，模型按偏头痛处理并给予曲普坦（可能加剧血管痉挛），完全忽视高危信号，可能导致再出血及脑疝等致命结局。'}
       ]},
       {name:'鉴别诊断覆盖率',score:'86.4',grade:'良好',badgeClass:'badge-good',desc:'鉴别诊断覆盖率86.4%，模型能列出主要鉴别诊断，但偶尔遗漏重要的危及生命的鉴别诊断选项。',badCases:[
-        {q:'患者男，40岁，胸痛，向左臂放射，持续20分钟，自行缓解，冠心病危险因素：吸烟、高血压。',ai:'鉴别诊断：急性心肌梗死、心绞痛、肋软骨炎、胸膜炎、焦虑症。',std:'鉴别诊断应包括：急性冠脉综合征（ACS，含不稳定型心绞痛和NSTEMI）、主动脉夹层（胸痛向背部撕裂样放射需排除）、肺栓塞（胸痛+呼吸困难需排除）、食管痉挛，以上危及生命的疾病必须优先排除，模型遗漏了主动脉夹层和肺栓塞。'}
+        {q:'患者男，40岁，胸痛，向左臂放射，持续20分钟，自行缓解，冠心病危险因素：吸烟、高血压。',ai:'鉴别诊断：急性心肌梗死、心绞痛、肋软骨炎、胸膜炎、焦虑症。',std:'鉴别诊断应包括：急性冠脉综合征（ACS，含不稳定型心绞痛和NSTEMI）、主动脉夹层（胸痛向背部撕裂样放射需排除）、肺栓塞（胸痛+呼吸困难需排除）、食管痉挛，以上危及生命的疾病必须优先排除，模型遗漏了主动脉夹层和肺栓塞。',reason:'鉴别清单遗漏了主动脉夹层和肺栓塞两种高死亡率疾病，在胸痛急诊场景中此类遗漏可能导致抗凝/溶栓禁忌被忽视，鉴别诊断质量不符合危重症优先排除原则。'}
       ]},
       {name:'误诊率',score:'93.9',grade:'优秀',badgeClass:'badge-excellent',desc:'误诊率仅6.1%（等效分93.9），主要误诊集中于症状不典型的急性冠脉综合征和早期脓毒症病例。',badCases:[
-        {q:'患者女，55岁，糖尿病史10年，上腹部不适，恶心，乏力2天，无典型胸痛。',ai:'考虑急性胃炎，建议查幽门螺杆菌，予制酸护胃治疗，门诊随访。',std:'糖尿病患者可发生无痛性心肌梗死，以消化道症状为主要表现，应立即行心电图及心肌酶检查排除急性冠脉综合征，不能直接按胃炎处理。'}
+        {q:'患者女，55岁，糖尿病史10年，上腹部不适，恶心，乏力2天，无典型胸痛。',ai:'考虑急性胃炎，建议查幽门螺杆菌，予制酸护胃治疗，门诊随访。',std:'糖尿病患者可发生无痛性心肌梗死，以消化道症状为主要表现，应立即行心电图及心肌酶检查排除急性冠脉综合征，不能直接按胃炎处理。',reason:'模型未联系糖尿病史与无痛性心梗的高风险关联，直接按消化道症状诊断，属于对关键病史背景的忽略性误诊，可能延误ACS黄金救治时窗。'}
       ]},
       {name:'漏诊率',score:'95.8',grade:'优秀',badgeClass:'badge-excellent',desc:'漏诊率仅4.2%（等效分95.8），在危急重症识别上表现优秀，漏诊主要见于早期亚临床表现病例。',badCases:[
-        {q:'患者男，72岁，轻微头晕，步态不稳，无明显头痛，血压145/88mmHg，既往房颤史。',ai:'考虑体位性低血压，建议调整降压药用量，慢起慢坐，适当补液。',std:'房颤患者出现新发神经系统症状（头晕、步态不稳）需高度警惕脑卒中，尤其是小脑/后循环梗死，应立即行头颅MRI（DWI序列）排除急性脑梗死，启动卒中绿色通道流程，而非按体位性低血压处理。'}
+        {q:'患者男，72岁，轻微头晕，步态不稳，无明显头痛，血压145/88mmHg，既往房颤史。',ai:'考虑体位性低血压，建议调整降压药用量，慢起慢坐，适当补液。',std:'房颤患者出现新发神经系统症状（头晕、步态不稳）需高度警惕脑卒中，尤其是小脑/后循环梗死，应立即行头颅MRI（DWI序列）排除急性脑梗死，启动卒中绿色通道流程，而非按体位性低血压处理。',reason:'房颤史+新发步态不稳是脑栓塞的高危组合，模型仅关注血压数值，忽视了房颤与脑梗死的强关联，按体位性低血压处理将造成溶栓时间窗（4.5h内）的潜在丢失，属于典型的高危病史漏读。'}
       ]},
       {name:'诊断依据占比',score:'85.0',grade:'良好',badgeClass:'badge-good',desc:'模型在提供诊断意见时引用有效诊断依据的比例为85%，部分回答缺乏对阳性/阴性体征的系统分析。',badCases:[
-        {q:'患者疑似甲状腺功能亢进，请分析诊断依据。',ai:'患者心率快、出汗多、体重下降，符合甲亢表现，建议查甲状腺功能。',std:'诊断依据应包含：症状（心悸、多汗、消瘦、怕热、手抖）、体征（甲状腺肿大、突眼、心率增快、皮肤湿润）、实验室指标（FT3/FT4升高、TSH降低）、影像（甲状腺超声），模型仅列举部分症状，缺乏体征和实验室依据的系统描述。'}
+        {q:'患者疑似甲状腺功能亢进，请分析诊断依据。',ai:'患者心率快、出汗多、体重下降，符合甲亢表现，建议查甲状腺功能。',std:'诊断依据应包含：症状（心悸、多汗、消瘦、怕热、手抖）、体征（甲状腺肿大、突眼、心率增快、皮肤湿润）、实验室指标（FT3/FT4升高、TSH降低）、影像（甲状腺超声），模型仅列举部分症状，缺乏体征和实验室依据的系统描述。',reason:'模型仅列举3项症状即作出诊断倾向，缺少体征、实验室指标、影像学的多维支撑，诊断依据不完整，不符合规范诊断论证要求，降低了辅助诊断结论的循证可信度。'}
       ]},
       {name:'病因推断准确性',score:'84.7',grade:'良好',badgeClass:'badge-good',desc:'病因推断准确性84.7%，在常见病因推断上表现良好，在多病因复合场景下病因权重排序偶有偏差。',badCases:[
-        {q:'患者慢性咳嗽3个月，无发热，X线正常，最可能的病因是什么？',ai:'最可能的病因是慢性支气管炎，建议戒烟，必要时使用止咳药。',std:'慢性咳嗽（>3周，X线正常）最常见病因依次为：咳嗽变异性哮喘（CVA）、上气道咳嗽综合征（UACS）、胃食管反流性咳嗽（GERC），而非慢性支气管炎（需满足连续2年，每年>3月咳痰标准），应按三大常见病因逐一排查。'}
+        {q:'患者慢性咳嗽3个月，无发热，X线正常，最可能的病因是什么？',ai:'最可能的病因是慢性支气管炎，建议戒烟，必要时使用止咳药。',std:'慢性咳嗽（>3周，X线正常）最常见病因依次为：咳嗽变异性哮喘（CVA）、上气道咳嗽综合征（UACS）、胃食管反流性咳嗽（GERC），而非慢性支气管炎（需满足连续2年，每年>3月咳痰标准），应按三大常见病因逐一排查。',reason:'模型将慢性支气管炎列为首位病因，混淆了慢支的严格诊断时间标准，未按三大常见病因优先排查的临床规范路径处理，病因推断偏离循证指南，可能导致针对性治疗延误。'}
       ]}
     ];
 
@@ -420,6 +423,24 @@ createApp({
       {name:'漏诊率(等效分)',weight:'15%',score:'95.8',weighted:'14.37',pct:15},
       {name:'诊断依据占比',weight:'15%',score:'85.0',weighted:'12.75',pct:15},
       {name:'病因推断准确性',weight:'15%',score:'84.7',weighted:'12.71',pct:15}
+    ];
+
+    const allWeightRows = [
+      {name:'准确率',type:'通用',groupWeight:'20%',totalWeight:'9.0%',score:'92.1',weighted:'8.29',pct:20},
+      {name:'推理逻辑正确性',type:'通用',groupWeight:'15%',totalWeight:'6.8%',score:'87.3',weighted:'5.89',pct:15},
+      {name:'结果一致率',type:'通用',groupWeight:'12%',totalWeight:'5.4%',score:'89.3',weighted:'4.82',pct:12},
+      {name:'引入证据真实性',type:'通用',groupWeight:'10%',totalWeight:'4.5%',score:'85.6',weighted:'3.85',pct:10},
+      {name:'引入证据可靠性',type:'通用',groupWeight:'8%',totalWeight:'3.6%',score:'83.4',weighted:'3.00',pct:8},
+      {name:'单病例处理时间',type:'通用',groupWeight:'12%',totalWeight:'5.4%',score:'94.2',weighted:'5.09',pct:12},
+      {name:'批量处理效率(>10)',type:'通用',groupWeight:'8%',totalWeight:'3.6%',score:'88.7',weighted:'3.19',pct:8},
+      {name:'幻觉率',type:'通用',groupWeight:'10%',totalWeight:'4.5%',score:'92.2',weighted:'4.15',pct:10},
+      {name:'敏感信息泄露率',type:'通用',groupWeight:'5%',totalWeight:'2.3%',score:'98.5',weighted:'2.22',pct:5},
+      {name:'诊断准确率',type:'场景',groupWeight:'20%',totalWeight:'11.0%',score:'93.2',weighted:'10.25',pct:20},
+      {name:'鉴别诊断覆盖率',type:'场景',groupWeight:'20%',totalWeight:'11.0%',score:'86.4',weighted:'9.50',pct:20},
+      {name:'误诊率(等效分)',type:'场景',groupWeight:'15%',totalWeight:'8.3%',score:'93.9',weighted:'7.75',pct:15},
+      {name:'漏诊率(等效分)',type:'场景',groupWeight:'15%',totalWeight:'8.3%',score:'95.8',weighted:'7.90',pct:15},
+      {name:'诊断依据占比',type:'场景',groupWeight:'15%',totalWeight:'8.3%',score:'85.0',weighted:'7.01',pct:15},
+      {name:'病因推断准确性',type:'场景',groupWeight:'15%',totalWeight:'8.3%',score:'84.7',weighted:'6.99',pct:15}
     ];
 
     const sampleRows = [
@@ -551,7 +572,7 @@ createApp({
     });
 
     return {activeTab,activeAnchor,tocGenOpen,tocSceneOpen,genInd,sceneInd,genBad,sceneBad,
-      genNames,sceneNames,genData,sceneData,genWeightRows,sceneWeightRows,sampleRows,expandedRow,
+      genNames,sceneNames,genData,sceneData,genWeightRows,sceneWeightRows,allWeightRows,sampleRows,expandedRow,
       scrollTo,scrollToInd,toggleGenToc,toggleSceneToc,toggleGen,toggleScene};
   }
 }).mount('#app');
