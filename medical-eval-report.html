@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>医疗AI测评报告</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+:root{--nav-h:112px;--blue-dk:#0a2f6b;--blue-md:#1a56db;--blue-lt:#dbeafe;--blue-pale:#eff6ff;--scene-blue:#1e4d8c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f1f5fb;color:#1e293b}
+
+/* ── Unified top nav ── */
+.top-nav{background:linear-gradient(120deg,var(--blue-dk) 0%,var(--blue-md) 100%);position:sticky;top:0;z-index:100;box-shadow:0 3px 14px rgba(0,0,0,.28)}
+.top-nav-brand{display:flex;align-items:center;gap:16px;padding:16px 32px 8px}
+.nav-icon{font-size:2rem;filter:drop-shadow(0 1px 4px rgba(0,0,0,.3))}
+.nav-title{font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:.02em}
+.nav-sub{font-size:.78rem;color:rgba(255,255,255,.72);margin-top:2px}
+.nav-badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:1px 10px;font-size:.7rem;color:rgba(255,255,255,.85);margin-left:10px;vertical-align:middle}
+.top-nav-tabs{display:flex;padding:0 28px;border-top:1px solid rgba(255,255,255,.15)}
+.tab-btn{padding:9px 22px;border:none;background:transparent;cursor:pointer;font-size:.9rem;color:rgba(255,255,255,.72);border-bottom:3px solid transparent;transition:all .18s;font-weight:500;letter-spacing:.01em;margin-bottom:-1px}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.tab-btn.active{color:#fff;border-bottom-color:#93c5fd;font-weight:700}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* ── Sidebar + layout ── */
+.report-layout{display:flex;min-height:calc(100vh - var(--nav-h))}
+.toc-sidebar{width:230px;min-width:230px;background:#fff;border-right:1px solid #e2e8f0;padding:14px 0;position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow-y:auto}
+.toc-title{font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;padding:0 14px 8px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:.85rem;color:#475569;border-left:3px solid transparent;transition:all .14s}
+.toc-item:hover{background:var(--blue-pale);color:var(--blue-md)}
+.toc-item.active{background:var(--blue-pale);color:var(--blue-md);border-left-color:var(--blue-md);font-weight:600}
+.toc-item.l2{padding-left:26px;font-size:.8rem;color:#64748b}
+.toc-item.l2.active{color:var(--blue-md);font-weight:600}
+.toc-l1-item{display:flex;align-items:center;justify-content:space-between;padding:6px 14px;cursor:pointer;font-size:.85rem;color:#334155;border-left:3px solid transparent;transition:all .14s;font-weight:700}
+.toc-l1-item:hover{background:var(--blue-pale);color:var(--blue-md)}
+.toc-chevron{font-size:.65rem;transition:transform .2s;color:#94a3b8}
+.toc-chevron.open{transform:rotate(180deg)}
+
+/* ── Cards ── */
+.report-main{flex:1;padding:24px 32px;overflow-y:auto}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(10,47,107,.08);margin-bottom:24px;overflow:hidden;border:1px solid #e8eef8}
+.card-header{background:linear-gradient(90deg,var(--blue-dk),var(--blue-md));padding:14px 22px;display:flex;align-items:center;gap:10px}
+.card-header h2{font-size:1rem;font-weight:700;color:#fff}
+.card-body{padding:20px 24px}
+
+/* ── Basic info ── */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.info-item{background:var(--blue-pale);border:1px solid var(--blue-lt);border-radius:8px;padding:11px 14px}
+.info-item .label{font-size:.72rem;color:#64748b;margin-bottom:3px}
+.info-item .value{font-weight:700;color:var(--blue-dk);font-size:.95rem}
+
+/* ── Overview: 3-col score strip ── */
+.score-strip{display:flex;gap:0;border:1px solid var(--blue-lt);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.score-cell{flex:1;padding:18px 16px;text-align:center;background:#fff}
+.score-cell+.score-cell{border-left:1px solid var(--blue-lt)}
+.score-cell.main{background:linear-gradient(135deg,var(--blue-dk),var(--blue-md));color:#fff}
+.score-cell .sc-label{font-size:.75rem;color:#64748b;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.score-cell.main .sc-label{color:rgba(255,255,255,.8)}
+.score-cell .sc-val{font-size:2.6rem;font-weight:800;color:var(--blue-md);line-height:1}
+.score-cell.main .sc-val{font-size:3.2rem;color:#fff}
+.score-cell .sc-grade{display:inline-block;border-radius:20px;padding:2px 12px;font-size:.78rem;font-weight:700;margin-top:6px;background:var(--blue-lt);color:var(--blue-dk)}
+.score-cell.main .sc-grade{background:rgba(255,255,255,.22);color:#fff}
+.score-cell .sc-meta{font-size:.7rem;color:#94a3b8;margin-top:6px}
+.score-cell.main .sc-meta{color:rgba(255,255,255,.65)}
+
+/* ── Radar row ── */
+.radar-row{display:flex;gap:16px;margin-bottom:16px}
+.radar-col{flex:1;border:1px solid #e8eef8;border-radius:10px;padding:14px;background:#fafcff}
+.radar-col-title{font-size:.82rem;font-weight:700;color:var(--blue-dk);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.radar-col-score{font-size:1.3rem;font-weight:800;color:var(--blue-md)}
+.chart-medium{height:240px}
+
+/* ── Grade legend strip ── */
+.grade-strip{display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 4px;border-top:1px solid #e8eef8;margin-top:8px}
+.grade-chip{display:flex;align-items:center;gap:6px;font-size:.78rem;color:#475569}
+.grade-chip .gd-box{width:26px;height:8px;border-radius:3px}
+
+/* ── Indicator cards ── */
+.ind-card{border:1px solid #e2eaf5;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.ind-card-header{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;cursor:pointer;background:#f8faff;transition:background .14s}
+.ind-card-header:hover{background:var(--blue-pale)}
+.ind-card-header.open{background:var(--blue-pale)}
+.ind-left{display:flex;align-items:center;gap:11px}
+.ind-num{width:26px;height:26px;border-radius:50%;background:var(--blue-md);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:700}
+.ind-num.scene{background:var(--scene-blue)}
+.ind-name{font-weight:600;font-size:.93rem;color:#1e293b}
+.ind-right{display:flex;align-items:center;gap:11px}
+.ind-score{font-size:1.15rem;font-weight:800;color:var(--blue-md)}
+.badge{border-radius:20px;padding:3px 11px;font-size:.75rem;font-weight:600}
+.badge-excellent{background:#dcfce7;color:#166534}
+.badge-good{background:var(--blue-lt);color:var(--blue-dk)}
+.badge-pass{background:#fef9c3;color:#854d0e}
+.badge-fail{background:#fee2e2;color:#991b1b}
+.chevron{font-size:.7rem;color:#94a3b8;transition:transform .18s}
+.chevron.open{transform:rotate(180deg)}
+.ind-body{padding:18px;border-top:1px solid #e2eaf5;display:none}
+.ind-body.open{display:block}
+.chart-area{height:230px;margin-bottom:14px}
+.desc-text{font-size:.865rem;color:#475569;line-height:1.65;margin-bottom:12px}
+
+/* ── Bad cases ── */
+.bad-case-box{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:14px;margin-top:8px}
+.bad-case-title{font-size:.8rem;font-weight:700;color:#b91c1c;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.bad-case-row{display:flex;gap:8px;margin-bottom:8px;font-size:.81rem;line-height:1.5}
+.bad-case-row:last-child{margin-bottom:0}
+.bad-case-label{font-weight:700;color:#475569;white-space:nowrap;min-width:60px}
+.bad-case-ai .bad-case-label{color:#b45309}
+.bad-case-ai .bad-case-content{color:#b45309}
+.bad-case-reason .bad-case-label{color:#7c3aed}
+.bad-case-reason .bad-case-content{color:#7c3aed;font-style:italic}
+.bad-case-content{color:#475569}
+.show-more-btn{background:none;border:1px dashed #fca5a5;border-radius:6px;color:#b91c1c;cursor:pointer;font-size:.79rem;padding:4px 12px;margin-top:8px;width:100%}
+
+/* ── Tab 2/3 containers ── */
+.tab2-container,.tab3-container{padding:24px 32px}
+.weight-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:8px}
+.weight-table th{background:var(--blue-dk);color:#fff;padding:10px 14px;text-align:left}
+.weight-table td{padding:8px 14px;border-bottom:1px solid #e8eef8}
+.weight-table tr:nth-child(even) td{background:#f8faff}
+.weight-table tfoot td{background:var(--blue-pale);font-weight:700;color:var(--blue-dk)}
+.weight-bar-wrap{background:#dbeafe;border-radius:4px;height:7px;width:100%;margin-top:3px}
+.weight-bar{height:7px;border-radius:4px;background:var(--blue-md)}
+.sample-table{width:100%;border-collapse:collapse;font-size:.86rem}
+.sample-table th{background:var(--blue-dk);color:#fff;padding:10px 14px;text-align:left}
+.sample-table td{padding:8px 14px;border-bottom:1px solid #e8eef8;vertical-align:top}
+.sample-table tr.expandable{cursor:pointer}.sample-table tr.expandable:hover td{background:var(--blue-pale)}
+.expand-row td{background:#f8faff;padding:14px 22px;font-size:.84rem;color:#475569;line-height:1.65}
+.tag{display:inline-block;border-radius:12px;padding:2px 10px;font-size:.74rem;font-weight:600}
+.tag-pass{background:#dcfce7;color:#166534}
+.tag-fail{background:#fee2e2;color:#991b1b}
+/* Section group label for indicator sections */
+.ind-section-label{font-size:.85rem;font-weight:700;color:#fff;background:var(--blue-dk);padding:6px 14px;border-radius:6px;margin-bottom:12px;display:inline-block;letter-spacing:.04em}
+.ind-section-label.scene{background:var(--scene-blue)}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Unified top nav -->
+  <div class="top-nav">
+    <div class="top-nav-brand">
+      <div class="nav-icon">🏥</div>
+      <div>
+        <div class="nav-title">医疗AI测评平台 · 评测报告<span class="nav-badge">MedAI-Pro v3.2</span></div>
+        <div class="nav-sub">Medical AI Evaluation Platform — Comprehensive Assessment Report</div>
+      </div>
+    </div>
+    <div class="top-nav-tabs">
+      <button class="tab-btn" :class="{active:activeTab===0}" @click="activeTab=0">📊 测评详情</button>
+      <button class="tab-btn" :class="{active:activeTab===1}" @click="activeTab=1">⚖️ 权重配置</button>
+      <button class="tab-btn" :class="{active:activeTab===2}" @click="activeTab=2">📋 测评样例</button>
+    </div>
+  </div>
+
+  <!-- Tab 1 -->
+  <div class="tab-content" :class="{active:activeTab===0}">
+    <div class="report-layout">
+      <!-- TOC sidebar -->
+      <div class="toc-sidebar">
+        <div class="toc-title">目录导航</div>
+        <div class="toc-item" :class="{active:activeAnchor==='basic'}" @click="scrollTo('section-basic','basic')">🏷️ 基础信息</div>
+        <div class="toc-item" :class="{active:activeAnchor==='overview'}" @click="scrollTo('section-overview','overview')">📈 测评总览</div>
+        <!-- L1: 通用指标 -->
+        <div class="toc-l1-item" @click="toggleGenToc">
+          <span>🔷 通用指标</span>
+          <span class="toc-chevron" :class="{open:tocGenOpen}">▼</span>
+        </div>
+        <template v-if="tocGenOpen">
+          <div v-for="(n,i) in genNames" :key="'g'+i" class="toc-item l2" :class="{active:activeAnchor==='gen-card-'+i}" @click="scrollToInd('gen-card-'+i,'gen-card-'+i,i,'gen')">{{ i+1 }}. {{n}}</div>
+        </template>
+        <!-- L1: 场景指标 -->
+        <div class="toc-l1-item" @click="toggleSceneToc">
+          <span>🏥 场景指标·辅助诊断</span>
+          <span class="toc-chevron" :class="{open:tocSceneOpen}">▼</span>
+        </div>
+        <template v-if="tocSceneOpen">
+          <div v-for="(n,i) in sceneNames" :key="'s'+i" class="toc-item l2" :class="{active:activeAnchor==='scene-card-'+i}" @click="scrollToInd('scene-card-'+i,'scene-card-'+i,i,'scene')">{{ i+1 }}. {{n}}</div>
+        </template>
+      </div>
+
+      <!-- Main -->
+      <div class="report-main">
+        <!-- 基础信息 -->
+        <div class="card" id="section-basic">
+          <div class="card-header"><h2>🏷️ 基础信息</h2></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-item"><div class="label">模型名称</div><div class="value">MedAI-Pro v3.2</div></div>
+              <div class="info-item"><div class="label">测评机构</div><div class="value">医疗AI测评平台</div></div>
+              <div class="info-item"><div class="label">测评日期</div><div class="value">2024-11-15</div></div>
+              <div class="info-item"><div class="label">测评场景</div><div class="value">辅助诊断</div></div>
+              <div class="info-item"><div class="label">测试样本量</div><div class="value">2,400例</div></div>
+              <div class="info-item"><div class="label">版本号</div><div class="value">Report-2024-1115-001</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 测评总览 -->
+        <div class="card" id="section-overview">
+          <div class="card-header"><h2>📈 测评总览</h2></div>
+          <div class="card-body">
+            <!-- 3-col score strip -->
+            <div class="score-strip">
+              <div class="score-cell">
+                <div class="sc-label">🔷 通用指标</div>
+                <div class="sc-val">90.1</div>
+                <div class="sc-grade">优秀</div>
+                <div class="sc-meta">9项指标 · 权重 45%</div>
+              </div>
+              <div class="score-cell main">
+                <div class="sc-label">综合 AIQ 得分</div>
+                <div class="sc-val">89.9</div>
+                <div class="sc-grade">良好</div>
+                <div class="sc-meta">通用(45%) + 场景(55%) 加权综合</div>
+              </div>
+              <div class="score-cell">
+                <div class="sc-label">🏥 场景指标</div>
+                <div class="sc-val">89.8</div>
+                <div class="sc-grade">良好</div>
+                <div class="sc-meta">6项指标 · 权重 55%</div>
+              </div>
+            </div>
+            <!-- Dual radar -->
+            <div class="radar-row">
+              <div class="radar-col">
+                <div class="radar-col-title">🔷 通用指标 <span class="radar-col-score">90.1</span></div>
+                <div id="genRadarChart" class="chart-medium"></div>
+              </div>
+              <div class="radar-col">
+                <div class="radar-col-title">🏥 场景指标·辅助诊断 <span class="radar-col-score" style="color:var(--scene-blue)">89.8</span></div>
+                <div id="sceneRadarChart" class="chart-medium"></div>
+              </div>
+            </div>
+            <!-- Grade legend strip -->
+            <div class="grade-strip">
+              <div class="grade-chip"><div class="gd-box" style="background:#166534"></div>优秀 ≥ 90</div>
+              <div class="grade-chip" style="margin-left:8px"><div class="gd-box" style="background:var(--blue-md)"></div>良好 80–89</div>
+              <div class="grade-chip" style="margin-left:8px"><div class="gd-box" style="background:#b45309"></div>合格 70–79</div>
+              <div class="grade-chip" style="margin-left:8px"><div class="gd-box" style="background:#991b1b"></div>不合格 &lt; 70</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 通用指标 section -->
+        <div class="card" id="section-general">
+          <div class="card-header"><h2>🔷 通用指标详细评测</h2></div>
+          <div class="card-body">
+            <div class="ind-section-label">🔷 通用指标 — 9项核心能力</div>
+            <div v-for="(item,i) in genData" :key="'g'+i" class="ind-card" :id="'gen-card-'+i">
+              <div class="ind-card-header" :class="{open:genInd[i]}" @click="toggleGen(i)">
+                <div class="ind-left">
+                  <div class="ind-num">{{i+1}}</div>
+                  <div class="ind-name">{{item.name}}</div>
+                </div>
+                <div class="ind-right">
+                  <div class="ind-score">{{item.score}}</div>
+                  <span class="badge" :class="item.badgeClass">{{item.grade}}</span>
+                  <span class="chevron" :class="{open:genInd[i]}">▼</span>
+                </div>
+              </div>
+              <div class="ind-body" :class="{open:genInd[i]}">
+                <div :id="'genChart'+i" class="chart-area"></div>
+                <p class="desc-text">{{item.desc}}</p>
+                <div class="bad-case-box" v-if="item.badCases && item.badCases.length">
+                  <div class="bad-case-title">⚠️ 典型错误案例</div>
+                  <template v-for="(bc,bi) in (genBad[i] ? item.badCases : item.badCases.slice(0,1))" :key="bi">
+                    <div style="border-bottom:1px dashed #fed7d7;margin-bottom:8px;padding-bottom:8px" v-if="bi>0"></div>
+                    <div class="bad-case-row"><span class="bad-case-label">问题描述</span><span class="bad-case-content">{{bc.q}}</span></div>
+                    <div class="bad-case-row bad-case-ai"><span class="bad-case-label">AI回答</span><span class="bad-case-content">{{bc.ai}}</span></div>
+                    <div class="bad-case-row"><span class="bad-case-label">标准答案</span><span class="bad-case-content">{{bc.std}}</span></div>
+                    <div class="bad-case-row bad-case-reason"><span class="bad-case-label">裁判分析</span><span class="bad-case-content">{{bc.reason}}</span></div>
+                  </template>
+                  <button class="show-more-btn" v-if="item.badCases.length>1" @click="genBad[i]=!genBad[i]">{{genBad[i]?'收起':'展开全部 '+item.badCases.length+' 个案例'}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 场景指标 section -->
+        <div class="card" id="section-scene">
+          <div class="card-header"><h2>🏥 场景指标·辅助诊断 详细评测</h2></div>
+          <div class="card-body">
+            <div class="ind-section-label scene">🏥 场景指标·辅助诊断 — 6项专科能力</div>
+            <div v-for="(item,i) in sceneData" :key="'s'+i" class="ind-card" :id="'scene-card-'+i">
+              <div class="ind-card-header" :class="{open:sceneInd[i]}" @click="toggleScene(i)">
+                <div class="ind-left">
+                  <div class="ind-num scene">{{i+1}}</div>
+                  <div class="ind-name">{{item.name}}</div>
+                </div>
+                <div class="ind-right">
+                  <div class="ind-score">{{item.score}}</div>
+                  <span class="badge" :class="item.badgeClass">{{item.grade}}</span>
+                  <span class="chevron" :class="{open:sceneInd[i]}">▼</span>
+                </div>
+              </div>
+              <div class="ind-body" :class="{open:sceneInd[i]}">
+                <div :id="'sceneChart'+i" class="chart-area"></div>
+                <p class="desc-text">{{item.desc}}</p>
+                <div class="bad-case-box" v-if="item.badCases && item.badCases.length">
+                  <div class="bad-case-title">⚠️ 典型错误案例</div>
+                  <template v-for="(bc,bi) in (sceneBad[i] ? item.badCases : item.badCases.slice(0,1))" :key="bi">
+                    <div style="border-bottom:1px dashed #fed7d7;margin-bottom:8px;padding-bottom:8px" v-if="bi>0"></div>
+                    <div class="bad-case-row"><span class="bad-case-label">问题描述</span><span class="bad-case-content">{{bc.q}}</span></div>
+                    <div class="bad-case-row bad-case-ai"><span class="bad-case-label">AI回答</span><span class="bad-case-content">{{bc.ai}}</span></div>
+                    <div class="bad-case-row"><span class="bad-case-label">标准答案</span><span class="bad-case-content">{{bc.std}}</span></div>
+                    <div class="bad-case-row bad-case-reason"><span class="bad-case-label">裁判分析</span><span class="bad-case-content">{{bc.reason}}</span></div>
+                  </template>
+                  <button class="show-more-btn" v-if="item.badCases.length>1" @click="sceneBad[i]=!sceneBad[i]">{{sceneBad[i]?'收起':'展开全部 '+item.badCases.length+' 个案例'}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: 权重配置 -->
+  <div class="tab-content" :class="{active:activeTab===1}">
+    <div class="tab2-container">
+      <!-- 基础信息 -->
+      <div class="card">
+        <div class="card-header"><h2>🏷️ 基础信息</h2></div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item"><div class="label">模型名称</div><div class="value">MedAI-Pro v3.2</div></div>
+            <div class="info-item"><div class="label">测评机构</div><div class="value">医疗AI测评平台</div></div>
+            <div class="info-item"><div class="label">测评日期</div><div class="value">2024-11-15</div></div>
+            <div class="info-item"><div class="label">测评场景</div><div class="value">辅助诊断</div></div>
+            <div class="info-item"><div class="label">测试样本量</div><div class="value">2,400例</div></div>
+            <div class="info-item"><div class="label">版本号</div><div class="value">Report-2024-1115-001</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- 综合指标评分汇总与权重分析 -->
+      <div class="card">
+        <div class="card-header"><h2>⚖️ 指标评分汇总与权重分析</h2></div>
+        <div class="card-body">
+          <table class="weight-table">
+            <thead><tr><th>指标名称</th><th>类别</th><th>组内权重</th><th>综合权重</th><th>得分</th><th>加权得分</th><th>占比</th></tr></thead>
+            <tbody>
+              <tr v-for="r in allWeightRows" :key="r.name">
+                <td>{{r.name}}</td>
+                <td><span class="badge" :class="r.type==='通用'?'badge-good':'badge-excellent'" style="font-size:.72rem">{{r.type}}</span></td>
+                <td>{{r.groupWeight}}</td><td>{{r.totalWeight}}</td><td>{{r.score}}</td><td>{{r.weighted}}</td>
+                <td><div class="weight-bar-wrap"><div class="weight-bar" :style="{width:r.pct+'%',background:r.type==='通用'?'var(--blue-md)':'var(--scene-blue)'}"></div></div></td>
+              </tr>
+            </tbody>
+            <tfoot><tr><td colspan="2">综合 AIQ</td><td>—</td><td>100%</td><td>—</td><td>89.9</td><td></td></tr></tfoot>
+          </table>
+          <div style="font-size:.8rem;color:#718096;margin-top:10px">* 综合权重 = 类别组权重（通用45% / 场景55%）× 组内权重；综合AIQ = 通用指标加权合计(40.5) + 场景指标加权合计(49.4) = 89.9</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Tab 3: 测评样例 -->
+  <div class="tab-content" :class="{active:activeTab===2}">
+    <div class="tab3-container">
+      <div class="card">
+        <div class="card-header"><h2>📋 测评样例</h2></div>
+        <div class="card-body" style="padding:0">
+          <table class="sample-table">
+            <thead><tr><th>#</th><th>问题摘要</th><th>场景</th><th>评测指标</th><th>结果</th></tr></thead>
+            <tbody>
+              <template v-for="(row,i) in sampleRows" :key="i">
+                <tr class="expandable" @click="expandedRow=expandedRow===i?null:i">
+                  <td>{{i+1}}</td><td>{{row.q}}</td><td>{{row.scene}}</td><td>{{row.metric}}</td>
+                  <td><span class="tag" :class="row.pass?'tag-pass':'tag-fail'">{{row.pass?'通过':'未通过'}}</span></td>
+                </tr>
+                <tr v-if="expandedRow===i" class="expand-row"><td colspan="5"><strong>问题：</strong>{{row.q}}<br/><strong>AI回答：</strong>{{row.aiAns}}<br/><strong>标准答案：</strong>{{row.stdAns}}<br/><strong>评语：</strong>{{row.comment}}</td></tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const {createApp,ref,reactive,onMounted,nextTick,watch} = Vue;
+createApp({
+  setup(){
+    const activeTab = ref(0);
+    const activeAnchor = ref('basic');
+    const tocGenOpen = ref(true);
+    const tocSceneOpen = ref(true);
+    const genInd = reactive(Array(9).fill(false));
+    const sceneInd = reactive(Array(6).fill(false));
+    const genBad = reactive(Array(9).fill(false));
+    const sceneBad = reactive(Array(6).fill(false));
+    const expandedRow = ref(null);
+
+    const genNames = ['准确率','推理逻辑正确性','结果一致率','引入证据真实性','引入证据可靠性','单病例处理时间','批量处理效率(>10)','幻觉率','敏感信息泄露率'];
+    const sceneNames = ['诊断准确率','鉴别诊断覆盖率','误诊率','漏诊率','诊断依据占比','病因推断准确性'];
+
+    const genData = [
+      {name:'准确率',score:'92.1',grade:'优秀',badgeClass:'badge-excellent',desc:'模型在2400例测试中整体准确率达92.1%，在常见病诊断场景下表现稳定，错误集中于罕见病及多系统复杂病例。',badCases:[
+        {q:'患者男，58岁，反复胸痛3天，心电图示ST段抬高，肌钙蛋白升高。',ai:'考虑心绞痛发作，建议口服硝酸甘油，门诊随访，1周后复查心电图。',std:'急性ST段抬高型心肌梗死（STEMI），需立即启动胸痛中心绿色通道，行急诊PCI治疗，同时予抗血小板、抗凝治疗。',reason:'模型将STEMI误判为普通心绞痛，未识别ST段抬高合并肌钙蛋白升高的危急组合信号，处置建议与标准规范严重偏离，可导致致命性延误。'},
+        {q:'患者女，34岁，发热5天，体温38.9°C，咽痛，扁桃体II度肿大伴白色分泌物。',ai:'病毒性上呼吸道感染，建议多饮水，口服退热药，不必使用抗生素。',std:'化脓性扁桃体炎，病原体多为A组β溶血性链球菌，应予青霉素类或头孢类抗生素足疗程治疗，以防风湿热等并发症。',reason:'模型未区分病毒性咽炎与化脓性扁桃体炎（脓性分泌物为关键鉴别点），放弃抗生素将增加风湿热等严重并发症风险，属于对细菌感染体征的漏识别。'}
+      ]},
+      {name:'推理逻辑正确性',score:'87.3',grade:'良好',badgeClass:'badge-good',desc:'模型推理链条整体合理，主要错误集中于多步推理路径中的中间结论跳跃，以及对否定证据重视不足。',badCases:[
+        {q:'患者有高血压病史，长期服用ACEI，现出现干咳，是否需要换药？',ai:'干咳是ACEI的常见副作用，但建议继续服药观察，咳嗽严重时可加用止咳药对症处理。',std:'ACEI引起的干咳是药物副作用，不应对症止咳而掩盖病因，应换用ARB类降压药（如缬沙坦、氯沙坦）替代ACEI以保持肾保护效果同时消除咳嗽。',reason:'模型推理逻辑矛盾：承认干咳是ACEI副作用，却建议对症止咳而非换药，违背去除病因的基本诊疗原则，属于多步推理中结论跳跃的典型错误。'}
+      ]},
+      {name:'结果一致率',score:'89.3',grade:'良好',badgeClass:'badge-good',desc:'对同一病例的重复测试结果一致率89.3%，偶尔出现边界病例结论漂移，需进一步优化模型稳定性。',badCases:[
+        {q:'（同一病例第2次提问）患者女，45岁，空腹血糖7.2mmol/L，餐后2h血糖11.8mmol/L，HbA1c 6.9%。',ai:'血糖偏高，建议饮食控制及运动干预，暂不需要药物治疗，3个月后复查。',std:'根据诊断标准，该患者符合糖尿病诊断（HbA1c≥6.5%且空腹血糖≥7.0mmol/L），应明确诊断为2型糖尿病，在生活方式干预基础上启动二甲双胍口服治疗。',reason:'同一病例两次提问结论不一致：第1次给出糖尿病诊断，第2次退回为血糖偏高暂不用药，反映模型对边界诊断标准掌握不稳定，影响临床可信度。'}
+      ]},
+      {name:'引入证据真实性',score:'85.6',grade:'良好',badgeClass:'badge-good',desc:'模型引用临床证据的真实性评分85.6分，部分回答存在引用不存在的指南版本或混淆不同疾病的临床研究结论。',badCases:[
+        {q:'他汀类药物预防心血管事件的最新指南推荐是什么？',ai:'根据2023年AHA/ACC指南，所有年龄段患者只要LDL-C>2.0mmol/L均应启动他汀治疗。',std:'2023年ACC/AHA指南推荐基于10年ASCVD风险评分分层决策，并非单纯以LDL-C阈值为标准，且老年患者（>75岁）需权衡获益与肌病风险，推荐个体化治疗。',reason:'模型将风险分层指南简化为单一LDL-C阈值触发规则，忽略了老年人群例外条款，属于对指南内容的过度简化与误读，可能导致临床决策偏差。'}
+      ]},
+      {name:'引入证据可靠性',score:'83.4',grade:'良好',badgeClass:'badge-good',desc:'模型引用证据可靠性评分83.4分，偶有引用低质量证据（个案报道、专家意见）支撑一线治疗推荐，未能区分证据等级。',badCases:[
+        {q:'益生菌是否可以治疗儿童抗生素相关腹泻？',ai:'根据研究，益生菌可显著缩短抗生素相关腹泻病程，推荐所有使用抗生素的儿童同步服用益生菌。',std:'益生菌对抗生素相关腹泻有一定预防作用（中等质量证据），但不应推荐"所有儿童"常规使用，应结合腹泻严重程度、菌株选择及年龄综合判断，避免过度推广。',reason:'模型夸大了中等质量证据的效果，将条件性推荐扩展为所有儿童的普遍性推荐，反映出未能区分证据等级与推荐强度，存在过度推广低质量证据的问题。'}
+      ]},
+      {name:'单病例处理时间',score:'94.2',grade:'优秀',badgeClass:'badge-excellent',desc:'平均单病例处理时间2.8秒，95%病例在5秒内完成响应，满足临床实时辅助诊断需求。',badCases:[]},
+      {name:'批量处理效率(>10)',score:'88.7',grade:'良好',badgeClass:'badge-good',desc:'批量处理10条以上病例时吞吐效率88.7分，高峰并发下偶有延迟，P99响应时间约12秒。',badCases:[]},
+      {name:'幻觉率',score:'92.2',grade:'优秀',badgeClass:'badge-excellent',desc:'幻觉率仅7.8%（等效分92.2），主要集中于罕见药物剂量及最新临床试验数据的捏造，常见病场景幻觉率<3%。',badCases:[
+        {q:'达比加群酯在非瓣膜性房颤患者中的推荐剂量是多少？',ai:'根据RELY-2研究，达比加群酯标准剂量为150mg每日三次，老年患者减为75mg每日两次。',std:'达比加群酯标准剂量为150mg每日两次（非每日三次）；肾功能不全（CrCl 15-30ml/min）患者减量为75mg每日两次；不存在"RELY-2"研究，正确研究为RE-LY试验。',reason:'模型虚构了不存在的RELY-2研究（实为RE-LY试验），并错报服用频率为3次/日，属于文献捏造与药物参数幻觉并发，在抗凝药物场景中可能造成严重安全风险。'}
+      ]},
+      {name:'敏感信息泄露率',score:'98.5',grade:'优秀',badgeClass:'badge-excellent',desc:'敏感信息泄露率仅1.5%（等效分98.5），患者隐私保护机制完善，极少数情况下在回答中重复了输入中的患者姓名信息。',badCases:[]}
+    ];
+
+    const sceneData = [
+      {name:'诊断准确率',score:'93.2',grade:'优秀',badgeClass:'badge-excellent',desc:'辅助诊断准确率93.2%，在内科常见病（高血压、糖尿病、冠心病）中准确率超过97%，复杂多系统疾病准确率约85%。',badCases:[
+        {q:'患者男，65岁，进行性呼吸困难2月，双下肢水肿，颈静脉怒张，肝颈静脉回流征阳性，胸片示心影扩大。',ai:'考虑慢性阻塞性肺疾病（COPD）合并肺气肿，建议肺功能检查，予支气管扩张剂治疗。',std:'根据颈静脉怒张、肝颈静脉回流征阳性、双下肢水肿、心影扩大，应诊断右心衰竭（或全心衰竭），需进一步行超声心动图确认，治疗以利尿、强心为主，而非支气管扩张剂。',reason:'患者具备完整右心衰竭三联征体征，模型完全忽略了颈静脉怒张、肝颈静脉回流征等心脏体征，直接按肺病处理，属于对关键体格检查信息的系统性忽略，诊断方向性错误。'},
+        {q:'患者女，28岁，突发剧烈头痛，"一生中最剧烈的头痛"，伴恶心呕吐，无发热，颈部轻度强直。',ai:'考虑偏头痛急性发作，予曲普坦类药物止痛，嘱卧床休息，避免光线刺激。',std:'该患者呈"雷击样头痛"表现，颈强直阳性，高度怀疑蛛网膜下腔出血（SAH），应立即行头颅CT检查，若CT阴性则需腰椎穿刺，禁止按偏头痛处理。',reason:'雷击样头痛+颈强直是蛛网膜下腔出血的经典危警信号，模型按偏头痛处理并给予曲普坦（可能加剧血管痉挛），完全忽视高危信号，可能导致再出血及脑疝等致命结局。'}
+      ]},
+      {name:'鉴别诊断覆盖率',score:'86.4',grade:'良好',badgeClass:'badge-good',desc:'鉴别诊断覆盖率86.4%，模型能列出主要鉴别诊断，但偶尔遗漏重要的危及生命的鉴别诊断选项。',badCases:[
+        {q:'患者男，40岁，胸痛，向左臂放射，持续20分钟，自行缓解，冠心病危险因素：吸烟、高血压。',ai:'鉴别诊断：急性心肌梗死、心绞痛、肋软骨炎、胸膜炎、焦虑症。',std:'鉴别诊断应包括：急性冠脉综合征（ACS，含不稳定型心绞痛和NSTEMI）、主动脉夹层（胸痛向背部撕裂样放射需排除）、肺栓塞（胸痛+呼吸困难需排除）、食管痉挛，以上危及生命的疾病必须优先排除，模型遗漏了主动脉夹层和肺栓塞。',reason:'鉴别清单遗漏了主动脉夹层和肺栓塞两种高死亡率疾病，在胸痛急诊场景中此类遗漏可能导致抗凝/溶栓禁忌被忽视，鉴别诊断质量不符合危重症优先排除原则。'}
+      ]},
+      {name:'误诊率',score:'93.9',grade:'优秀',badgeClass:'badge-excellent',desc:'误诊率仅6.1%（等效分93.9），主要误诊集中于症状不典型的急性冠脉综合征和早期脓毒症病例。',badCases:[
+        {q:'患者女，55岁，糖尿病史10年，上腹部不适，恶心，乏力2天，无典型胸痛。',ai:'考虑急性胃炎，建议查幽门螺杆菌，予制酸护胃治疗，门诊随访。',std:'糖尿病患者可发生无痛性心肌梗死，以消化道症状为主要表现，应立即行心电图及心肌酶检查排除急性冠脉综合征，不能直接按胃炎处理。',reason:'模型未联系糖尿病史与无痛性心梗的高风险关联，直接按消化道症状诊断，属于对关键病史背景的忽略性误诊，可能延误ACS黄金救治时窗。'}
+      ]},
+      {name:'漏诊率',score:'95.8',grade:'优秀',badgeClass:'badge-excellent',desc:'漏诊率仅4.2%（等效分95.8），在危急重症识别上表现优秀，漏诊主要见于早期亚临床表现病例。',badCases:[
+        {q:'患者男，72岁，轻微头晕，步态不稳，无明显头痛，血压145/88mmHg，既往房颤史。',ai:'考虑体位性低血压，建议调整降压药用量，慢起慢坐，适当补液。',std:'房颤患者出现新发神经系统症状（头晕、步态不稳）需高度警惕脑卒中，尤其是小脑/后循环梗死，应立即行头颅MRI（DWI序列）排除急性脑梗死，启动卒中绿色通道流程，而非按体位性低血压处理。',reason:'房颤史+新发步态不稳是脑栓塞的高危组合，模型仅关注血压数值，忽视了房颤与脑梗死的强关联，按体位性低血压处理将造成溶栓时间窗（4.5h内）的潜在丢失，属于典型的高危病史漏读。'}
+      ]},
+      {name:'诊断依据占比',score:'85.0',grade:'良好',badgeClass:'badge-good',desc:'模型在提供诊断意见时引用有效诊断依据的比例为85%，部分回答缺乏对阳性/阴性体征的系统分析。',badCases:[
+        {q:'患者疑似甲状腺功能亢进，请分析诊断依据。',ai:'患者心率快、出汗多、体重下降，符合甲亢表现，建议查甲状腺功能。',std:'诊断依据应包含：症状（心悸、多汗、消瘦、怕热、手抖）、体征（甲状腺肿大、突眼、心率增快、皮肤湿润）、实验室指标（FT3/FT4升高、TSH降低）、影像（甲状腺超声），模型仅列举部分症状，缺乏体征和实验室依据的系统描述。',reason:'模型仅列举3项症状即作出诊断倾向，缺少体征、实验室指标、影像学的多维支撑，诊断依据不完整，不符合规范诊断论证要求，降低了辅助诊断结论的循证可信度。'}
+      ]},
+      {name:'病因推断准确性',score:'84.7',grade:'良好',badgeClass:'badge-good',desc:'病因推断准确性84.7%，在常见病因推断上表现良好，在多病因复合场景下病因权重排序偶有偏差。',badCases:[
+        {q:'患者慢性咳嗽3个月，无发热，X线正常，最可能的病因是什么？',ai:'最可能的病因是慢性支气管炎，建议戒烟，必要时使用止咳药。',std:'慢性咳嗽（>3周，X线正常）最常见病因依次为：咳嗽变异性哮喘（CVA）、上气道咳嗽综合征（UACS）、胃食管反流性咳嗽（GERC），而非慢性支气管炎（需满足连续2年，每年>3月咳痰标准），应按三大常见病因逐一排查。',reason:'模型将慢性支气管炎列为首位病因，混淆了慢支的严格诊断时间标准，未按三大常见病因优先排查的临床规范路径处理，病因推断偏离循证指南，可能导致针对性治疗延误。'}
+      ]}
+    ];
+
+    const genWeightRows = [
+      {name:'准确率',weight:'20%',score:'92.1',weighted:'18.42',pct:20},
+      {name:'推理逻辑正确性',weight:'15%',score:'87.3',weighted:'13.10',pct:15},
+      {name:'结果一致率',weight:'12%',score:'89.3',weighted:'10.72',pct:12},
+      {name:'引入证据真实性',weight:'10%',score:'85.6',weighted:'8.56',pct:10},
+      {name:'引入证据可靠性',weight:'8%',score:'83.4',weighted:'6.67',pct:8},
+      {name:'单病例处理时间',weight:'12%',score:'94.2',weighted:'11.30',pct:12},
+      {name:'批量处理效率(>10)',weight:'8%',score:'88.7',weighted:'7.10',pct:8},
+      {name:'幻觉率',weight:'10%',score:'92.2',weighted:'9.22',pct:10},
+      {name:'敏感信息泄露率',weight:'5%',score:'98.5',weighted:'4.93',pct:5}
+    ];
+
+    const sceneWeightRows = [
+      {name:'诊断准确率',weight:'20%',score:'93.2',weighted:'18.64',pct:20},
+      {name:'鉴别诊断覆盖率',weight:'20%',score:'86.4',weighted:'17.28',pct:20},
+      {name:'误诊率(等效分)',weight:'15%',score:'93.9',weighted:'14.09',pct:15},
+      {name:'漏诊率(等效分)',weight:'15%',score:'95.8',weighted:'14.37',pct:15},
+      {name:'诊断依据占比',weight:'15%',score:'85.0',weighted:'12.75',pct:15},
+      {name:'病因推断准确性',weight:'15%',score:'84.7',weighted:'12.71',pct:15}
+    ];
+
+    const allWeightRows = [
+      {name:'准确率',type:'通用',groupWeight:'20%',totalWeight:'9.0%',score:'92.1',weighted:'8.29',pct:20},
+      {name:'推理逻辑正确性',type:'通用',groupWeight:'15%',totalWeight:'6.8%',score:'87.3',weighted:'5.89',pct:15},
+      {name:'结果一致率',type:'通用',groupWeight:'12%',totalWeight:'5.4%',score:'89.3',weighted:'4.82',pct:12},
+      {name:'引入证据真实性',type:'通用',groupWeight:'10%',totalWeight:'4.5%',score:'85.6',weighted:'3.85',pct:10},
+      {name:'引入证据可靠性',type:'通用',groupWeight:'8%',totalWeight:'3.6%',score:'83.4',weighted:'3.00',pct:8},
+      {name:'单病例处理时间',type:'通用',groupWeight:'12%',totalWeight:'5.4%',score:'94.2',weighted:'5.09',pct:12},
+      {name:'批量处理效率(>10)',type:'通用',groupWeight:'8%',totalWeight:'3.6%',score:'88.7',weighted:'3.19',pct:8},
+      {name:'幻觉率',type:'通用',groupWeight:'10%',totalWeight:'4.5%',score:'92.2',weighted:'4.15',pct:10},
+      {name:'敏感信息泄露率',type:'通用',groupWeight:'5%',totalWeight:'2.3%',score:'98.5',weighted:'2.22',pct:5},
+      {name:'诊断准确率',type:'场景',groupWeight:'20%',totalWeight:'11.0%',score:'93.2',weighted:'10.25',pct:20},
+      {name:'鉴别诊断覆盖率',type:'场景',groupWeight:'20%',totalWeight:'11.0%',score:'86.4',weighted:'9.50',pct:20},
+      {name:'误诊率(等效分)',type:'场景',groupWeight:'15%',totalWeight:'8.3%',score:'93.9',weighted:'7.75',pct:15},
+      {name:'漏诊率(等效分)',type:'场景',groupWeight:'15%',totalWeight:'8.3%',score:'95.8',weighted:'7.90',pct:15},
+      {name:'诊断依据占比',type:'场景',groupWeight:'15%',totalWeight:'8.3%',score:'85.0',weighted:'7.01',pct:15},
+      {name:'病因推断准确性',type:'场景',groupWeight:'15%',totalWeight:'8.3%',score:'84.7',weighted:'6.99',pct:15}
+    ];
+
+    const sampleRows = [
+      {q:'急性心肌梗死识别',scene:'辅助诊断',metric:'诊断准确率',pass:true,aiAns:'患者ST段抬高，肌钙蛋白升高，考虑STEMI，建议紧急PCI。',stdAns:'急性ST段抬高型心肌梗死，立即启动胸痛绿色通道。',comment:'AI准确识别STEMI并给出正确处置意见。'},
+      {q:'糖尿病足感染分级',scene:'辅助诊断',metric:'诊断依据占比',pass:true,aiAns:'根据Wagner分级，该患者足部溃疡深达肌腱，为3级，需住院抗感染+清创。',stdAns:'Wagner 3级糖尿病足，住院治疗，局部清创+全身抗生素。',comment:'分级准确，处置方案合理。'},
+      {q:'儿童发热惊厥处置',scene:'辅助诊断',metric:'漏诊率',pass:true,aiAns:'热性惊厥，需排除颅内感染，建议腰穿，同时予退热处理。',stdAns:'单纯热性惊厥首次发作且退热后意识恢复正常，可不立即腰穿，密切观察。',comment:'AI过度处置但方向正确，漏诊未发生。'},
+      {q:'肺癌早期筛查建议',scene:'辅助诊断',metric:'诊断准确率',pass:false,aiAns:'建议所有50岁以上成人每年行胸部X线筛查肺癌。',stdAns:'LDCT（低剂量螺旋CT）是肺癌筛查金标准，胸部X线不推荐作为筛查工具。',comment:'AI推荐了已被淘汰的筛查工具，存在知识错误。'},
+      {q:'抗生素选择-社区获得性肺炎',scene:'辅助诊断',metric:'病因推断准确性',pass:true,aiAns:'社区获得性肺炎轻症，首选阿莫西林或阿奇霉素，覆盖非典型病原体。',stdAns:'社区获得性肺炎轻症：阿莫西林（或联合阿奇霉素），覆盖肺炎链球菌及非典型病原体。',comment:'方案符合指南推荐。'},
+      {q:'主动脉夹层鉴别',scene:'辅助诊断',metric:'鉴别诊断覆盖率',pass:false,aiAns:'胸痛患者，考虑急性心肌梗死，建议急诊PCI。',stdAns:'撕裂样胸背痛需首先排除主动脉夹层，CTPA为首选，确诊前禁止抗凝/溶栓。',comment:'AI漏掉了主动脉夹层这一危及生命的鉴别诊断。'},
+      {q:'慢性肾病贫血治疗',scene:'辅助诊断',metric:'推理逻辑正确性',pass:true,aiAns:'CKD3期贫血，Hb<100g/L，补充促红细胞生成素，目标Hb维持110-120g/L，同时补铁。',stdAns:'CKD贫血管理：EPO+铁剂，目标Hb 110-120g/L，避免过高（增加心血管风险）。',comment:'治疗方案正确，目标值合理。'},
+      {q:'脓毒症早期识别',scene:'辅助诊断',metric:'误诊率',pass:true,aiAns:'患者发热、心率快、血压偏低，qSOFA评分≥2，考虑脓毒症，立即启动集束化治疗：抽血培养后1h内给予广谱抗生素，液体复苏。',stdAns:'脓毒症集束化治疗：1h内完成血培养+乳酸检测+广谱抗生素+液体复苏30ml/kg。',comment:'AI正确识别脓毒症并给出规范的集束化治疗方案。'}
+    ];
+
+    function scrollTo(id, anchor){
+      activeAnchor.value = anchor;
+      const el = document.getElementById(id);
+      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+
+    function scrollToInd(id, anchor, idx, type){
+      activeAnchor.value = anchor;
+      if(type==='gen'){ genInd[idx]=true; }
+      else { sceneInd[idx]=true; }
+      nextTick(()=>{
+        const el = document.getElementById(id);
+        if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); }
+        setTimeout(()=>{
+          if(type==='gen') initGenChart(idx);
+          else initSceneChart(idx);
+        },300);
+      });
+    }
+
+    function toggleGenToc(){
+      tocGenOpen.value = !tocGenOpen.value;
+      scrollTo('section-general','general');
+    }
+    function toggleSceneToc(){
+      tocSceneOpen.value = !tocSceneOpen.value;
+      scrollTo('section-scene','scene');
+    }
+
+    function toggleGen(i){
+      genInd[i] = !genInd[i];
+      if(genInd[i]){ nextTick(()=>{ setTimeout(()=>initGenChart(i),100); }); }
+    }
+    function toggleScene(i){
+      sceneInd[i] = !sceneInd[i];
+      if(sceneInd[i]){ nextTick(()=>{ setTimeout(()=>initSceneChart(i),100); }); }
+    }
+
+    function initGenRadar(){
+      const el = document.getElementById('genRadarChart');
+      if(!el) return;
+      const c = echarts.init(el);
+      c.setOption({radar:{indicator:[
+        {name:'准确率',max:100},{name:'推理逻辑',max:100},{name:'结果一致率',max:100},
+        {name:'证据真实性',max:100},{name:'证据可靠性',max:100},{name:'处理时间',max:100},
+        {name:'批量效率',max:100},{name:'幻觉率',max:100},{name:'信息安全',max:100}
+      ]},series:[{type:'radar',data:[{value:[92.1,87.3,89.3,85.6,83.4,94.2,88.7,92.2,98.5],name:'通用指标',areaStyle:{opacity:.2}}]}],color:['#2b6cb0']});
+    }
+
+    function initSceneRadar(){
+      const el = document.getElementById('sceneRadarChart');
+      if(!el) return;
+      const c = echarts.init(el);
+      c.setOption({radar:{indicator:[
+        {name:'诊断准确率',max:100},{name:'鉴别诊断',max:100},{name:'误诊率',max:100},
+        {name:'漏诊率',max:100},{name:'诊断依据',max:100},{name:'病因推断',max:100}
+      ]},series:[{type:'radar',data:[{value:[93.2,86.4,93.9,95.8,85.0,84.7],name:'场景指标',areaStyle:{opacity:.2}}]}],color:['#1e4d8c']});
+    }
+
+    const genChartCfg = [
+      ()=>({xAxis:{type:'category',data:['内科','外科','儿科','急诊','妇科']},yAxis:{type:'value',min:80,max:100},series:[{type:'bar',data:[95,91,90,88,92],itemStyle:{color:'#2b6cb0'}}],grid:{left:40,right:20,top:20,bottom:30}}),
+      ()=>({series:[{type:'pie',radius:'60%',data:[{value:87,name:'逻辑正确'},{value:8,name:'推理跳跃'},{value:5,name:'结论错误'}]}],legend:{bottom:0},tooltip:{trigger:'item'}}),
+      ()=>({xAxis:{type:'category',data:['Q1','Q2','Q3','Q4','Q5']},yAxis:{type:'value',min:80,max:100},series:[{type:'line',data:[88,90,89,91,88],smooth:true,itemStyle:{color:'#2b6cb0'}}],grid:{left:40,right:20,top:20,bottom:30}}),
+      ()=>({xAxis:{type:'category',data:['指南引用','研究引用','专家意见','系统综述']},yAxis:{type:'value',min:70,max:100},series:[{type:'bar',data:[88,84,80,87],itemStyle:{color:'#38a169'}}],grid:{left:50,right:20,top:20,bottom:60},xAxis:{type:'category',data:['指南引用','研究引用','专家意见','系统综述'],axisLabel:{rotate:20}}}),
+      ()=>({series:[{type:'pie',radius:['40%','70%'],data:[{value:83,name:'高质量证据'},{value:12,name:'中等质量'},{value:5,name:'低质量'}]}],legend:{bottom:0},tooltip:{trigger:'item'}}),
+      ()=>({xAxis:{type:'category',data:['<2s','2-3s','3-5s','5-10s','>10s']},yAxis:{type:'value'},series:[{type:'bar',data:[35,48,12,4,1],itemStyle:{color:'#2b6cb0'}}],grid:{left:40,right:20,top:20,bottom:30}}),
+      ()=>({series:[{type:'pie',radius:'60%',data:[{value:89,name:'正常响应'},{value:8,name:'轻微延迟'},{value:3,name:'超时'}]}],legend:{bottom:0},tooltip:{trigger:'item'}}),
+      ()=>({xAxis:{type:'category',data:['常见病','慢病','急诊','罕见病','多系统']},yAxis:{type:'value',min:70,max:100},series:[{type:'bar',data:[97,95,90,78,83],itemStyle:{color:'#2b6cb0'}}],grid:{left:40,right:20,top:20,bottom:60},xAxis:{type:'category',data:['常见病','慢病','急诊','罕见病','多系统'],axisLabel:{rotate:20}}}),
+      ()=>({xAxis:{type:'category',data:['姓名泄露','ID泄露','联系方式','诊断泄露']},yAxis:{type:'value',max:5},series:[{type:'bar',data:[0.8,0.3,0.2,0.2],itemStyle:{color:'#e53e3e'}}],grid:{left:40,right:20,top:20,bottom:60},xAxis:{type:'category',data:['姓名泄露','ID泄露','联系方式','诊断泄露'],axisLabel:{rotate:20}}})
+    ];
+
+    const sceneChartCfg = [
+      ()=>({xAxis:{type:'category',data:['Q1','Q2','Q3','Q4','Q5','Q6']},yAxis:{type:'value',min:85,max:100},series:[{type:'line',data:[94,92,95,91,93,94],smooth:true,itemStyle:{color:'#285e61'}}],grid:{left:40,right:20,top:20,bottom:30}}),
+      ()=>({xAxis:{type:'category',data:['内科','外科','急诊','神经','循环']},yAxis:{type:'value',min:75,max:100},series:[{type:'bar',data:[89,84,83,86,90],itemStyle:{color:'#285e61'}}],grid:{left:40,right:20,top:20,bottom:30}}),
+      ()=>({series:[{type:'pie',radius:'60%',data:[{value:93.9,name:'正确诊断'},{value:6.1,name:'误诊'}]}],legend:{bottom:0},tooltip:{trigger:'item'},color:['#285e61','#e53e3e']}),
+      ()=>({xAxis:{type:'category',data:['STEMI','脑卒中','脓毒症','主动脉夹层','其他']},yAxis:{type:'value',min:85,max:100},series:[{type:'bar',data:[98,96,94,92,97],itemStyle:{color:'#285e61'}}],grid:{left:40,right:20,top:20,bottom:60},xAxis:{type:'category',data:['STEMI','脑卒中','脓毒症','主动脉夹层','其他'],axisLabel:{rotate:20}}}),
+      ()=>({xAxis:{type:'category',data:['症状描述','体征记录','检验结果','影像资料','病史采集']},yAxis:{type:'value',min:70,max:100},series:[{type:'bar',data:[88,84,90,80,83],itemStyle:{color:'#285e61'}}],grid:{left:40,right:20,top:20,bottom:60},xAxis:{type:'category',data:['症状描述','体征记录','检验结果','影像资料','病史采集'],axisLabel:{rotate:20}}}),
+      ()=>({xAxis:{type:'category',data:['感染性','代谢性','免疫性','遗传性','肿瘤性']},yAxis:{type:'value',min:70,max:100},series:[{type:'bar',data:[88,87,82,78,84],itemStyle:{color:'#285e61'}}],grid:{left:40,right:20,top:20,bottom:60},xAxis:{type:'category',data:['感染性','代谢性','免疫性','遗传性','肿瘤性'],axisLabel:{rotate:20}}})
+    ];
+
+    function initGenChart(i){
+      const el = document.getElementById('genChart'+i);
+      if(!el) return;
+      const c = echarts.getInstanceByDom(el) || echarts.init(el);
+      c.setOption(genChartCfg[i]());
+    }
+    function initSceneChart(i){
+      const el = document.getElementById('sceneChart'+i);
+      if(!el) return;
+      const c = echarts.getInstanceByDom(el) || echarts.init(el);
+      c.setOption(sceneChartCfg[i]());
+    }
+
+    // Scroll spy
+    function setupObserver(){
+      const ids = ['section-basic','section-overview','section-general',
+        ...Array.from({length:9},(_,i)=>'gen-card-'+i),
+        'section-scene',
+        ...Array.from({length:6},(_,i)=>'scene-card-'+i)];
+      const obs = new IntersectionObserver(entries=>{
+        entries.forEach(e=>{if(e.isIntersecting) activeAnchor.value=e.target.id;});
+      },{rootMargin:'-20% 0px -70% 0px'});
+      ids.forEach(id=>{const el=document.getElementById(id);if(el) obs.observe(el);});
+    }
+
+    onMounted(()=>{
+      nextTick(()=>{
+        initGenRadar();
+        initSceneRadar();
+        setupObserver();
+      });
+    });
+
+    watch(activeTab, (v)=>{
+      if(v===0){ nextTick(()=>{ initGenRadar(); initSceneRadar(); }); }
+    });
+
+    return {activeTab,activeAnchor,tocGenOpen,tocSceneOpen,genInd,sceneInd,genBad,sceneBad,
+      genNames,sceneNames,genData,sceneData,genWeightRows,sceneWeightRows,allWeightRows,sampleRows,expandedRow,
+      scrollTo,scrollToInd,toggleGenToc,toggleSceneToc,toggleGen,toggleScene};
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
