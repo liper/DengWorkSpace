@@ -7,124 +7,150 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <style>
+:root{--nav-h:112px;--blue-dk:#0a2f6b;--blue-md:#1a56db;--blue-lt:#dbeafe;--blue-pale:#eff6ff;--scene-blue:#1e4d8c}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d3748}
-.header{background:linear-gradient(135deg,#1a365d 0%,#2b6cb0 100%);color:#fff;padding:20px 32px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.header-icon{font-size:2rem}
-.header h1{font-size:1.5rem;font-weight:700}
-.header p{font-size:.85rem;opacity:.85;margin-top:2px}
-.tab-bar{background:#fff;border-bottom:2px solid #e2e8f0;display:flex;padding:0 32px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.tab-btn{padding:14px 24px;border:none;background:none;cursor:pointer;font-size:.95rem;color:#718096;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
-.tab-btn.active{color:#2b6cb0;border-bottom-color:#2b6cb0;font-weight:600}
+body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f1f5fb;color:#1e293b}
+
+/* ── Unified top nav ── */
+.top-nav{background:linear-gradient(120deg,var(--blue-dk) 0%,var(--blue-md) 100%);position:sticky;top:0;z-index:100;box-shadow:0 3px 14px rgba(0,0,0,.28)}
+.top-nav-brand{display:flex;align-items:center;gap:16px;padding:16px 32px 8px}
+.nav-icon{font-size:2rem;filter:drop-shadow(0 1px 4px rgba(0,0,0,.3))}
+.nav-title{font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:.02em}
+.nav-sub{font-size:.78rem;color:rgba(255,255,255,.72);margin-top:2px}
+.nav-badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:1px 10px;font-size:.7rem;color:rgba(255,255,255,.85);margin-left:10px;vertical-align:middle}
+.top-nav-tabs{display:flex;padding:0 28px;border-top:1px solid rgba(255,255,255,.15)}
+.tab-btn{padding:9px 22px;border:none;background:transparent;cursor:pointer;font-size:.9rem;color:rgba(255,255,255,.72);border-bottom:3px solid transparent;transition:all .18s;font-weight:500;letter-spacing:.01em;margin-bottom:-1px}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.tab-btn.active{color:#fff;border-bottom-color:#93c5fd;font-weight:700}
 .tab-content{display:none}.tab-content.active{display:block}
-.report-layout{display:flex;min-height:calc(100vh - 110px)}
-/* TOC sidebar */
-.toc-sidebar{width:240px;min-width:240px;background:#fff;border-right:1px solid #e2e8f0;padding:16px 0;position:sticky;top:0;height:calc(100vh - 110px);overflow-y:auto}
-.toc-title{font-size:.75rem;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.08em;padding:0 16px 8px}
-.toc-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:.875rem;color:#4a5568;border-left:3px solid transparent;transition:all .15s}
-.toc-item:hover{background:#ebf8ff;color:#2b6cb0}
-.toc-item.active{background:#ebf8ff;color:#2b6cb0;border-left-color:#2b6cb0;font-weight:600}
-.toc-item.l2{padding-left:28px;font-size:.82rem;color:#718096}
-.toc-item.l2.active{color:#2b6cb0;font-weight:600}
-.toc-l1-item{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;cursor:pointer;font-size:.875rem;color:#4a5568;border-left:3px solid transparent;transition:all .15s;font-weight:600}
-.toc-l1-item:hover{background:#ebf8ff;color:#2b6cb0}
-.toc-chevron{font-size:.7rem;transition:transform .2s;color:#a0aec0}
+
+/* ── Sidebar + layout ── */
+.report-layout{display:flex;min-height:calc(100vh - var(--nav-h))}
+.toc-sidebar{width:230px;min-width:230px;background:#fff;border-right:1px solid #e2e8f0;padding:14px 0;position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow-y:auto}
+.toc-title{font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;padding:0 14px 8px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:.85rem;color:#475569;border-left:3px solid transparent;transition:all .14s}
+.toc-item:hover{background:var(--blue-pale);color:var(--blue-md)}
+.toc-item.active{background:var(--blue-pale);color:var(--blue-md);border-left-color:var(--blue-md);font-weight:600}
+.toc-item.l2{padding-left:26px;font-size:.8rem;color:#64748b}
+.toc-item.l2.active{color:var(--blue-md);font-weight:600}
+.toc-l1-item{display:flex;align-items:center;justify-content:space-between;padding:6px 14px;cursor:pointer;font-size:.85rem;color:#334155;border-left:3px solid transparent;transition:all .14s;font-weight:700}
+.toc-l1-item:hover{background:var(--blue-pale);color:var(--blue-md)}
+.toc-chevron{font-size:.65rem;transition:transform .2s;color:#94a3b8}
 .toc-chevron.open{transform:rotate(180deg)}
-/* Main content */
+
+/* ── Cards ── */
 .report-main{flex:1;padding:24px 32px;overflow-y:auto}
-.card{background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:24px;overflow:hidden}
-.card-header{background:linear-gradient(135deg,#ebf8ff,#bee3f8);padding:16px 24px;border-bottom:1px solid #bee3f8;display:flex;align-items:center;gap:10px}
-.card-header h2{font-size:1.05rem;font-weight:700;color:#1a365d}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(10,47,107,.08);margin-bottom:24px;overflow:hidden;border:1px solid #e8eef8}
+.card-header{background:linear-gradient(90deg,var(--blue-dk),var(--blue-md));padding:14px 22px;display:flex;align-items:center;gap:10px}
+.card-header h2{font-size:1rem;font-weight:700;color:#fff}
 .card-body{padding:20px 24px}
-/* Basic info */
-.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.info-item{background:#f7fafc;border-radius:8px;padding:12px 16px}
-.info-item .label{font-size:.75rem;color:#718096;margin-bottom:4px}
-.info-item .value{font-weight:600;color:#2d3748}
-/* Overview: dual score cards */
-.aiq-cards-row{display:flex;gap:20px;margin-bottom:20px}
-.aiq-card{flex:1;background:linear-gradient(135deg,#1a365d,#2b6cb0);border-radius:12px;padding:20px;color:#fff;text-align:center}
-.aiq-card .aiq-subtitle{font-size:.8rem;opacity:.8;margin-bottom:6px}
-.aiq-card .aiq-score{font-size:2.8rem;font-weight:700;line-height:1}
-.aiq-card .aiq-grade{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 12px;font-size:.8rem;margin-top:8px}
-.radar-row{display:flex;gap:20px;margin-bottom:20px}
-.radar-box{flex:1;text-align:center}
-.radar-box .radar-label{font-size:.85rem;color:#4a5568;font-weight:600;margin-bottom:4px}
-.chart-medium{height:260px}
-.grade-table{width:100%;border-collapse:collapse;font-size:.875rem}
-.grade-table th{background:#ebf8ff;padding:8px 12px;text-align:left;font-weight:600;color:#1a365d;border:1px solid #bee3f8}
-.grade-table td{padding:8px 12px;border:1px solid #e2e8f0}
-/* Section group label */
-.section-group-label{font-size:1rem;font-weight:700;color:#1a365d;padding:8px 0 16px;border-bottom:2px solid #bee3f8;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-/* Indicator card */
-.ind-card{border:1px solid #e2e8f0;border-radius:10px;margin-bottom:12px;overflow:hidden}
-.ind-card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;background:#f7fafc;transition:background .15s}
-.ind-card-header:hover{background:#ebf8ff}
-.ind-card-header.open{background:#ebf8ff}
-.ind-left{display:flex;align-items:center;gap:12px}
-.ind-num{width:28px;height:28px;border-radius:50%;background:#2b6cb0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700}
-.ind-name{font-weight:600;font-size:.95rem;color:#2d3748}
-.ind-right{display:flex;align-items:center;gap:12px}
-.ind-score{font-size:1.2rem;font-weight:700;color:#2b6cb0}
-.badge{border-radius:20px;padding:3px 12px;font-size:.78rem;font-weight:600}
-.badge-excellent{background:#c6f6d5;color:#276749}
-.badge-good{background:#bee3f8;color:#2b6cb0}
-.badge-pass{background:#fefcbf;color:#744210}
-.badge-fail{background:#fed7d7;color:#9b2c2c}
-.chevron{font-size:.75rem;color:#a0aec0;transition:transform .2s}
+
+/* ── Basic info ── */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.info-item{background:var(--blue-pale);border:1px solid var(--blue-lt);border-radius:8px;padding:11px 14px}
+.info-item .label{font-size:.72rem;color:#64748b;margin-bottom:3px}
+.info-item .value{font-weight:700;color:var(--blue-dk);font-size:.95rem}
+
+/* ── Overview: 3-col score strip ── */
+.score-strip{display:flex;gap:0;border:1px solid var(--blue-lt);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.score-cell{flex:1;padding:18px 16px;text-align:center;background:#fff}
+.score-cell+.score-cell{border-left:1px solid var(--blue-lt)}
+.score-cell.main{background:linear-gradient(135deg,var(--blue-dk),var(--blue-md));color:#fff}
+.score-cell .sc-label{font-size:.75rem;color:#64748b;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.score-cell.main .sc-label{color:rgba(255,255,255,.8)}
+.score-cell .sc-val{font-size:2.6rem;font-weight:800;color:var(--blue-md);line-height:1}
+.score-cell.main .sc-val{font-size:3.2rem;color:#fff}
+.score-cell .sc-grade{display:inline-block;border-radius:20px;padding:2px 12px;font-size:.78rem;font-weight:700;margin-top:6px;background:var(--blue-lt);color:var(--blue-dk)}
+.score-cell.main .sc-grade{background:rgba(255,255,255,.22);color:#fff}
+.score-cell .sc-meta{font-size:.7rem;color:#94a3b8;margin-top:6px}
+.score-cell.main .sc-meta{color:rgba(255,255,255,.65)}
+
+/* ── Radar row ── */
+.radar-row{display:flex;gap:16px;margin-bottom:16px}
+.radar-col{flex:1;border:1px solid #e8eef8;border-radius:10px;padding:14px;background:#fafcff}
+.radar-col-title{font-size:.82rem;font-weight:700;color:var(--blue-dk);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.radar-col-score{font-size:1.3rem;font-weight:800;color:var(--blue-md)}
+.chart-medium{height:240px}
+
+/* ── Grade legend strip ── */
+.grade-strip{display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 4px;border-top:1px solid #e8eef8;margin-top:8px}
+.grade-chip{display:flex;align-items:center;gap:6px;font-size:.78rem;color:#475569}
+.grade-chip .gd-box{width:26px;height:8px;border-radius:3px}
+
+/* ── Indicator cards ── */
+.ind-card{border:1px solid #e2eaf5;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.ind-card-header{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;cursor:pointer;background:#f8faff;transition:background .14s}
+.ind-card-header:hover{background:var(--blue-pale)}
+.ind-card-header.open{background:var(--blue-pale)}
+.ind-left{display:flex;align-items:center;gap:11px}
+.ind-num{width:26px;height:26px;border-radius:50%;background:var(--blue-md);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:700}
+.ind-num.scene{background:var(--scene-blue)}
+.ind-name{font-weight:600;font-size:.93rem;color:#1e293b}
+.ind-right{display:flex;align-items:center;gap:11px}
+.ind-score{font-size:1.15rem;font-weight:800;color:var(--blue-md)}
+.badge{border-radius:20px;padding:3px 11px;font-size:.75rem;font-weight:600}
+.badge-excellent{background:#dcfce7;color:#166534}
+.badge-good{background:var(--blue-lt);color:var(--blue-dk)}
+.badge-pass{background:#fef9c3;color:#854d0e}
+.badge-fail{background:#fee2e2;color:#991b1b}
+.chevron{font-size:.7rem;color:#94a3b8;transition:transform .18s}
 .chevron.open{transform:rotate(180deg)}
-.ind-body{padding:18px;border-top:1px solid #e2e8f0;display:none}
+.ind-body{padding:18px;border-top:1px solid #e2eaf5;display:none}
 .ind-body.open{display:block}
-.chart-area{height:240px;margin-bottom:16px}
-.desc-text{font-size:.875rem;color:#4a5568;line-height:1.6;margin-bottom:12px}
-.bad-case-box{background:#fff5f5;border:1px solid #fed7d7;border-radius:8px;padding:14px;margin-top:8px}
-.bad-case-title{font-size:.8rem;font-weight:700;color:#c53030;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.bad-case-row{display:flex;gap:8px;margin-bottom:8px;font-size:.82rem;line-height:1.5}
+.chart-area{height:230px;margin-bottom:14px}
+.desc-text{font-size:.865rem;color:#475569;line-height:1.65;margin-bottom:12px}
+
+/* ── Bad cases ── */
+.bad-case-box{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:14px;margin-top:8px}
+.bad-case-title{font-size:.8rem;font-weight:700;color:#b91c1c;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.bad-case-row{display:flex;gap:8px;margin-bottom:8px;font-size:.81rem;line-height:1.5}
 .bad-case-row:last-child{margin-bottom:0}
-.bad-case-label{font-weight:700;color:#4a5568;white-space:nowrap;min-width:60px}
-.bad-case-ai .bad-case-label{color:#c05621}
-.bad-case-ai .bad-case-content{color:#c05621}
-.bad-case-reason .bad-case-label{color:#744210}
-.bad-case-reason .bad-case-content{color:#744210;font-style:italic}
-.bad-case-content{color:#4a5568}
-.show-more-btn{background:none;border:1px dashed #fed7d7;border-radius:6px;color:#c53030;cursor:pointer;font-size:.8rem;padding:4px 12px;margin-top:8px;width:100%}
-/* Tab 2 */
-.tab2-container{padding:24px 32px}
-.weight-table{width:100%;border-collapse:collapse;font-size:.875rem;margin-bottom:8px}
-.weight-table th{background:#1a365d;color:#fff;padding:10px 14px;text-align:left}
-.weight-table td{padding:9px 14px;border-bottom:1px solid #e2e8f0}
-.weight-table tr:nth-child(even) td{background:#f7fafc}
-.weight-table tfoot td{background:#ebf8ff;font-weight:700;color:#1a365d}
-.weight-bar-wrap{background:#e2e8f0;border-radius:4px;height:8px;width:100%;margin-top:3px}
-.weight-bar{height:8px;border-radius:4px;background:#2b6cb0}
-/* Tab 3 */
-.tab3-container{padding:24px 32px}
-.sample-table{width:100%;border-collapse:collapse;font-size:.875rem}
-.sample-table th{background:#1a365d;color:#fff;padding:10px 14px;text-align:left}
-.sample-table td{padding:9px 14px;border-bottom:1px solid #e2e8f0;vertical-align:top}
-.sample-table tr.expandable{cursor:pointer}.sample-table tr.expandable:hover td{background:#ebf8ff}
-.expand-row td{background:#f7fafc;padding:14px 24px;font-size:.85rem;color:#4a5568;line-height:1.6}
-.tag{display:inline-block;border-radius:12px;padding:2px 10px;font-size:.75rem;font-weight:600}
-.tag-pass{background:#c6f6d5;color:#276749}
-.tag-fail{background:#fed7d7;color:#9b2c2c}
+.bad-case-label{font-weight:700;color:#475569;white-space:nowrap;min-width:60px}
+.bad-case-ai .bad-case-label{color:#b45309}
+.bad-case-ai .bad-case-content{color:#b45309}
+.bad-case-reason .bad-case-label{color:#7c3aed}
+.bad-case-reason .bad-case-content{color:#7c3aed;font-style:italic}
+.bad-case-content{color:#475569}
+.show-more-btn{background:none;border:1px dashed #fca5a5;border-radius:6px;color:#b91c1c;cursor:pointer;font-size:.79rem;padding:4px 12px;margin-top:8px;width:100%}
+
+/* ── Tab 2/3 containers ── */
+.tab2-container,.tab3-container{padding:24px 32px}
+.weight-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:8px}
+.weight-table th{background:var(--blue-dk);color:#fff;padding:10px 14px;text-align:left}
+.weight-table td{padding:8px 14px;border-bottom:1px solid #e8eef8}
+.weight-table tr:nth-child(even) td{background:#f8faff}
+.weight-table tfoot td{background:var(--blue-pale);font-weight:700;color:var(--blue-dk)}
+.weight-bar-wrap{background:#dbeafe;border-radius:4px;height:7px;width:100%;margin-top:3px}
+.weight-bar{height:7px;border-radius:4px;background:var(--blue-md)}
+.sample-table{width:100%;border-collapse:collapse;font-size:.86rem}
+.sample-table th{background:var(--blue-dk);color:#fff;padding:10px 14px;text-align:left}
+.sample-table td{padding:8px 14px;border-bottom:1px solid #e8eef8;vertical-align:top}
+.sample-table tr.expandable{cursor:pointer}.sample-table tr.expandable:hover td{background:var(--blue-pale)}
+.expand-row td{background:#f8faff;padding:14px 22px;font-size:.84rem;color:#475569;line-height:1.65}
+.tag{display:inline-block;border-radius:12px;padding:2px 10px;font-size:.74rem;font-weight:600}
+.tag-pass{background:#dcfce7;color:#166534}
+.tag-fail{background:#fee2e2;color:#991b1b}
+/* Section group label for indicator sections */
+.ind-section-label{font-size:.85rem;font-weight:700;color:#fff;background:var(--blue-dk);padding:6px 14px;border-radius:6px;margin-bottom:12px;display:inline-block;letter-spacing:.04em}
+.ind-section-label.scene{background:var(--scene-blue)}
 </style>
 </head>
 <body>
 <div id="app">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-icon">🏥</div>
-    <div>
-      <h1>医疗AI测评平台 · 评测报告</h1>
-      <p>Medical AI Evaluation Platform — Assessment Report</p>
+  <!-- Unified top nav -->
+  <div class="top-nav">
+    <div class="top-nav-brand">
+      <div class="nav-icon">🏥</div>
+      <div>
+        <div class="nav-title">医疗AI测评平台 · 评测报告<span class="nav-badge">MedAI-Pro v3.2</span></div>
+        <div class="nav-sub">Medical AI Evaluation Platform — Comprehensive Assessment Report</div>
+      </div>
     </div>
-  </div>
-
-  <!-- Tab bar -->
-  <div class="tab-bar">
-    <button class="tab-btn" :class="{active:activeTab===0}" @click="activeTab=0">📊 测评详情</button>
-    <button class="tab-btn" :class="{active:activeTab===1}" @click="activeTab=1">⚖️ 权重配置</button>
-    <button class="tab-btn" :class="{active:activeTab===2}" @click="activeTab=2">📋 测评样例</button>
+    <div class="top-nav-tabs">
+      <button class="tab-btn" :class="{active:activeTab===0}" @click="activeTab=0">📊 测评详情</button>
+      <button class="tab-btn" :class="{active:activeTab===1}" @click="activeTab=1">⚖️ 权重配置</button>
+      <button class="tab-btn" :class="{active:activeTab===2}" @click="activeTab=2">📋 测评样例</button>
+    </div>
   </div>
 
   <!-- Tab 1 -->
@@ -174,33 +200,45 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
         <div class="card" id="section-overview">
           <div class="card-header"><h2>📈 测评总览</h2></div>
           <div class="card-body">
-            <div class="aiq-cards-row" style="justify-content:center">
-              <div class="aiq-card" style="max-width:320px;flex:none;padding:24px 48px">
-                <div class="aiq-subtitle">综合 AIQ 得分</div>
-                <div class="aiq-score">89.9</div>
-                <div class="aiq-grade">良好</div>
-                <div style="font-size:.75rem;opacity:.7;margin-top:10px">通用指标(45%) + 场景指标·辅助诊断(55%) 加权综合</div>
+            <!-- 3-col score strip -->
+            <div class="score-strip">
+              <div class="score-cell">
+                <div class="sc-label">🔷 通用指标</div>
+                <div class="sc-val">90.1</div>
+                <div class="sc-grade">优秀</div>
+                <div class="sc-meta">9项指标 · 权重 45%</div>
+              </div>
+              <div class="score-cell main">
+                <div class="sc-label">综合 AIQ 得分</div>
+                <div class="sc-val">89.9</div>
+                <div class="sc-grade">良好</div>
+                <div class="sc-meta">通用(45%) + 场景(55%) 加权综合</div>
+              </div>
+              <div class="score-cell">
+                <div class="sc-label">🏥 场景指标</div>
+                <div class="sc-val">89.8</div>
+                <div class="sc-grade">良好</div>
+                <div class="sc-meta">6项指标 · 权重 55%</div>
               </div>
             </div>
+            <!-- Dual radar -->
             <div class="radar-row">
-              <div class="radar-box">
-                <div class="radar-label">通用指标雷达图</div>
+              <div class="radar-col">
+                <div class="radar-col-title">🔷 通用指标 <span class="radar-col-score">90.1</span></div>
                 <div id="genRadarChart" class="chart-medium"></div>
               </div>
-              <div class="radar-box">
-                <div class="radar-label">场景指标雷达图</div>
+              <div class="radar-col">
+                <div class="radar-col-title">🏥 场景指标·辅助诊断 <span class="radar-col-score" style="color:var(--scene-blue)">89.8</span></div>
                 <div id="sceneRadarChart" class="chart-medium"></div>
               </div>
             </div>
-            <table class="grade-table">
-              <thead><tr><th>等级</th><th>分数区间</th><th>说明</th></tr></thead>
-              <tbody>
-                <tr><td>优秀</td><td>90–100</td><td>各项指标表现卓越，全面超越基准线</td></tr>
-                <tr><td>良好</td><td>80–89</td><td>整体表现稳健，核心指标达标</td></tr>
-                <tr><td>合格</td><td>70–79</td><td>基本满足使用要求，部分指标待提升</td></tr>
-                <tr><td>不合格</td><td>&lt;70</td><td>存在明显缺陷，需重点改进</td></tr>
-              </tbody>
-            </table>
+            <!-- Grade legend strip -->
+            <div class="grade-strip">
+              <div class="grade-chip"><div class="gd-box" style="background:#166534"></div>优秀 ≥ 90</div>
+              <div class="grade-chip" style="margin-left:8px"><div class="gd-box" style="background:var(--blue-md)"></div>良好 80–89</div>
+              <div class="grade-chip" style="margin-left:8px"><div class="gd-box" style="background:#b45309"></div>合格 70–79</div>
+              <div class="grade-chip" style="margin-left:8px"><div class="gd-box" style="background:#991b1b"></div>不合格 &lt; 70</div>
+            </div>
           </div>
         </div>
 
@@ -208,6 +246,7 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
         <div class="card" id="section-general">
           <div class="card-header"><h2>🔷 通用指标详细评测</h2></div>
           <div class="card-body">
+            <div class="ind-section-label">🔷 通用指标 — 9项核心能力</div>
             <div v-for="(item,i) in genData" :key="'g'+i" class="ind-card" :id="'gen-card-'+i">
               <div class="ind-card-header" :class="{open:genInd[i]}" @click="toggleGen(i)">
                 <div class="ind-left">
@@ -243,10 +282,11 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
         <div class="card" id="section-scene">
           <div class="card-header"><h2>🏥 场景指标·辅助诊断 详细评测</h2></div>
           <div class="card-body">
+            <div class="ind-section-label scene">🏥 场景指标·辅助诊断 — 6项专科能力</div>
             <div v-for="(item,i) in sceneData" :key="'s'+i" class="ind-card" :id="'scene-card-'+i">
               <div class="ind-card-header" :class="{open:sceneInd[i]}" @click="toggleScene(i)">
                 <div class="ind-left">
-                  <div class="ind-num" style="background:#285e61">{{i+1}}</div>
+                  <div class="ind-num scene">{{i+1}}</div>
                   <div class="ind-name">{{item.name}}</div>
                 </div>
                 <div class="ind-right">
@@ -305,7 +345,7 @@ body{font-family:'Microsoft YaHei',Arial,sans-serif;background:#f0f4f8;color:#2d
                 <td>{{r.name}}</td>
                 <td><span class="badge" :class="r.type==='通用'?'badge-good':'badge-excellent'" style="font-size:.72rem">{{r.type}}</span></td>
                 <td>{{r.groupWeight}}</td><td>{{r.totalWeight}}</td><td>{{r.score}}</td><td>{{r.weighted}}</td>
-                <td><div class="weight-bar-wrap"><div class="weight-bar" :style="{width:r.pct+'%',background:r.type==='通用'?'#2b6cb0':'#285e61'}"></div></div></td>
+                <td><div class="weight-bar-wrap"><div class="weight-bar" :style="{width:r.pct+'%',background:r.type==='通用'?'var(--blue-md)':'var(--scene-blue)'}"></div></div></td>
               </tr>
             </tbody>
             <tfoot><tr><td colspan="2">综合 AIQ</td><td>—</td><td>100%</td><td>—</td><td>89.9</td><td></td></tr></tfoot>
@@ -510,7 +550,7 @@ createApp({
       c.setOption({radar:{indicator:[
         {name:'诊断准确率',max:100},{name:'鉴别诊断',max:100},{name:'误诊率',max:100},
         {name:'漏诊率',max:100},{name:'诊断依据',max:100},{name:'病因推断',max:100}
-      ]},series:[{type:'radar',data:[{value:[93.2,86.4,93.9,95.8,85.0,84.7],name:'场景指标',areaStyle:{opacity:.2}}]}],color:['#285e61']});
+      ]},series:[{type:'radar',data:[{value:[93.2,86.4,93.9,95.8,85.0,84.7],name:'场景指标',areaStyle:{opacity:.2}}]}],color:['#1e4d8c']});
     }
 
     const genChartCfg = [
