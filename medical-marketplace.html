@@ -227,7 +227,7 @@
     }
     .cat-card-stat { text-align: right; }
     .cat-stat-num { font-size: 28px; font-weight: 800; color: rgba(255,255,255,.95); line-height: 1; }
-    .cat-stat-label { font-size: 11px; color: rgba(255,255,255,.7); margin-top: 3px; }
+    .cat-stat-label { font-size: 11px; color: rgba(255,255,255,.88); margin-top: 3px; }
 
     .cat-card-body { padding: 16px 20px 12px; flex: 1; }
     .cat-name { font-size: 16px; font-weight: 700; color: #0f1c35; margin-bottom: 2px; }
@@ -467,7 +467,7 @@
         <div class="banner-eyebrow">Healthcare AI · Application &amp; Plugin Marketplace</div>
         <div class="banner-title">医疗应用与插件广场</div>
         <div class="banner-desc">
-          覆盖医疗行业六大核心场景，汇聚 AI 原生应用与标准化插件（MCP / Skill），
+          覆盖医疗行业十二大核心场景，汇聚 AI 原生应用与标准化插件（MCP / Skill），
           助力医院、科研机构与医药企业快速构建智能医疗能力体系。
         </div>
         <div class="banner-cats">
@@ -486,7 +486,7 @@
         </div>
         <div class="bstat-sep"></div>
         <div class="bstat">
-          <div class="bstat-num">{{ activeTab === 'apps' ? categories.length : 10 }}</div>
+          <div class="bstat-num">{{ activeTab === 'apps' ? categories.length : pluginCategories.length }}</div>
           <div class="bstat-label">{{ activeTab === 'apps' ? '应用分类' : '插件分类' }}</div>
         </div>
       </div>
