@@ -471,7 +471,7 @@
           助力医院、科研机构与医药企业快速构建智能医疗能力体系。
         </div>
         <div class="banner-cats">
-          <span v-for="cat in (activeTab === 'apps' ? categories : pluginCategories)" :key="cat.id" class="banner-cat">{{ cat.name }}</span>
+          <span v-for="cat in activeCategoryList" :key="cat.id" class="banner-cat">{{ cat.name }}</span>
         </div>
       </div>
       <div class="banner-stats">
@@ -1232,6 +1232,7 @@ createApp({
     /* ── Computed ── */
     const totalApps    = computed(() => categories.reduce((s, c) => s + c.appCount, 0));
     const totalPlugins = computed(() => pluginCategories.reduce((s, c) => s + c.pluginCount, 0));
+    const activeCategoryList = computed(() => activeTab.value === 'apps' ? categories : pluginCategories);
 
     const filteredItems = computed(() => {
       if (!view.value.category) return [];
@@ -1281,7 +1282,7 @@ createApp({
 
     return {
       view, search, activeFilter, activeSubcat, activeTab, pluginFilters,
-      categories, pluginCategories, filteredItems,
+      categories, pluginCategories, activeCategoryList, filteredItems,
       totalApps, totalPlugins,
       enterCategory, goBack,
     };
