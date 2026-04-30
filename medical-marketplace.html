@@ -155,61 +155,111 @@
     .mp-section-badge.apps    { background: #1677ff; color: #fff; }
     .mp-section-badge.plugins { background: #07a691; color: #fff; }
 
-    /* ─── Category Grid ──────────────────────────── */
+    /* ─── Tab Bar ─────────────────────────────────── */
+    .tab-bar {
+      display: flex; gap: 4px;
+      background: #fff; border-radius: 14px;
+      border: 1px solid #e2eaf7;
+      padding: 5px; margin-bottom: 28px;
+      box-shadow: 0 2px 12px rgba(16,40,100,.06);
+      width: fit-content;
+    }
+    .tab-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 24px; border-radius: 10px;
+      font-size: 14px; font-weight: 500;
+      color: #6b7fa8; background: transparent;
+      border: none; cursor: pointer;
+      transition: all .2s;
+    }
+    .tab-btn:hover { color: #1677ff; background: #f4f7ff; }
+    .tab-btn.tab-active { color: #fff; background: linear-gradient(135deg, #1677ff, #36abff); box-shadow: 0 4px 12px rgba(22,119,255,.35); }
+    .tab-btn.tab-active .tab-count { background: rgba(255,255,255,.25); color: #fff; }
+    .tab-icon-wrap { display: flex; align-items: center; }
+    .tab-count {
+      background: #f0f4fb; color: #1677ff;
+      font-size: 11px; font-weight: 700;
+      padding: 1px 7px; border-radius: 10px;
+    }
+
+    /* ─── Tab Content ─────────────────────────────── */
+    .tab-content-hd { margin-bottom: 22px; }
+    .tab-content-title { font-size: 22px; font-weight: 700; color: #0f1c35; margin-bottom: 6px; }
+    .tab-content-sub { font-size: 13px; color: #6b7fa8; }
+
+    /* ─── Premium Category Grid ──────────────────── */
     .cat-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
     }
     .cat-card {
       background: #fff;
-      border-radius: 12px;
-      border: 1px solid #d4e0f5;
-      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid #e8effc;
+      overflow: hidden;
       cursor: pointer;
-      transition: transform .2s, box-shadow .2s, border-color .2s;
-      display: flex; gap: 16px; align-items: flex-start;
+      transition: transform .2s, box-shadow .25s, border-color .2s;
+      display: flex; flex-direction: column;
+      box-shadow: 0 2px 12px rgba(16,40,100,.06);
     }
     .cat-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 28px rgba(10,47,107,.16);
-      border-color: #1677ff;
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(10,47,107,.18);
+      border-color: transparent;
     }
-    .cat-icon-wrap {
-      width: 52px; height: 52px; border-radius: 12px;
+    .cat-card-header {
+      padding: 22px 20px 18px;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      position: relative; overflow: hidden;
+      min-height: 92px;
+    }
+    .cat-card-header::after {
+      content: ''; position: absolute;
+      right: -20px; bottom: -20px;
+      width: 80px; height: 80px; border-radius: 50%;
+      background: rgba(255,255,255,.12); pointer-events: none;
+    }
+    .cat-card-icon {
+      width: 48px; height: 48px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 26px; flex-shrink: 0;
+      flex-shrink: 0;
     }
-    .cat-body { flex: 1; min-width: 0; }
-    .cat-name { font-size: 16px; font-weight: 700; color: #0f1c35; margin-bottom: 6px; }
-    .cat-desc { font-size: 12px; color: #6b7fa8; line-height: 1.65; margin-bottom: 10px; }
-    .cat-kws  { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
-    .cat-kw   {
-      font-size: 11px; padding: 2px 8px; border-radius: 8px;
+    .cat-card-stat { text-align: right; }
+    .cat-stat-num { font-size: 28px; font-weight: 800; color: rgba(255,255,255,.95); line-height: 1; }
+    .cat-stat-label { font-size: 11px; color: rgba(255,255,255,.7); margin-top: 3px; }
+
+    .cat-card-body { padding: 16px 20px 12px; flex: 1; }
+    .cat-name { font-size: 16px; font-weight: 700; color: #0f1c35; margin-bottom: 2px; }
+    .cat-name-en { font-size: 11px; color: #a0b0cc; letter-spacing: .03em; margin-bottom: 8px; }
+    .cat-desc { font-size: 12px; color: #6b7fa8; line-height: 1.65; margin-bottom: 10px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .cat-kws { display: flex; gap: 5px; flex-wrap: wrap; }
+    .cat-kw {
+      font-size: 11px; padding: 2px 8px; border-radius: 10px;
       background: #f0f4fb; color: #4a5e7a;
     }
-    .cat-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      border-top: 1px solid #f0f4fb; padding-top: 10px;
-    }
-    .cat-counts { display: flex; gap: 16px; }
-    .cat-count-item { font-size: 12px; color: #8898b0; }
-    .cat-count-item strong { font-size: 16px; font-weight: 700; color: #1677ff; }
-    .cat-arrow {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: #f0f4fb;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; color: #8898b0;
-      transition: background .15s, color .15s;
-    }
-    .cat-card:hover .cat-arrow { background: #1677ff; color: #fff; }
-
-    /* plugin category: subcats chips on card */
-    .cat-subcats { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+    /* plugin subcats on card */
+    .cat-subcats { display: flex; gap: 5px; flex-wrap: wrap; }
     .cat-subcat-chip {
-      font-size: 10px; padding: 1px 7px; border-radius: 8px;
+      font-size: 10px; padding: 2px 7px; border-radius: 8px;
       background: #e6f7f5; color: #07a691; border: 1px solid #b2e8df;
     }
+    .cat-sub-count { font-size: 12px; color: #8898b0; }
+
+    .cat-card-footer {
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 12px 20px; border-top: 1px solid #f3f6fc;
+      margin-top: auto;
+    }
+    .cat-card-footer-plugin { justify-content: space-between; }
+    .cat-explore-btn {
+      font-size: 12px; font-weight: 600; color: #1677ff;
+      transition: gap .15s;
+    }
+    .cat-card:hover .cat-explore-btn { color: #0958d9; }
+    .cat-explore-plugin { color: #07a691; }
+    .cat-card:hover .cat-explore-plugin { color: #057a6b; }
 
     /* ─── Subcategory Bar (detail view) ─────────────── */
     .subcat-bar {
@@ -373,7 +423,10 @@
     @media (max-width: 1100px) {
       .items-grid { grid-template-columns: repeat(3, 1fr); }
     }
-    @media (max-width: 860px) {
+    @media (max-width: 1200px) {
+      .cat-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
       .cat-grid   { grid-template-columns: repeat(2, 1fr); }
       .items-grid { grid-template-columns: repeat(2, 1fr); }
       .banner-stats { display: none; }
@@ -418,7 +471,7 @@
           助力医院、科研机构与医药企业快速构建智能医疗能力体系。
         </div>
         <div class="banner-cats">
-          <span v-for="cat in categories" :key="cat.id" class="banner-cat">{{ cat.name }}</span>
+          <span v-for="cat in (activeTab === 'apps' ? categories : pluginCategories)" :key="cat.id" class="banner-cat">{{ cat.name }}</span>
         </div>
       </div>
       <div class="banner-stats">
@@ -433,8 +486,8 @@
         </div>
         <div class="bstat-sep"></div>
         <div class="bstat">
-          <div class="bstat-num">10</div>
-          <div class="bstat-label">插件分类</div>
+          <div class="bstat-num">{{ activeTab === 'apps' ? categories.length : 10 }}</div>
+          <div class="bstat-label">{{ activeTab === 'apps' ? '应用分类' : '插件分类' }}</div>
         </div>
       </div>
     </div>
@@ -446,77 +499,81 @@
     <!-- ── OVERVIEW MODE ──────────────────────────── -->
     <template v-if="!view.category">
 
-      <!-- 应用广场 section -->
-      <div class="mp-section">
-        <div class="mp-section-hd">
-          <div class="mp-section-left">
-            <div class="mp-section-icon apps">📱</div>
-            <div>
-              <div class="mp-section-title">应用广场</div>
-              <div class="mp-section-sub">开箱即用的医疗 AI 原生应用，覆盖临床、管理、科研全链条</div>
-            </div>
-          </div>
-          <div class="mp-section-badge apps">共 {{ totalApps }} 个应用</div>
+      <!-- Tab bar -->
+      <div class="tab-bar">
+        <button class="tab-btn" :class="{ 'tab-active': activeTab === 'apps' }" @click="activeTab = 'apps'">
+          <span class="tab-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </span>
+          <span>应用广场</span>
+          <span class="tab-count">{{ totalApps }}+</span>
+        </button>
+        <button class="tab-btn" :class="{ 'tab-active': activeTab === 'plugins' }" @click="activeTab = 'plugins'">
+          <span class="tab-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4"/><path d="M14 9h-4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4"/><rect x="2" y="5" width="8" height="14" rx="2"/></svg>
+          </span>
+          <span>插件广场</span>
+          <span class="tab-count">{{ totalPlugins }}+</span>
+        </button>
+      </div>
+
+      <!-- Apps tab content -->
+      <div v-if="activeTab === 'apps'" class="tab-content">
+        <div class="tab-content-hd">
+          <div class="tab-content-title">应用广场</div>
+          <div class="tab-content-sub">开箱即用的医疗 AI 原生应用，覆盖临床、管理、科研全链条 · 共 {{ totalApps }}+ 个应用</div>
         </div>
         <div class="cat-grid">
-          <div
-            v-for="cat in categories"
-            :key="'app-' + cat.id"
-            class="cat-card"
-            @click="enterCategory(cat, 'apps')"
-          >
-            <div class="cat-icon-wrap" :style="{ background: cat.lightBg }">{{ cat.icon }}</div>
-            <div class="cat-body">
+          <div v-for="cat in categories" :key="'app-' + cat.id" class="cat-card" @click="enterCategory(cat, 'apps')">
+            <div class="cat-card-header" :style="{ background: cat.gradient }">
+              <div class="cat-card-icon" v-html="cat.svgIcon"></div>
+              <div class="cat-card-stat">
+                <div class="cat-stat-num">{{ cat.appCount }}</div>
+                <div class="cat-stat-label">个应用</div>
+              </div>
+            </div>
+            <div class="cat-card-body">
               <div class="cat-name">{{ cat.name }}</div>
+              <div class="cat-name-en">{{ cat.nameEn }}</div>
               <div class="cat-desc">{{ cat.desc }}</div>
               <div class="cat-kws">
                 <span v-for="kw in cat.keywords" :key="kw" class="cat-kw">{{ kw }}</span>
               </div>
-              <div class="cat-footer">
-                <div class="cat-counts">
-                  <div class="cat-count-item"><strong>{{ cat.appCount }}</strong> 个应用</div>
-                </div>
-                <div class="cat-arrow">›</div>
-              </div>
+            </div>
+            <div class="cat-card-footer">
+              <span class="cat-explore-btn">探索全部 →</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 插件广场 section -->
-      <div class="mp-section">
-        <div class="mp-section-hd">
-          <div class="mp-section-left">
-            <div class="mp-section-icon plugins">🔌</div>
-            <div>
-              <div class="mp-section-title">插件广场 <span style="font-size:13px;font-weight:400;color:#8898b0;">MCP + Skills</span></div>
-              <div class="mp-section-sub">标准化 MCP 协议工具与 AI Skills，覆盖医疗、生物信息、数据科学全领域</div>
-            </div>
-          </div>
-          <div class="mp-section-badge plugins">共 {{ totalPlugins }} 个插件</div>
+      <!-- Plugins tab content -->
+      <div v-if="activeTab === 'plugins'" class="tab-content">
+        <div class="tab-content-hd">
+          <div class="tab-content-title">插件广场 <span style="font-size:14px;font-weight:400;color:#6b7fa8;">MCP + Skills</span></div>
+          <div class="tab-content-sub">标准化 MCP 协议工具与 AI Skills，覆盖医疗、生物信息、数据科学全领域 · 共 {{ totalPlugins }}+ 个插件</div>
         </div>
         <div class="cat-grid">
-          <div
-            v-for="pcat in pluginCategories"
-            :key="'plugin-' + pcat.id"
-            class="cat-card"
-            @click="enterCategory(pcat, 'plugins')"
-          >
-            <div class="cat-icon-wrap" :style="{ background: pcat.lightBg }">{{ pcat.icon }}</div>
-            <div class="cat-body">
+          <div v-for="pcat in pluginCategories" :key="'plugin-' + pcat.id" class="cat-card cat-card-plugin" @click="enterCategory(pcat, 'plugins')">
+            <div class="cat-card-header" :style="{ background: pcat.gradient }">
+              <div class="cat-card-icon" v-html="pcat.svgIcon"></div>
+              <div class="cat-card-stat">
+                <div class="cat-stat-num">{{ pcat.pluginCount }}</div>
+                <div class="cat-stat-label">个插件</div>
+              </div>
+            </div>
+            <div class="cat-card-body">
               <div class="cat-name">{{ pcat.name }}</div>
+              <div class="cat-name-en">{{ pcat.nameEn }}</div>
               <div class="cat-desc">{{ pcat.desc }}</div>
               <div class="cat-subcats">
                 <span v-for="sc in pcat.subcats.slice(0,3)" :key="sc" class="cat-subcat-chip">{{ sc }}</span>
                 <span v-if="pcat.subcats.length > 3" class="cat-subcat-chip">+{{ pcat.subcats.length - 3 }}</span>
               </div>
-              <div class="cat-footer">
-                <div class="cat-counts">
-                  <div class="cat-count-item"><strong>{{ pcat.pluginCount }}</strong> 个插件</div>
-                  <div class="cat-count-item">{{ pcat.subcats.length }} 个子类</div>
-                </div>
-                <div class="cat-arrow">›</div>
-              </div>
+            </div>
+            <div class="cat-card-footer cat-card-footer-plugin">
+              <span class="cat-sub-count">{{ pcat.subcats.length }} 个子分类</span>
+              <span class="cat-explore-btn cat-explore-plugin">探索全部 →</span>
             </div>
           </div>
         </div>
@@ -638,6 +695,7 @@ createApp({
     const view = ref({ category: null, type: null }); // type: 'apps' | 'plugins'
     const search = ref('');
     const activeFilter = ref('all');
+    const activeTab = ref('apps');
     const activeSubcat = ref('全部');
     const pluginFilters = [
       { label: '全部',  value: 'all'   },
@@ -645,40 +703,100 @@ createApp({
       { label: 'Skill', value: 'Skill' },
     ];
 
-    /* ── App Categories (6 medical scenes) ── */
+    /* ── App Categories (12 medical scenes) ── */
     const categories = [
       {
-        id: 'clinical', name: '临床辅助', icon: '⚕️', lightBg: '#e8f0ff',
+        id: 'clinical', name: '临床辅助', nameEn: 'Clinical Decision Support',
+        gradient: 'linear-gradient(135deg, #1677ff 0%, #36abff 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/><path d="M8 12h4"/><path d="M10 10v4"/></svg>',
         desc: '覆盖诊断辅助、医嘱生成、病历书写等临床全流程智能化支持，提升医生诊疗效率与准确性',
         keywords: ['智能诊断', '医嘱管理', '病历书写', '影像AI'],
         appCount: 18,
       },
       {
-        id: 'patient', name: '患者服务', icon: '🫀', lightBg: '#e0f7fa',
+        id: 'patient', name: '患者服务', nameEn: 'Patient Engagement',
+        gradient: 'linear-gradient(135deg, #0ba3c4 0%, #36cfc9 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
         desc: '聚焦患者就医全程体验，涵盖在线问诊、随访管理、慢病干预、健康档案等服务场景',
         keywords: ['在线问诊', '随访管理', '慢病干预', '健康档案'],
         appCount: 14,
       },
       {
-        id: 'specialty', name: '专科专病', icon: '🔬', lightBg: '#f3e8ff',
+        id: 'specialty', name: '专科专病', nameEn: 'Specialty & Disease',
+        gradient: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>',
         desc: '针对肿瘤、心血管、神经、眼科、呼吸等专科场景的深度专病解决方案与辅助诊断工具',
         keywords: ['肿瘤辅诊', '心血管', '神经科学', '眼科筛查'],
         appCount: 22,
       },
       {
-        id: 'management', name: '医院管理', icon: '🏛️', lightBg: '#dbeafe',
+        id: 'management', name: '医院管理', nameEn: 'Hospital Operations',
+        gradient: 'linear-gradient(135deg, #0f7bc0 0%, #2563eb 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
         desc: '助力医院运营管理、绩效考核、供应链管理、医疗质控等数字化升级，提升整体运营效能',
         keywords: ['运营分析', '质量管理', '供应链', '绩效考核'],
         appCount: 11,
       },
       {
-        id: 'research', name: '科研教育', icon: '📖', lightBg: '#dcfce7',
+        id: 'insurance', name: '医保与支付', nameEn: 'Insurance & Payment',
+        gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+        desc: '医保智能审核、DRG/DIP分组管理、医疗费用合规分析与医保结算数字化，赋能医院医保管理精细化',
+        keywords: ['DRG/DIP', '医保审核', '费用分析', '结算管理'],
+        appCount: 10,
+      },
+      {
+        id: 'publichealth', name: '公共卫生与疾控', nameEn: 'Public Health & CDC',
+        gradient: 'linear-gradient(135deg, #dc2626 0%, #f87171 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+        desc: '传染病监测预警、流行病学溯源分析、慢病防控与社区公共卫生服务数字化管理，助力疾控能力建设',
+        keywords: ['传染病监测', '流行病学', '慢病防控', '疫情预警'],
+        appCount: 9,
+      },
+      {
+        id: 'tcm', name: '中医药智慧诊疗', nameEn: 'Traditional Chinese Medicine',
+        gradient: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2C6.5 2 2 6.5 2 12"/><path d="M16 2c1.5 3 2 5.5 2 10"/><path d="M8 22c1-2 2-4 2-10"/></svg>',
+        desc: '中医辅助辨证、智能方剂推荐、中药饮片知识图谱与中西医协同诊疗方案，传承与创新中医药智慧',
+        keywords: ['辨证论治', '智能方剂', '中药知识图谱', '中西医结合'],
+        appCount: 8,
+      },
+      {
+        id: 'health', name: '健康管理', nameEn: 'Health Management',
+        gradient: 'linear-gradient(135deg, #16a34a 0%, #4ade80 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+        desc: '覆盖健康体检、运动营养、体重管理、睡眠健康等生命全周期健康管理与个性化干预方案',
+        keywords: ['健康体检', '慢病管理', '运动营养', '个性化干预'],
+        appCount: 12,
+      },
+      {
+        id: 'nursing', name: '护理与照护', nameEn: 'Nursing & Care',
+        gradient: 'linear-gradient(135deg, #be185d 0%, #f472b6 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        desc: '院内护理排班、压疮风险预测、老年照护评估、护理质控与居家延续护理智能化管理平台',
+        keywords: ['护理排班', '压疮预测', '老年照护', '护理质控'],
+        appCount: 7,
+      },
+      {
+        id: 'internet', name: '互联网医疗', nameEn: 'Internet Healthcare',
+        gradient: 'linear-gradient(135deg, #0369a1 0%, #38bdf8 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>',
+        desc: '互联网医院建设、远程会诊、电子处方流转、在线复诊与院外处方配送全链路数字化互联网医疗解决方案',
+        keywords: ['远程会诊', '电子处方', '互联网医院', '在线复诊'],
+        appCount: 11,
+      },
+      {
+        id: 'research', name: '科研教育', nameEn: 'Research & Education',
+        gradient: 'linear-gradient(135deg, #065f46 0%, #34d399 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
         desc: '支持临床科研、文献智能分析、医学教育培训与队列研究的一站式智能工具平台',
         keywords: ['文献分析', '临床试验', '医学教育', '队列研究'],
         appCount: 16,
       },
       {
-        id: 'pharma', name: '医药研发', icon: '💊', lightBg: '#fff7ed',
+        id: 'pharma', name: '医药研发', nameEn: 'Drug R&D',
+        gradient: 'linear-gradient(135deg, #92400e 0%, #f59e0b 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/></svg>',
         desc: '加速药物发现、靶点预测、临床前研究与不良反应监测全链条，赋能新药研发数字化转型',
         keywords: ['靶点预测', '药效分析', '临床前研究', '不良反应'],
         appCount: 13,
@@ -688,61 +806,81 @@ createApp({
     /* ── Plugin Categories (10 hierarchical groups) ── */
     const pluginCategories = [
       {
-        id: 'general', name: '通用与核心', icon: '⚙️', lightBg: '#f5f5ff',
+        id: 'general', name: '通用与核心', nameEn: 'General & Core', icon: '⚙️', lightBg: '#f5f5ff',
+        gradient: 'linear-gradient(135deg,#4f46e5 0%,#818cf8 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>',
         desc: '通用工具与基础能力插件，适用于多种医疗AI场景的核心调度、格式转换与集成能力',
         subcats: ['通用工具'],
         pluginCount: 8,
       },
       {
-        id: 'medical-clinical', name: '医疗与临床', icon: '⚕️', lightBg: '#e8f0ff',
+        id: 'medical-clinical', name: '医疗与临床', nameEn: 'Medical & Clinical', icon: '⚕️', lightBg: '#e8f0ff',
+        gradient: 'linear-gradient(135deg,#1677ff 0%,#36abff 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
         desc: '医疗专用工具、药物安全、影像病理、临床AI、心理健康、健康管理与医疗器械全领域能力',
         subcats: ['医疗专用工具','药物安全与化学生物学','医学影像与病理学','医疗机器学习与临床人工智能','心理健康与危机干预','健康与健康管理分析','医疗器械与监管','医疗器械软件'],
         pluginCount: 40,
       },
       {
-        id: 'sci-database', name: '科学数据库', icon: '🗄️', lightBg: '#e6f7f5',
+        id: 'sci-database', name: '科学数据库', nameEn: 'Science Databases', icon: '🗄️', lightBg: '#e6f7f5',
+        gradient: 'linear-gradient(135deg,#0ba3c4 0%,#36cfc9 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
         desc: '基因组、蛋白质、癌症、分子与结构生物学权威科学数据库标准化查询与分析接口',
         subcats: ['科学数据库（基因组与变异）','科学数据库（蛋白质、通路与药物）','癌症基因组数据库','基因组与分子数据库','结构生物学与药物发现','生物信息学'],
         pluginCount: 24,
       },
       {
-        id: 'bioinformatics', name: '生物信息学工具', icon: '🧬', lightBg: '#dcfce7',
+        id: 'bioinformatics', name: '生物信息学工具', nameEn: 'Bioinformatics Tools', icon: '🧬', lightBg: '#dcfce7',
+        gradient: 'linear-gradient(135deg,#16a34a 0%,#4ade80 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
         desc: '涵盖变异分析、测序质控、转录组、单细胞、表观基因组、宏基因组、免疫信息学等全流程工具',
         subcats: ['生物信息 — 临床数据库与变异分析','生物信息 — 测序与读长质控','生物信息 — 差异表达与转录组学','生物信息学——通路与网络分析','生物信息 — 单细胞与空间组学','生物信息学——表观基因组学与染色质','生物信息 — 宏基因组学与微生物组','生物信息 — 免疫信息学与流式细胞术','生物信息学——多组学整合','生物信息 — 蛋白质组学与代谢组学','生物信息 — 结构生物学与化学信息学','生物信息学 — 流行病学、基因组学与因果基因组学'],
         pluginCount: 56,
       },
       {
-        id: 'omics', name: '组学与计算生物学', icon: '🔭', lightBg: '#fef3c7',
+        id: 'omics', name: '组学与计算生物学', nameEn: 'Omics & Computational Bio', icon: '🔭', lightBg: '#fef3c7',
+        gradient: 'linear-gradient(135deg,#b45309 0%,#fbbf24 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>',
         desc: '单细胞与空间组学、蛋白质组学、化学信息学、蛋白质结构设计及系统发育网络分析工具',
         subcats: ['单细胞与空间组学','单细胞与轨迹分析','蛋白质组学与质谱','化学信息学与药物发现','蛋白质结构与设计','系统发育与网络分析'],
         pluginCount: 28,
       },
       {
-        id: 'clawbio', name: 'ClawBio管道', icon: '🦀', lightBg: '#fff1f2',
+        id: 'clawbio', name: 'ClawBio管道', nameEn: 'ClawBio Pipelines', icon: '🦀', lightBg: '#fff1f2',
+        gradient: 'linear-gradient(135deg,#be185d 0%,#f472b6 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="19" y1="12" x2="5" y2="12"/></svg>',
         desc: 'ClawBio 提供的生物信息学编排流水线，覆盖基因组学、祖先分析、药物基因组学与结构生物学',
         subcats: ['生物信息学编排与管道 (ClawBio)','基因组学、祖先分析与药物基因组学 (ClawBio)','结构生物学与文献综合 (ClawBio)'],
         pluginCount: 12,
       },
       {
-        id: 'bioos', name: 'BioOS扩展套件', icon: '🧫', lightBg: '#faf0ff',
+        id: 'bioos', name: 'BioOS扩展套件', nameEn: 'BioOS Extension Suite', icon: '🧫', lightBg: '#faf0ff',
+        gradient: 'linear-gradient(135deg,#7c3aed 0%,#a855f7 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>',
         desc: 'BioOS 平台扩展工具套件，涵盖肿瘤学、血液学、免疫学、单细胞、药物发现与临床AI智能体',
         subcats: ['BioOS扩展生物信息工具套件','肿瘤学与精准医学智能体 (BioOS)','血液学与血液病 (BioOS)','免疫学与细胞治疗 (BioOS)','单细胞与空间组学智能体 (BioOS)','药物发现与分子设计 (BioOS)','临床AI与医疗 (BioOS)','研究基础设施与智能体框架（BioOS）'],
         pluginCount: 36,
       },
       {
-        id: 'datascience', name: '数据科学与工具', icon: '📊', lightBg: '#fff7ed',
+        id: 'datascience', name: '数据科学与工具', nameEn: 'Data Science & Tools', icon: '📊', lightBg: '#fff7ed',
+        gradient: 'linear-gradient(135deg,#0369a1 0%,#38bdf8 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
         desc: '统计分析、科学计算、可视化、公共卫生、计算模拟、分析师智能体与实验室自动化工具',
         subcats: ['统计与数据分析','数据处理与科学计算','科学可视化与科研传播','公共卫生与时序分析','计算模拟与本体论','分析师人格','实验室自动化与集成'],
         pluginCount: 32,
       },
       {
-        id: 'research-writing', name: '科学研究与写作', icon: '📝', lightBg: '#f0f9ff',
+        id: 'research-writing', name: '科学研究与写作', nameEn: 'Research & Writing', icon: '📝', lightBg: '#f0f9ff',
+        gradient: 'linear-gradient(135deg,#065f46 0%,#34d399 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
         desc: '科学文献检索与参考管理、论文辅助写作与补充科学工具，加速科研全流程',
         subcats: ['科学文献与参考管理','补充科学工具'],
         pluginCount: 14,
       },
       {
-        id: 'devworkflow', name: '开发工作流技能', icon: '🛠️', lightBg: '#f8fafc',
+        id: 'devworkflow', name: '开发工作流技能', nameEn: 'Dev Workflow Skills', icon: '🛠️', lightBg: '#f8fafc',
+        gradient: 'linear-gradient(135deg,#374151 0%,#6b7280 100%)',
+        svgIcon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
         desc: '代码版本管理、容器化、CI/CD流水线、API测试等开发工程化工作流支撑插件',
         subcats: ['开发工作流技能'],
         pluginCount: 10,
@@ -834,6 +972,90 @@ createApp({
           desc: '生成式AI药物分子设计，从靶点到候选药物全流程智能加速，支持多参数同步优化', tags: ['生成式AI', '分子设计', '全流程', '多参数'] },
         { id: 36, icon: '📐', name: '药代动力学建模', vendor: '非线性医学', rating: 4.5, installs: '510+', version: 'v1.9.0', isNew: false, isHot: false,
           desc: 'PK/PD参数自动化建模与仿真，群体药代动力学分析与个体化给药方案优化', tags: ['PK/PD', '群体药代', '仿真', '给药优化'] },
+      ],
+      insurance: [
+        { id: 37, icon: '🛡️', name: 'DRG/DIP智能分组系统', vendor: '医保信息云', rating: 4.8, installs: '2.6k+', version: 'v3.2.0', isNew: false, isHot: true,
+          desc: '智能DRG/DIP分组与入组预测，费用合理性分析，自动生成医保结算清单，助力医院医保精细化管理', tags: ['DRG', 'DIP', '医保分组', '费用分析'] },
+        { id: 38, icon: '📋', name: '医保费用审核平台', vendor: '万达信息', rating: 4.7, installs: '1.8k+', version: 'v2.5.0', isNew: false, isHot: false,
+          desc: '基于规则引擎与AI的医保费用自动审核，识别过度医疗、违规收费等异常行为，辅助医保监管', tags: ['费用审核', '异常识别', '合规', '医保监管'] },
+        { id: 39, icon: '💳', name: '商业健康险智能核保', vendor: '众安科技', rating: 4.6, installs: '1.1k+', version: 'v2.0.0', isNew: false, isHot: true,
+          desc: '结合医疗大数据的健康险智能核保与定价，风险分层模型，提升保险产品的精准定价能力', tags: ['健康险', '智能核保', '精准定价', '风险模型'] },
+        { id: 40, icon: '📊', name: '医疗费用预测分析', vendor: '智慧医保', rating: 4.5, installs: '890+', version: 'v1.8.0', isNew: true, isHot: false,
+          desc: '基于历史数据与患者特征的医疗费用预测模型，辅助医院费用管理与医保预算编制', tags: ['费用预测', '预算管理', '医保', '数据分析'] },
+        { id: 41, icon: '🔄', name: '按病种付费管理', vendor: '东软医保', rating: 4.6, installs: '1.3k+', version: 'v2.2.0', isNew: false, isHot: false,
+          desc: '按病种付费业务全流程管理，费用测算、协议管理与绩效考核一体化，助力医保支付方式改革', tags: ['按病种付费', '支付改革', '绩效考核', '费用测算'] },
+        { id: 42, icon: '📝', name: '医保编码标准化', vendor: '医保智信', rating: 4.7, installs: '2.1k+', version: 'v3.0.0', isNew: false, isHot: true,
+          desc: '疾病诊断、手术操作、药品耗材国家医保编码自动映射与标准化，支持多版本编码体系兼容', tags: ['医保编码', '标准化', 'ICD-10', '耗材编码'] },
+      ],
+      publichealth: [
+        { id: 43, icon: '🌡️', name: '传染病智能监测预警', vendor: '疾控信息云', rating: 4.8, installs: '1.4k+', version: 'v2.1.0', isNew: false, isHot: true,
+          desc: '多源数据融合传染病早期预警，异常信号自动识别与上报，支持新发突发传染病快速响应', tags: ['传染病监测', '预警', '疫情上报', '多源数据'] },
+        { id: 44, icon: '🗺️', name: '流行病学溯源分析', vendor: '公卫数据云', rating: 4.7, installs: '980+', version: 'v3.0.0', isNew: false, isHot: true,
+          desc: '基于空间流行病学的病例聚集性分析、传播链重建与溯源调查辅助，支持GIS可视化', tags: ['流行病学', '溯源分析', 'GIS', '传播链'] },
+        { id: 45, icon: '📈', name: '慢病防控管理平台', vendor: '国家疾控', rating: 4.6, installs: '2.3k+', version: 'v4.0.0', isNew: false, isHot: false,
+          desc: '社区慢病高危人群筛查、干预跟踪与效果评估，覆盖高血压、糖尿病、肿瘤等重大慢病防控', tags: ['慢病防控', '高危筛查', '干预评估', '社区卫生'] },
+        { id: 46, icon: '💉', name: '疫苗接种管理系统', vendor: '国家免疫规划', rating: 4.7, installs: '3.2k+', version: 'v3.5.0', isNew: false, isHot: true,
+          desc: '疫苗接种档案数字化管理，AI预约排班，接种率统计与冷链全程追踪，支持多苗种管理', tags: ['疫苗接种', '冷链追踪', '接种率', '预约'] },
+        { id: 47, icon: '🏘️', name: '社区卫生服务平台', vendor: '卫生信息云', rating: 4.5, installs: '1.7k+', version: 'v2.8.0', isNew: false, isHot: false,
+          desc: '家庭医生签约服务、社区居民健康档案、基本公共卫生服务绩效考核一体化管理', tags: ['家庭医生', '签约服务', '公共卫生', '绩效'] },
+        { id: 48, icon: '🔬', name: '环境健康监测分析', vendor: '环境卫生AI', rating: 4.4, installs: '620+', version: 'v1.5.0', isNew: true, isHot: false,
+          desc: '环境污染与人群健康关联分析，暴露-反应关系建模，辅助环境卫生政策制定与评估', tags: ['环境健康', '暴露评估', '政策评估', '监测'] },
+      ],
+      tcm: [
+        { id: 49, icon: '🌿', name: '中医智能辨证系统', vendor: '神州医疗', rating: 4.7, installs: '1.6k+', version: 'v3.0.0', isNew: false, isHot: true,
+          desc: '基于中医理论知识图谱的症状-证候智能辨证，融合舌象、脉象AI分析，辅助中医辨证论治', tags: ['辨证论治', '证候分析', '舌诊', '脉诊'] },
+        { id: 50, icon: '📜', name: '智能方剂推荐平台', vendor: '中医AI云', rating: 4.6, installs: '1.2k+', version: 'v2.4.0', isNew: false, isHot: false,
+          desc: '基于历代医案大数据的方剂智能推荐与配伍分析，支持经典方、时方与个体化加减建议', tags: ['方剂推荐', '配伍分析', '医案挖掘', '个性化'] },
+        { id: 51, icon: '🌱', name: '中药饮片知识图谱', vendor: '本草数据云', rating: 4.8, installs: '2.1k+', version: 'v4.1.0', isNew: false, isHot: true,
+          desc: '全面收录中药饮片性味、归经、功效、禁忌与现代药理研究，支持医师查询与临床决策辅助', tags: ['中药知识', '药理研究', '禁忌查询', '知识图谱'] },
+        { id: 52, icon: '🏺', name: '针灸智能诊疗助手', vendor: '中医经络AI', rating: 4.5, installs: '780+', version: 'v2.0.0', isNew: true, isHot: false,
+          desc: '经络穴位精准定位，针灸取穴方案智能推荐，疗效评估记录，融合中医经络理论与现代研究', tags: ['针灸', '穴位', '取穴方案', '经络'] },
+        { id: 53, icon: '🫖', name: '治未病健康管理', vendor: '中医预防云', rating: 4.6, installs: '950+', version: 'v2.5.0', isNew: false, isHot: false,
+          desc: '基于中医体质辨识的个性化治未病健康方案，融合季节调摄、膳食调理与生活方式干预建议', tags: ['治未病', '体质辨识', '膳食调理', '健康干预'] },
+        { id: 54, icon: '🔭', name: '中西医协同诊疗', vendor: '整合医学AI', rating: 4.7, installs: '1.1k+', version: 'v3.0.0', isNew: false, isHot: true,
+          desc: '整合中医证型与西医诊断数据，提供中西医协同治疗方案与疗效评价，推动中西医结合发展', tags: ['中西医结合', '协同治疗', '整合医学', '疗效评价'] },
+      ],
+      health: [
+        { id: 55, icon: '❤️', name: '智慧体检管理平台', vendor: '爱康国宾', rating: 4.8, installs: '4.2k+', version: 'v5.0.0', isNew: false, isHot: true,
+          desc: '体检全流程数字化管理，异常指标AI解读，个性化健康报告生成与体检后健康干预跟踪', tags: ['体检管理', 'AI解读', '健康报告', '异常随访'] },
+        { id: 56, icon: '🏃', name: '运动健康管理应用', vendor: '姿态科技', rating: 4.6, installs: '2.8k+', version: 'v3.2.0', isNew: false, isHot: true,
+          desc: '基于可穿戴设备数据的运动量化分析，AI制定个性化运动处方，运动风险评估与损伤预防', tags: ['运动处方', '可穿戴', '运动风险', 'AI训练'] },
+        { id: 57, icon: '🥗', name: '营养膳食干预平台', vendor: '营养云', rating: 4.5, installs: '1.6k+', version: 'v2.5.0', isNew: false, isHot: false,
+          desc: '基于营养科学的个性化膳食方案制定，食物营养数据库查询与餐饮营养素精准计算分析', tags: ['营养膳食', '食谱制定', '营养计算', '个性化'] },
+        { id: 58, icon: '😴', name: '睡眠健康监测分析', vendor: '睡眠云AI', rating: 4.7, installs: '2.1k+', version: 'v3.0.0', isNew: false, isHot: true,
+          desc: '多维睡眠数据采集与分析，睡眠质量评估、睡眠障碍筛查与改善方案智能推荐', tags: ['睡眠监测', '睡眠质量', '睡眠障碍', '干预方案'] },
+        { id: 59, icon: '🧘', name: '心理健康评估平台', vendor: '心悦智医', rating: 4.6, installs: '1.3k+', version: 'v2.3.0', isNew: true, isHot: false,
+          desc: '标准化心理量表数字化评估，抑郁焦虑早期筛查，心理健康状态趋势追踪与干预资源推荐', tags: ['心理评估', '量表测评', '抑郁筛查', '干预推荐'] },
+        { id: 60, icon: '⚖️', name: '体重管理智能平台', vendor: '轻松减重', rating: 4.4, installs: '1.9k+', version: 'v2.0.0', isNew: false, isHot: false,
+          desc: 'AI制定个性化减重方案，结合饮食记录、运动打卡与体重趋势分析，科学管理体重目标', tags: ['体重管理', '减重方案', '饮食记录', '行为干预'] },
+      ],
+      nursing: [
+        { id: 61, icon: '📅', name: '护理智能排班系统', vendor: '护理云', rating: 4.6, installs: '1.5k+', version: 'v2.8.0', isNew: false, isHot: false,
+          desc: '基于科室需求与护士能力的智能排班优化，合理分配护理工作量，支持弹性调班与紧急替换', tags: ['护理排班', '工作量分配', '弹性排班', '人力优化'] },
+        { id: 62, icon: '🛡️', name: '压疮风险预测系统', vendor: '伤口护理AI', rating: 4.7, installs: '1.1k+', version: 'v2.1.0', isNew: false, isHot: true,
+          desc: '基于Braden量表与患者多维数据的压疮风险动态预测，自动触发预防护理措施推荐', tags: ['压疮预防', '风险预测', 'Braden量表', '护理措施'] },
+        { id: 63, icon: '👴', name: '老年照护评估平台', vendor: '养老智能云', rating: 4.5, installs: '870+', version: 'v2.0.0', isNew: true, isHot: false,
+          desc: '老年人日常生活能力、认知功能、跌倒风险综合评估，个性化照护计划制定与执行追踪', tags: ['老年评估', 'ADL能力', '跌倒预防', '照护计划'] },
+        { id: 64, icon: '🏠', name: '居家延续护理管理', vendor: '护理到家', rating: 4.6, installs: '1.2k+', version: 'v2.4.0', isNew: false, isHot: true,
+          desc: '出院后居家护理任务分配与执行管理，护士上门服务调度，护理记录与质量监控一体化平台', tags: ['居家护理', '延续服务', '护士调度', '质控'] },
+        { id: 65, icon: '📊', name: '护理质量管控平台', vendor: '质护科技', rating: 4.7, installs: '1.6k+', version: 'v3.1.0', isNew: false, isHot: false,
+          desc: '护理质量指标实时监控，护理不良事件预警与分析，持续改进护理质量并自动生成质控报告', tags: ['护理质控', '不良事件', '质量指标', '持续改进'] },
+        { id: 66, icon: '💊', name: '用药护理安全监控', vendor: '安护云', rating: 4.8, installs: '2.0k+', version: 'v2.6.0', isNew: false, isHot: true,
+          desc: '护士给药执行与核对智能化，药物剂量计算助手，给药错误智能预警与护理记录自动生成', tags: ['用药安全', '给药核对', '剂量计算', '护理记录'] },
+      ],
+      internet: [
+        { id: 67, icon: '🏥', name: '互联网医院建设平台', vendor: '医惠科技', rating: 4.7, installs: '2.4k+', version: 'v4.0.0', isNew: false, isHot: true,
+          desc: '互联网医院全功能建设方案，涵盖在线问诊、处方流转、药品配送与电子档案的一站式平台', tags: ['互联网医院', '在线诊疗', '处方流转', '药品配送'] },
+        { id: 68, icon: '📹', name: '远程会诊协作平台', vendor: '好大夫在线', rating: 4.8, installs: '3.6k+', version: 'v5.1.0', isNew: false, isHot: true,
+          desc: '高清视频会诊、多学科MDT协作、影像资料实时共享，实现优质医疗资源跨区域共享', tags: ['远程会诊', 'MDT协作', '影像共享', '视频问诊'] },
+        { id: 69, icon: '📱', name: '移动医疗APP平台', vendor: '微医集团', rating: 4.6, installs: '8.9k+', version: 'v6.0.0', isNew: false, isHot: true,
+          desc: '患者端移动医疗全场景应用，集成挂号预约、在线问诊、报告查看、用药提醒与随访管理', tags: ['移动医疗', '挂号预约', '报告查看', '用药提醒'] },
+        { id: 70, icon: '💊', name: '电子处方流转平台', vendor: '健民医药', rating: 4.7, installs: '2.1k+', version: 'v3.3.0', isNew: false, isHot: false,
+          desc: '医院处方电子化流转，对接院内HIS与院外药房，处方核查、配药与患者取药全流程数字化', tags: ['电子处方', '处方流转', '院外药房', '药品配送'] },
+        { id: 71, icon: '🔔', name: 'AI健康助手', vendor: '平安健康', rating: 4.5, installs: '5.2k+', version: 'v4.5.0', isNew: false, isHot: true,
+          desc: '基于大模型的全科AI健康助手，提供症状自查、用药咨询、检查报告解读与健康科普服务', tags: ['AI助手', '症状自查', '报告解读', '健康科普'] },
+        { id: 72, icon: '⭐', name: '医生个人品牌平台', vendor: '医脉通', rating: 4.4, installs: '1.7k+', version: 'v2.8.0', isNew: true, isHot: false,
+          desc: '医生个人专业品牌建设，学术内容发布、患者粉丝管理与在线学术交流一体化医生服务平台', tags: ['医生品牌', '学术内容', '患者管理', '在线交流'] },
       ],
     };
 
@@ -1058,7 +1280,7 @@ createApp({
     }
 
     return {
-      view, search, activeFilter, activeSubcat, pluginFilters,
+      view, search, activeFilter, activeSubcat, activeTab, pluginFilters,
       categories, pluginCategories, filteredItems,
       totalApps, totalPlugins,
       enterCategory, goBack,
