@@ -25,16 +25,16 @@
     .header {
       position: sticky; top: 0; z-index: 200;
       height: 60px;
-      background: #001529;
+      background: #ffffff;
+      border-bottom: 1px solid #e2eaf7;
       display: flex; align-items: center;
       padding: 0 28px;
       gap: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.35);
+      box-shadow: 0 2px 12px rgba(16,40,100,.07);
     }
     .logo {
       display: flex; align-items: center; gap: 10px;
-      color: #fff; text-decoration: none;
-      flex-shrink: 0;
+      text-decoration: none; flex-shrink: 0;
     }
     .logo-icon {
       width: 36px; height: 36px;
@@ -44,9 +44,9 @@
       font-size: 18px;
     }
     .logo-text { display: flex; flex-direction: column; }
-    .logo-name { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
-    .logo-sub  { font-size: 11px; color: rgba(255,255,255,.45); }
-    .logo-sep  { width: 1px; height: 26px; background: rgba(255,255,255,.15); flex-shrink: 0; }
+    .logo-name { font-size: 16px; font-weight: 700; color: #1a2f5a; line-height: 1.2; }
+    .logo-sub  { font-size: 11px; color: #8898b0; }
+    .logo-sep  { width: 1px; height: 26px; background: rgba(26,47,90,.12); flex-shrink: 0; }
     .header-nav {
       display: flex; gap: 2px;
     }
@@ -54,39 +54,40 @@
       padding: 6px 13px;
       border-radius: 6px;
       font-size: 13px; font-weight: 500;
-      color: rgba(255,255,255,.7);
+      color: #4a5e7a;
       transition: all .15s;
       cursor: pointer;
     }
-    .nav-link:hover  { color: #fff; background: rgba(255,255,255,.1); }
-    .nav-link.active { color: #fff; background: rgba(22,119,255,.45); }
+    .nav-link:hover  { color: #1677ff; background: #eff6ff; }
+    .nav-link.active { color: #1677ff; background: #e8f0ff; font-weight: 600; }
     .header-right {
       margin-left: auto;
       display: flex; align-items: center; gap: 10px;
     }
     .hdr-badge {
-      font-size: 11px; color: rgba(255,255,255,.5);
-      border: 1px solid rgba(255,255,255,.18);
+      font-size: 11px; color: #6b7fa8;
+      border: 1px solid #d4e0f5;
       border-radius: 10px; padding: 2px 10px;
     }
 
     /* ─── Banner ─────────────────────────────────── */
     .page-banner {
-      background: linear-gradient(118deg, #001529 0%, #0a3060 45%, #0d6fa0 100%);
-      padding: 36px 28px 32px;
+      background: linear-gradient(118deg, #eff6ff 0%, #dbeafe 55%, #e0f2fe 100%);
+      padding: 36px 28px 30px;
       position: relative; overflow: hidden;
+      border-bottom: 1px solid #d4e4f7;
     }
     .page-banner::before {
       content: ''; position: absolute;
-      right: -60px; top: -80px;
-      width: 420px; height: 420px; border-radius: 50%;
-      background: rgba(22,119,255,.13); pointer-events: none;
+      right: -40px; top: -60px;
+      width: 380px; height: 380px; border-radius: 50%;
+      background: rgba(22,119,255,.07); pointer-events: none;
     }
     .page-banner::after {
       content: ''; position: absolute;
-      right: 180px; bottom: -120px;
-      width: 320px; height: 320px; border-radius: 50%;
-      background: rgba(8,145,178,.1); pointer-events: none;
+      right: 200px; bottom: -100px;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: rgba(14,165,233,.06); pointer-events: none;
     }
     .banner-inner {
       max-width: 1240px; margin: 0 auto;
@@ -96,23 +97,23 @@
     }
     .banner-left { flex: 1; min-width: 0; }
     .banner-eyebrow {
-      font-size: 12px; color: rgba(255,255,255,.55);
+      font-size: 12px; color: #6b7fa8;
       letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px;
     }
     .banner-title {
-      font-size: 28px; font-weight: 700; color: #fff;
+      font-size: 28px; font-weight: 700; color: #0f1c35;
       letter-spacing: .02em; margin-bottom: 10px; line-height: 1.25;
     }
     .banner-desc {
-      font-size: 13px; color: rgba(255,255,255,.68); line-height: 1.75;
+      font-size: 13px; color: #4a5e7a; line-height: 1.75;
       max-width: 540px; margin-bottom: 16px;
     }
     .banner-cats {
       display: flex; gap: 8px; flex-wrap: wrap;
     }
     .banner-cat {
-      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-      color: rgba(255,255,255,.82); border-radius: 14px;
+      background: rgba(22,119,255,.08); border: 1px solid rgba(22,119,255,.2);
+      color: #1677ff; border-radius: 14px;
       padding: 3px 12px; font-size: 12px;
     }
     .banner-stats {
@@ -120,11 +121,11 @@
     }
     .bstat { text-align: center; }
     .bstat-num {
-      font-size: 34px; font-weight: 700; color: #fff; line-height: 1;
+      font-size: 36px; font-weight: 700; color: #1677ff; line-height: 1;
     }
-    .bstat-num sup { font-size: 16px; font-weight: 400; color: rgba(255,255,255,.55); }
-    .bstat-label { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 4px; }
-    .bstat-sep { width: 1px; background: rgba(255,255,255,.12); align-self: stretch; }
+    .bstat-num sup { font-size: 16px; font-weight: 400; color: #8898b0; }
+    .bstat-label { font-size: 12px; color: #6b7fa8; margin-top: 4px; }
+    .bstat-sep { width: 1px; background: rgba(26,47,90,.12); align-self: stretch; }
 
     /* ─── Main Content ───────────────────────────── */
     .main-content {
@@ -202,6 +203,27 @@
       transition: background .15s, color .15s;
     }
     .cat-card:hover .cat-arrow { background: #1677ff; color: #fff; }
+
+    /* plugin category: subcats chips on card */
+    .cat-subcats { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+    .cat-subcat-chip {
+      font-size: 10px; padding: 1px 7px; border-radius: 8px;
+      background: #e6f7f5; color: #07a691; border: 1px solid #b2e8df;
+    }
+
+    /* ─── Subcategory Bar (detail view) ─────────────── */
+    .subcat-bar {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 12px; padding-bottom: 14px;
+      border-bottom: 1px solid #eef2fb;
+    }
+    .subcat-chip {
+      padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      border: 1px solid #d4e0f5; background: #fff; color: #4a5e7a;
+      transition: all .15s; white-space: nowrap; cursor: pointer;
+    }
+    .subcat-chip:hover { border-color: #07a691; color: #07a691; }
+    .subcat-chip.sc-active { background: #07a691; border-color: #07a691; color: #fff; }
 
     /* ─── Detail View ────────────────────────────── */
     .detail-topbar {
@@ -306,6 +328,10 @@
     .ibadge-hot   { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
     .ibadge-mcp   { background: #eff6ff; color: #1677ff; border: 1px solid #bfdbfe; }
     .ibadge-skill { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+    .item-subcat  {
+      font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 4px;
+      background: #e6f7f5; color: #07a691; border: 1px solid #b2e8df;
+    }
     .item-desc {
       font-size: 12px; color: #6b7fa8; line-height: 1.65;
       margin-bottom: 10px; flex: 1;
@@ -407,8 +433,8 @@
         </div>
         <div class="bstat-sep"></div>
         <div class="bstat">
-          <div class="bstat-num">6</div>
-          <div class="bstat-label">覆盖场景</div>
+          <div class="bstat-num">10</div>
+          <div class="bstat-label">插件分类</div>
         </div>
       </div>
     </div>
@@ -464,28 +490,30 @@
             <div class="mp-section-icon plugins">🔌</div>
             <div>
               <div class="mp-section-title">插件广场 <span style="font-size:13px;font-weight:400;color:#8898b0;">MCP + Skills</span></div>
-              <div class="mp-section-sub">标准化 MCP 协议工具与 AI Skills，即插即用，灵活组合编排</div>
+              <div class="mp-section-sub">标准化 MCP 协议工具与 AI Skills，覆盖医疗、生物信息、数据科学全领域</div>
             </div>
           </div>
           <div class="mp-section-badge plugins">共 {{ totalPlugins }} 个插件</div>
         </div>
         <div class="cat-grid">
           <div
-            v-for="cat in categories"
-            :key="'plugin-' + cat.id"
+            v-for="pcat in pluginCategories"
+            :key="'plugin-' + pcat.id"
             class="cat-card"
-            @click="enterCategory(cat, 'plugins')"
+            @click="enterCategory(pcat, 'plugins')"
           >
-            <div class="cat-icon-wrap" :style="{ background: cat.lightBg }">{{ cat.icon }}</div>
+            <div class="cat-icon-wrap" :style="{ background: pcat.lightBg }">{{ pcat.icon }}</div>
             <div class="cat-body">
-              <div class="cat-name">{{ cat.name }}</div>
-              <div class="cat-desc">{{ cat.pluginDesc }}</div>
-              <div class="cat-kws">
-                <span v-for="kw in cat.pluginKeywords" :key="kw" class="cat-kw">{{ kw }}</span>
+              <div class="cat-name">{{ pcat.name }}</div>
+              <div class="cat-desc">{{ pcat.desc }}</div>
+              <div class="cat-subcats">
+                <span v-for="sc in pcat.subcats.slice(0,3)" :key="sc" class="cat-subcat-chip">{{ sc }}</span>
+                <span v-if="pcat.subcats.length > 3" class="cat-subcat-chip">+{{ pcat.subcats.length - 3 }}</span>
               </div>
               <div class="cat-footer">
                 <div class="cat-counts">
-                  <div class="cat-count-item"><strong>{{ cat.pluginCount }}</strong> 个插件</div>
+                  <div class="cat-count-item"><strong>{{ pcat.pluginCount }}</strong> 个插件</div>
+                  <div class="cat-count-item">{{ pcat.subcats.length }} 个子类</div>
                 </div>
                 <div class="cat-arrow">›</div>
               </div>
@@ -514,13 +542,22 @@
         </div>
         <div>
           <div class="detail-cat-title">{{ view.category.name }}</div>
-          <div class="detail-cat-desc">
-            {{ view.type === 'apps' ? view.category.desc : view.category.pluginDesc }}
-          </div>
+          <div class="detail-cat-desc">{{ view.category.desc }}</div>
           <span class="detail-cat-type" :class="view.type === 'apps' ? 'type-apps' : 'type-plugins'">
             {{ view.type === 'apps' ? '应用广场' : '插件广场 · MCP + Skills' }}
           </span>
         </div>
+      </div>
+
+      <!-- Subcategory filter (plugins with multiple subcategories) -->
+      <div v-if="view.type === 'plugins' && view.category.subcats && view.category.subcats.length > 1" class="subcat-bar">
+        <button
+          v-for="sc in ['全部', ...view.category.subcats]"
+          :key="sc"
+          class="subcat-chip"
+          :class="{ 'sc-active': activeSubcat === sc }"
+          @click="activeSubcat = sc"
+        >{{ sc }}</button>
       </div>
 
       <!-- Filter bar -->
@@ -562,6 +599,7 @@
                   <span v-if="item.isHot"  class="ibadge ibadge-hot">HOT</span>
                   <span v-if="item.type==='MCP'"   class="ibadge ibadge-mcp">MCP</span>
                   <span v-if="item.type==='Skill'" class="ibadge ibadge-skill">Skill</span>
+                  <span v-if="item.subcat && view.type==='plugins'" class="item-subcat">{{ item.subcat }}</span>
                 </div>
               </div>
             </div>
@@ -600,338 +638,411 @@ createApp({
     const view = ref({ category: null, type: null }); // type: 'apps' | 'plugins'
     const search = ref('');
     const activeFilter = ref('all');
+    const activeSubcat = ref('全部');
     const pluginFilters = [
       { label: '全部',  value: 'all'   },
       { label: 'MCP',   value: 'MCP'   },
       { label: 'Skill', value: 'Skill' },
     ];
 
-    /* ── Categories ── */
+    /* ── App Categories (6 medical scenes) ── */
     const categories = [
       {
-        id: 'clinical', name: '临床辅助', icon: '⚕️',
-        lightBg: '#e8f0ff',
+        id: 'clinical', name: '临床辅助', icon: '⚕️', lightBg: '#e8f0ff',
         desc: '覆盖诊断辅助、医嘱生成、病历书写等临床全流程智能化支持，提升医生诊疗效率与准确性',
-        pluginDesc: '提供医学NLP解析、DICOM处理、病历结构化、临床指南检索等标准化接口工具',
         keywords: ['智能诊断', '医嘱管理', '病历书写', '影像AI'],
-        pluginKeywords: ['NLP解析', 'DICOM处理', '结构化提取', '指南检索'],
-        appCount: 18, pluginCount: 12,
+        appCount: 18,
       },
       {
-        id: 'patient', name: '患者服务', icon: '🫀',
-        lightBg: '#e0f7fa',
+        id: 'patient', name: '患者服务', icon: '🫀', lightBg: '#e0f7fa',
         desc: '聚焦患者就医全程体验，涵盖在线问诊、随访管理、慢病干预、健康档案等服务场景',
-        pluginDesc: '提供多语言翻译、随访消息推送、患者情绪分析、健康问答引擎等面向患者的能力插件',
         keywords: ['在线问诊', '随访管理', '慢病干预', '健康档案'],
-        pluginKeywords: ['消息推送', '情绪分析', '健康问答', '患者画像'],
-        appCount: 14, pluginCount: 9,
+        appCount: 14,
       },
       {
-        id: 'specialty', name: '专科专病', icon: '🔬',
-        lightBg: '#f3e8ff',
+        id: 'specialty', name: '专科专病', icon: '🔬', lightBg: '#f3e8ff',
         desc: '针对肿瘤、心血管、神经、眼科、呼吸等专科场景的深度专病解决方案与辅助诊断工具',
-        pluginDesc: '提供放射影像标注、心电图分析、病理图像识别、基因序列分析等专科能力接口',
         keywords: ['肿瘤辅诊', '心血管', '神经科学', '眼科筛查'],
-        pluginKeywords: ['影像标注', 'ECG分析', '病理识别', '基因分析'],
-        appCount: 22, pluginCount: 15,
+        appCount: 22,
       },
       {
-        id: 'management', name: '医院管理', icon: '🏛️',
-        lightBg: '#dbeafe',
+        id: 'management', name: '医院管理', icon: '🏛️', lightBg: '#dbeafe',
         desc: '助力医院运营管理、绩效考核、供应链管理、医疗质控等数字化升级，提升整体运营效能',
-        pluginDesc: '提供报表自动生成、电子签章、医保编码映射、工作流自动化、数据脱敏等管理支撑插件',
         keywords: ['运营分析', '质量管理', '供应链', '绩效考核'],
-        pluginKeywords: ['报表生成', '电子签章', '医保编码', '流程自动化'],
-        appCount: 11, pluginCount: 8,
+        appCount: 11,
       },
       {
-        id: 'research', name: '科研教育', icon: '📖',
-        lightBg: '#dcfce7',
+        id: 'research', name: '科研教育', icon: '📖', lightBg: '#dcfce7',
         desc: '支持临床科研、文献智能分析、医学教育培训与队列研究的一站式智能工具平台',
-        pluginDesc: '提供文献检索、统计分析、知识图谱构建、引用管理、教学案例生成等科研教育插件',
         keywords: ['文献分析', '临床试验', '医学教育', '队列研究'],
-        pluginKeywords: ['文献检索', '统计分析', '知识图谱', '案例生成'],
-        appCount: 16, pluginCount: 11,
+        appCount: 16,
       },
       {
-        id: 'pharma', name: '医药研发', icon: '💊',
-        lightBg: '#fff7ed',
+        id: 'pharma', name: '医药研发', icon: '💊', lightBg: '#fff7ed',
         desc: '加速药物发现、靶点预测、临床前研究与不良反应监测全链条，赋能新药研发数字化转型',
-        pluginDesc: '提供分子结构可视化、药代动力学仿真、不良反应信号挖掘、临床数据ETL等研发插件',
         keywords: ['靶点预测', '药效分析', '临床前研究', '不良反应'],
-        pluginKeywords: ['分子可视化', 'PK/PD仿真', '信号挖掘', '数据ETL'],
-        appCount: 13, pluginCount: 10,
+        appCount: 13,
+      },
+    ];
+
+    /* ── Plugin Categories (10 hierarchical groups) ── */
+    const pluginCategories = [
+      {
+        id: 'general', name: '通用与核心', icon: '⚙️', lightBg: '#f5f5ff',
+        desc: '通用工具与基础能力插件，适用于多种医疗AI场景的核心调度、格式转换与集成能力',
+        subcats: ['通用工具'],
+        pluginCount: 8,
+      },
+      {
+        id: 'medical-clinical', name: '医疗与临床', icon: '⚕️', lightBg: '#e8f0ff',
+        desc: '医疗专用工具、药物安全、影像病理、临床AI、心理健康、健康管理与医疗器械全领域能力',
+        subcats: ['医疗专用工具','药物安全与化学生物学','医学影像与病理学','医疗机器学习与临床人工智能','心理健康与危机干预','健康与健康管理分析','医疗器械与监管','医疗器械软件'],
+        pluginCount: 40,
+      },
+      {
+        id: 'sci-database', name: '科学数据库', icon: '🗄️', lightBg: '#e6f7f5',
+        desc: '基因组、蛋白质、癌症、分子与结构生物学权威科学数据库标准化查询与分析接口',
+        subcats: ['科学数据库（基因组与变异）','科学数据库（蛋白质、通路与药物）','癌症基因组数据库','基因组与分子数据库','结构生物学与药物发现','生物信息学'],
+        pluginCount: 24,
+      },
+      {
+        id: 'bioinformatics', name: '生物信息学工具', icon: '🧬', lightBg: '#dcfce7',
+        desc: '涵盖变异分析、测序质控、转录组、单细胞、表观基因组、宏基因组、免疫信息学等全流程工具',
+        subcats: ['生物信息 — 临床数据库与变异分析','生物信息 — 测序与读长质控','生物信息 — 差异表达与转录组学','生物信息学——通路与网络分析','生物信息 — 单细胞与空间组学','生物信息学——表观基因组学与染色质','生物信息 — 宏基因组学与微生物组','生物信息 — 免疫信息学与流式细胞术','生物信息学——多组学整合','生物信息 — 蛋白质组学与代谢组学','生物信息 — 结构生物学与化学信息学','生物信息学 — 流行病学、基因组学与因果基因组学'],
+        pluginCount: 56,
+      },
+      {
+        id: 'omics', name: '组学与计算生物学', icon: '🔭', lightBg: '#fef3c7',
+        desc: '单细胞与空间组学、蛋白质组学、化学信息学、蛋白质结构设计及系统发育网络分析工具',
+        subcats: ['单细胞与空间组学','单细胞与轨迹分析','蛋白质组学与质谱','化学信息学与药物发现','蛋白质结构与设计','系统发育与网络分析'],
+        pluginCount: 28,
+      },
+      {
+        id: 'clawbio', name: 'ClawBio管道', icon: '🦀', lightBg: '#fff1f2',
+        desc: 'ClawBio 提供的生物信息学编排流水线，覆盖基因组学、祖先分析、药物基因组学与结构生物学',
+        subcats: ['生物信息学编排与管道 (ClawBio)','基因组学、祖先分析与药物基因组学 (ClawBio)','结构生物学与文献综合 (ClawBio)'],
+        pluginCount: 12,
+      },
+      {
+        id: 'bioos', name: 'BioOS扩展套件', icon: '🧫', lightBg: '#faf0ff',
+        desc: 'BioOS 平台扩展工具套件，涵盖肿瘤学、血液学、免疫学、单细胞、药物发现与临床AI智能体',
+        subcats: ['BioOS扩展生物信息工具套件','肿瘤学与精准医学智能体 (BioOS)','血液学与血液病 (BioOS)','免疫学与细胞治疗 (BioOS)','单细胞与空间组学智能体 (BioOS)','药物发现与分子设计 (BioOS)','临床AI与医疗 (BioOS)','研究基础设施与智能体框架（BioOS）'],
+        pluginCount: 36,
+      },
+      {
+        id: 'datascience', name: '数据科学与工具', icon: '📊', lightBg: '#fff7ed',
+        desc: '统计分析、科学计算、可视化、公共卫生、计算模拟、分析师智能体与实验室自动化工具',
+        subcats: ['统计与数据分析','数据处理与科学计算','科学可视化与科研传播','公共卫生与时序分析','计算模拟与本体论','分析师人格','实验室自动化与集成'],
+        pluginCount: 32,
+      },
+      {
+        id: 'research-writing', name: '科学研究与写作', icon: '📝', lightBg: '#f0f9ff',
+        desc: '科学文献检索与参考管理、论文辅助写作与补充科学工具，加速科研全流程',
+        subcats: ['科学文献与参考管理','补充科学工具'],
+        pluginCount: 14,
+      },
+      {
+        id: 'devworkflow', name: '开发工作流技能', icon: '🛠️', lightBg: '#f8fafc',
+        desc: '代码版本管理、容器化、CI/CD流水线、API测试等开发工程化工作流支撑插件',
+        subcats: ['开发工作流技能'],
+        pluginCount: 10,
       },
     ];
 
     /* ── Apps Data ── */
     const appsData = {
       clinical: [
-        { id: 1,  icon: '🤖', name: 'AI智能问诊助手',   vendor: '医准智能',   rating: 4.8, installs: '1.2k+', version: 'v2.3.1', isNew: false, isHot: true,
-          desc: '基于大语言模型的智能问诊系统，支持多轮对话采集症状，辅助医生快速定向诊断，减少漏诊误诊',
-          tags: ['大模型', 'NLP', '问诊', '诊断辅助'] },
-        { id: 2,  icon: '🧠', name: '临床决策支持系统', vendor: '惠每科技',   rating: 4.7, installs: '3.5k+', version: 'v3.1.0', isNew: false, isHot: true,
-          desc: '整合权威指南、文献与临床数据，实时提供循证医学诊疗建议与用药推荐，辅助临床决策',
-          tags: ['CDSS', '循证医学', '用药推荐', '指南'] },
-        { id: 3,  icon: '🖼️', name: '医学影像AI分析',  vendor: '推想医疗',   rating: 4.9, installs: '5.1k+', version: 'v4.0.2', isNew: false, isHot: true,
-          desc: '支持CT/MR/DR多模态影像智能分析，病灶自动识别与结构化报告生成，覆盖胸部、脑部等多部位',
-          tags: ['影像AI', 'DICOM', '报告生成', '多模态'] },
-        { id: 4,  icon: '📋', name: '智能电子病历助手', vendor: '健海科技',   rating: 4.6, installs: '2.8k+', version: 'v2.0.5', isNew: true,  isHot: false,
-          desc: '语音转文字结合结构化模板，实现病历自动录入与智能质控，大幅提升医生书写效率',
-          tags: ['病历', '语音识别', '结构化', '质控'] },
-        { id: 5,  icon: '💉', name: '药物相互作用检测', vendor: '药明康德数字', rating: 4.7, installs: '1.9k+', version: 'v1.5.0', isNew: false, isHot: false,
-          desc: '实时检测医嘱中潜在的药物相互作用与配伍禁忌，降低用药风险，覆盖数万种药物数据库',
-          tags: ['药学', '安全用药', '医嘱', '配伍'] },
-        { id: 6,  icon: '🏷️', name: '手术风险评估平台', vendor: '医疗AI实验室', rating: 4.5, installs: '980+',  version: 'v1.2.3', isNew: true,  isHot: false,
-          desc: '术前多维度风险分层评估，预测手术并发症概率，辅助麻醉科与外科医生制定手术方案',
-          tags: ['手术', '风险评估', '麻醉', '并发症'] },
+        { id: 1, icon: '🤖', name: 'AI智能问诊助手', vendor: '医准智能', rating: 4.8, installs: '1.2k+', version: 'v2.3.1', isNew: false, isHot: true,
+          desc: '基于大语言模型的智能问诊系统，支持多轮对话采集症状，辅助医生快速定向诊断，减少漏诊误诊', tags: ['大模型', 'NLP', '问诊', '诊断辅助'] },
+        { id: 2, icon: '🧠', name: '临床决策支持系统', vendor: '惠每科技', rating: 4.7, installs: '3.5k+', version: 'v3.1.0', isNew: false, isHot: true,
+          desc: '整合权威指南、文献与临床数据，实时提供循证医学诊疗建议与用药推荐，辅助临床决策', tags: ['CDSS', '循证医学', '用药推荐', '指南'] },
+        { id: 3, icon: '🖼️', name: '医学影像AI分析', vendor: '推想医疗', rating: 4.9, installs: '5.1k+', version: 'v4.0.2', isNew: false, isHot: true,
+          desc: '支持CT/MR/DR多模态影像智能分析，病灶自动识别与结构化报告生成，覆盖胸部、脑部等多部位', tags: ['影像AI', 'DICOM', '报告生成', '多模态'] },
+        { id: 4, icon: '📋', name: '智能电子病历助手', vendor: '健海科技', rating: 4.6, installs: '2.8k+', version: 'v2.0.5', isNew: true, isHot: false,
+          desc: '语音转文字结合结构化模板，实现病历自动录入与智能质控，大幅提升医生书写效率', tags: ['病历', '语音识别', '结构化', '质控'] },
+        { id: 5, icon: '💉', name: '药物相互作用检测', vendor: '药明康德数字', rating: 4.7, installs: '1.9k+', version: 'v1.5.0', isNew: false, isHot: false,
+          desc: '实时检测医嘱中潜在的药物相互作用与配伍禁忌，降低用药风险，覆盖数万种药物数据库', tags: ['药学', '安全用药', '医嘱', '配伍'] },
+        { id: 6, icon: '🏷️', name: '手术风险评估平台', vendor: '医疗AI实验室', rating: 4.5, installs: '980+', version: 'v1.2.3', isNew: true, isHot: false,
+          desc: '术前多维度风险分层评估，预测手术并发症概率，辅助麻醉科与外科医生制定手术方案', tags: ['手术', '风险评估', '麻醉', '并发症'] },
       ],
       patient: [
-        { id: 7,  icon: '📞', name: '患者随访管理系统',   vendor: '微医科技',     rating: 4.6, installs: '2.3k+', version: 'v3.2.0', isNew: false, isHot: true,
-          desc: '自动化随访任务分配与提醒，支持AI外呼与多渠道随访数据汇聚分析，提升随访依从率',
-          tags: ['随访', 'AI外呼', '慢病', '多渠道'] },
-        { id: 8,  icon: '💬', name: '互联网在线问诊平台', vendor: '好大夫互联网',   rating: 4.8, installs: '8.6k+', version: 'v5.0.1', isNew: false, isHot: true,
-          desc: '图文/视频多模式在线问诊，支持AI导诊分流与专家智能匹配，打通院内院外服务闭环',
-          tags: ['问诊', '远程医疗', '导诊', '专家匹配'] },
-        { id: 9,  icon: '🗂️', name: '健康档案管理',       vendor: '卫宁健康',     rating: 4.5, installs: '1.7k+', version: 'v2.1.0', isNew: false, isHot: false,
-          desc: '全生命周期健康档案管理，多机构数据互联互通，患者自主授权，保障数据安全与隐私',
-          tags: ['健康档案', '互联互通', 'PHR', '授权'] },
-        { id: 10, icon: '🗺️', name: '智能导诊分诊系统',   vendor: '妙健康',       rating: 4.4, installs: '3.2k+', version: 'v2.8.0', isNew: false, isHot: false,
-          desc: '基于症状描述与AI决策树的智能导诊，精准推荐科室与医生，减少患者等候时间',
-          tags: ['导诊', '分诊', '科室推荐', '患者体验'] },
-        { id: 11, icon: '❤️', name: '慢病精准管理应用',   vendor: '思派健康',     rating: 4.7, installs: '4.1k+', version: 'v3.5.2', isNew: false, isHot: true,
-          desc: '针对高血压、糖尿病等慢病人群，提供个性化管理方案、用药提醒与生活方式干预指导',
-          tags: ['慢病', '糖尿病', '高血压', '个性化'] },
-        { id: 12, icon: '⭐', name: '患者满意度分析',     vendor: '聚医信',       rating: 4.3, installs: '760+',  version: 'v1.3.0', isNew: true,  isHot: false,
-          desc: '多渠道收集患者满意度数据，NLP情感分析，自动生成科室改进建议报告，驱动服务优化',
-          tags: ['满意度', 'NLP', '情感分析', '运营'] },
+        { id: 7, icon: '📞', name: '患者随访管理系统', vendor: '微医科技', rating: 4.6, installs: '2.3k+', version: 'v3.2.0', isNew: false, isHot: true,
+          desc: '自动化随访任务分配与提醒，支持AI外呼与多渠道随访数据汇聚分析，提升随访依从率', tags: ['随访', 'AI外呼', '慢病', '多渠道'] },
+        { id: 8, icon: '💬', name: '互联网在线问诊平台', vendor: '好大夫互联网', rating: 4.8, installs: '8.6k+', version: 'v5.0.1', isNew: false, isHot: true,
+          desc: '图文/视频多模式在线问诊，支持AI导诊分流与专家智能匹配，打通院内院外服务闭环', tags: ['问诊', '远程医疗', '导诊', '专家匹配'] },
+        { id: 9, icon: '🗂️', name: '健康档案管理', vendor: '卫宁健康', rating: 4.5, installs: '1.7k+', version: 'v2.1.0', isNew: false, isHot: false,
+          desc: '全生命周期健康档案管理，多机构数据互联互通，患者自主授权，保障数据安全与隐私', tags: ['健康档案', '互联互通', 'PHR', '授权'] },
+        { id: 10, icon: '❤️', name: '慢病精准管理应用', vendor: '思派健康', rating: 4.7, installs: '4.1k+', version: 'v3.5.2', isNew: false, isHot: true,
+          desc: '针对高血压、糖尿病等慢病人群，提供个性化管理方案、用药提醒与生活方式干预指导', tags: ['慢病', '糖尿病', '高血压', '个性化'] },
+        { id: 11, icon: '🗺️', name: '智能导诊分诊系统', vendor: '妙健康', rating: 4.4, installs: '3.2k+', version: 'v2.8.0', isNew: false, isHot: false,
+          desc: '基于症状描述与AI决策树的智能导诊，精准推荐科室与医生，减少患者等候时间', tags: ['导诊', '分诊', '科室推荐', '患者体验'] },
+        { id: 12, icon: '⭐', name: '患者满意度分析', vendor: '聚医信', rating: 4.3, installs: '760+', version: 'v1.3.0', isNew: true, isHot: false,
+          desc: '多渠道收集患者满意度数据，NLP情感分析，自动生成科室改进建议报告，驱动服务优化', tags: ['满意度', 'NLP', '情感分析', '运营'] },
       ],
       specialty: [
-        { id: 13, icon: '🎯', name: '肿瘤辅助诊断系统',   vendor: '英飞智医', rating: 4.9, installs: '2.1k+', version: 'v3.0.0', isNew: false, isHot: true,
-          desc: '病理图像AI识别、多组学数据融合分析，提供肿瘤精准分型与个性化治疗方案建议',
-          tags: ['肿瘤', '病理AI', '多组学', '精准治疗'] },
-        { id: 14, icon: '💓', name: '心血管风险评估',     vendor: '数坤科技', rating: 4.8, installs: '1.8k+', version: 'v2.5.1', isNew: false, isHot: true,
-          desc: '融合心电、超声、实验室指标等多维数据，实时评估心血管事件发生风险，支持早期干预',
-          tags: ['心血管', '风险模型', 'ECG', '超声'] },
-        { id: 15, icon: '🩺', name: '糖尿病全程管理',     vendor: '杏仁医生', rating: 4.7, installs: '5.3k+', version: 'v4.1.0', isNew: false, isHot: true,
-          desc: '血糖趋势预测、并发症筛查、胰岛素方案智能调整，一体化糖尿病综合管理平台',
-          tags: ['糖尿病', '血糖预测', '并发症', 'CGM'] },
-        { id: 16, icon: '🧬', name: '神经科学分析平台',   vendor: '深透医疗', rating: 4.6, installs: '890+',  version: 'v2.0.0', isNew: true,  isHot: false,
-          desc: '脑影像AI分析、神经退行性疾病早期筛查，支持帕金森、阿尔茨海默症等辅助诊断',
-          tags: ['神经科', '脑影像', '早期筛查', '退行性病变'] },
-        { id: 17, icon: '👁️', name: '眼科AI筛查系统',    vendor: 'Airdoc',   rating: 4.9, installs: '3.7k+', version: 'v5.2.0', isNew: false, isHot: true,
-          desc: '眼底照片自动分析，糖尿病性视网膜病变、青光眼等多病种高精度筛查，支持社区健康管理',
-          tags: ['眼科', '眼底', '筛查', '社区健康'] },
-        { id: 18, icon: '🫁', name: '呼吸科辅助诊断',     vendor: '肺诊网',   rating: 4.7, installs: '2.2k+', version: 'v3.3.1', isNew: false, isHot: false,
-          desc: '肺结节AI识别与良恶性判断，慢阻肺风险评估，呼吸功能智能分析与随访管理',
-          tags: ['呼吸科', '肺结节', '慢阻肺', '随访'] },
+        { id: 13, icon: '🎯', name: '肿瘤辅助诊断系统', vendor: '英飞智医', rating: 4.9, installs: '2.1k+', version: 'v3.0.0', isNew: false, isHot: true,
+          desc: '病理图像AI识别、多组学数据融合分析，提供肿瘤精准分型与个性化治疗方案建议', tags: ['肿瘤', '病理AI', '多组学', '精准治疗'] },
+        { id: 14, icon: '💓', name: '心血管风险评估', vendor: '数坤科技', rating: 4.8, installs: '1.8k+', version: 'v2.5.1', isNew: false, isHot: true,
+          desc: '融合心电、超声、实验室指标等多维数据，实时评估心血管事件发生风险，支持早期干预', tags: ['心血管', '风险模型', 'ECG', '超声'] },
+        { id: 15, icon: '🩺', name: '糖尿病全程管理', vendor: '杏仁医生', rating: 4.7, installs: '5.3k+', version: 'v4.1.0', isNew: false, isHot: true,
+          desc: '血糖趋势预测、并发症筛查、胰岛素方案智能调整，一体化糖尿病综合管理平台', tags: ['糖尿病', '血糖预测', '并发症', 'CGM'] },
+        { id: 16, icon: '🧬', name: '神经科学分析平台', vendor: '深透医疗', rating: 4.6, installs: '890+', version: 'v2.0.0', isNew: true, isHot: false,
+          desc: '脑影像AI分析、神经退行性疾病早期筛查，支持帕金森、阿尔茨海默症等辅助诊断', tags: ['神经科', '脑影像', '早期筛查', '退行性病变'] },
+        { id: 17, icon: '👁️', name: '眼科AI筛查系统', vendor: 'Airdoc', rating: 4.9, installs: '3.7k+', version: 'v5.2.0', isNew: false, isHot: true,
+          desc: '眼底照片自动分析，糖尿病性视网膜病变、青光眼等多病种高精度筛查，支持社区健康管理', tags: ['眼科', '眼底', '筛查', '社区健康'] },
+        { id: 18, icon: '🫁', name: '呼吸科辅助诊断', vendor: '肺诊网', rating: 4.7, installs: '2.2k+', version: 'v3.3.1', isNew: false, isHot: false,
+          desc: '肺结节AI识别与良恶性判断，慢阻肺风险评估，呼吸功能智能分析与随访管理', tags: ['呼吸科', '肺结节', '慢阻肺', '随访'] },
       ],
       management: [
-        { id: 19, icon: '🛏️', name: '智能床位调度系统',   vendor: '嘉和美康', rating: 4.5, installs: '1.4k+', version: 'v2.1.0', isNew: false, isHot: false,
-          desc: '实时床位资源监控与智能调配，预测入出院趋势，自动匹配床位需求，提升床位周转率',
-          tags: ['床位管理', '运营', '调度', '周转率'] },
-        { id: 20, icon: '✅', name: '医疗质量管理平台',   vendor: '麦迪科技', rating: 4.6, installs: '2.0k+', version: 'v3.0.2', isNew: false, isHot: true,
-          desc: '核心医疗质量指标实时监控，不良事件智能预警，质控报表自动生成，驱动持续质量改进',
-          tags: ['质控', '不良事件', '指标监控', 'PDCA'] },
-        { id: 21, icon: '📦', name: '医疗供应链管理',     vendor: '科创信息', rating: 4.4, installs: '980+',  version: 'v2.4.0', isNew: false, isHot: false,
-          desc: '耗材药品全链路追踪管理，智能库存预警与采购建议，降低医院运营成本与积压风险',
-          tags: ['供应链', '库存', '采购', '耗材'] },
-        { id: 22, icon: '📊', name: '员工绩效考核平台',   vendor: '创业慧康', rating: 4.3, installs: '760+',  version: 'v1.8.0', isNew: false, isHot: false,
-          desc: '基于工作量、质量、患者满意度的多维绩效评价体系，支持科室与个人双维度考核分析',
-          tags: ['绩效', '考核', 'HRM', '多维评价'] },
-        { id: 23, icon: '📈', name: '医院运营大数据分析', vendor: '东软集团', rating: 4.7, installs: '3.1k+', version: 'v4.0.0', isNew: false, isHot: true,
-          desc: '汇聚HIS/EMR/LIS等系统数据，构建医院运营全景视图与智能决策支持仪表盘',
-          tags: ['大数据', '运营分析', 'BI', '决策支持'] },
-        { id: 24, icon: '🏛️', name: '医保合规审核系统',   vendor: '万达信息', rating: 4.5, installs: '1.2k+', version: 'v2.6.1', isNew: true,  isHot: false,
-          desc: '智能审核医保费用合规性，自动识别过度医疗与违规行为，辅助医保精细化管理',
-          tags: ['医保', '合规', 'DRG/DIP', '审核'] },
+        { id: 19, icon: '🛏️', name: '智能床位调度系统', vendor: '嘉和美康', rating: 4.5, installs: '1.4k+', version: 'v2.1.0', isNew: false, isHot: false,
+          desc: '实时床位资源监控与智能调配，预测入出院趋势，自动匹配床位需求，提升床位周转率', tags: ['床位管理', '运营', '调度', '周转率'] },
+        { id: 20, icon: '✅', name: '医疗质量管理平台', vendor: '麦迪科技', rating: 4.6, installs: '2.0k+', version: 'v3.0.2', isNew: false, isHot: true,
+          desc: '核心医疗质量指标实时监控，不良事件智能预警，质控报表自动生成，驱动持续质量改进', tags: ['质控', '不良事件', '指标监控', 'PDCA'] },
+        { id: 21, icon: '📦', name: '医疗供应链管理', vendor: '科创信息', rating: 4.4, installs: '980+', version: 'v2.4.0', isNew: false, isHot: false,
+          desc: '耗材药品全链路追踪管理，智能库存预警与采购建议，降低医院运营成本与积压风险', tags: ['供应链', '库存', '采购', '耗材'] },
+        { id: 22, icon: '📈', name: '医院运营大数据分析', vendor: '东软集团', rating: 4.7, installs: '3.1k+', version: 'v4.0.0', isNew: false, isHot: true,
+          desc: '汇聚HIS/EMR/LIS等系统数据，构建医院运营全景视图与智能决策支持仪表盘', tags: ['大数据', '运营分析', 'BI', '决策支持'] },
+        { id: 23, icon: '🏛️', name: '医保合规审核系统', vendor: '万达信息', rating: 4.5, installs: '1.2k+', version: 'v2.6.1', isNew: true, isHot: false,
+          desc: '智能审核医保费用合规性，自动识别过度医疗与违规行为，辅助医保精细化管理', tags: ['医保', '合规', 'DRG/DIP', '审核'] },
+        { id: 24, icon: '📊', name: '员工绩效考核平台', vendor: '创业慧康', rating: 4.3, installs: '760+', version: 'v1.8.0', isNew: false, isHot: false,
+          desc: '基于工作量、质量、患者满意度的多维绩效评价体系，支持科室与个人双维度考核分析', tags: ['绩效', '考核', 'HRM', '多维评价'] },
       ],
       research: [
-        { id: 25, icon: '📚', name: '医学文献智能分析',   vendor: '知网医学',     rating: 4.7, installs: '2.8k+', version: 'v3.1.0', isNew: false, isHot: true,
-          desc: '海量文献自动摘要与知识提取，支持系统综述、Meta分析辅助写作、文献引用管理',
-          tags: ['文献分析', 'NLP', '系统综述', 'Meta分析'] },
-        { id: 26, icon: '🧪', name: '临床试验管理系统',   vendor: '太美医疗',     rating: 4.8, installs: '1.5k+', version: 'v4.2.0', isNew: false, isHot: true,
-          desc: '从方案设计到数据采集、统计分析全流程覆盖，符合GCP规范的临床研究数字化管理平台',
-          tags: ['临床试验', 'EDC', 'GCP', 'CTMS'] },
-        { id: 27, icon: '🎓', name: '医学教育模拟系统',   vendor: '医路通',       rating: 4.6, installs: '1.1k+', version: 'v2.5.0', isNew: true,  isHot: false,
-          desc: '结合AI智能评分的沉浸式医学技能培训与考核平台，支持虚拟标准化病人与临床情景模拟',
-          tags: ['医学教育', '技能培训', '模拟考核', 'SP'] },
-        { id: 28, icon: '💾', name: '科研数据管理平台',   vendor: '华大智造',     rating: 4.5, installs: '870+',  version: 'v2.0.1', isNew: false, isHot: false,
-          desc: '科研数据全生命周期管理，支持多中心数据汇聚、数据清洗与隐私保护联邦计算',
-          tags: ['科研数据', '联邦学习', '多中心', '隐私保护'] },
-        { id: 29, icon: '🕸️', name: '医学知识图谱平台',   vendor: '开放医疗',     rating: 4.7, installs: '1.3k+', version: 'v3.0.0', isNew: false, isHot: false,
-          desc: '构建疾病-症状-药物-基因关联知识图谱，支持医学推理问答与知识驱动的临床辅助决策',
-          tags: ['知识图谱', '医学推理', '知识问答', 'KG'] },
-        { id: 30, icon: '📉', name: '队列研究分析工具',   vendor: '优智医疗',     rating: 4.6, installs: '650+',  version: 'v1.7.0', isNew: true,  isHot: false,
-          desc: '大规模队列数据分析、生存分析与因果推断，助力流行病学与真实世界研究（RWS）',
-          tags: ['队列研究', '生存分析', '因果推断', 'RWE'] },
+        { id: 25, icon: '📚', name: '医学文献智能分析', vendor: '知网医学', rating: 4.7, installs: '2.8k+', version: 'v3.1.0', isNew: false, isHot: true,
+          desc: '海量文献自动摘要与知识提取，支持系统综述、Meta分析辅助写作、文献引用管理', tags: ['文献分析', 'NLP', '系统综述', 'Meta分析'] },
+        { id: 26, icon: '🧪', name: '临床试验管理系统', vendor: '太美医疗', rating: 4.8, installs: '1.5k+', version: 'v4.2.0', isNew: false, isHot: true,
+          desc: '从方案设计到数据采集、统计分析全流程覆盖，符合GCP规范的临床研究数字化管理平台', tags: ['临床试验', 'EDC', 'GCP', 'CTMS'] },
+        { id: 27, icon: '🎓', name: '医学教育模拟系统', vendor: '医路通', rating: 4.6, installs: '1.1k+', version: 'v2.5.0', isNew: true, isHot: false,
+          desc: '结合AI智能评分的沉浸式医学技能培训与考核平台，支持虚拟标准化病人与临床情景模拟', tags: ['医学教育', '技能培训', '模拟考核', 'SP'] },
+        { id: 28, icon: '💾', name: '科研数据管理平台', vendor: '华大智造', rating: 4.5, installs: '870+', version: 'v2.0.1', isNew: false, isHot: false,
+          desc: '科研数据全生命周期管理，支持多中心数据汇聚、数据清洗与隐私保护联邦计算', tags: ['科研数据', '联邦学习', '多中心', '隐私保护'] },
+        { id: 29, icon: '🕸️', name: '医学知识图谱平台', vendor: '开放医疗', rating: 4.7, installs: '1.3k+', version: 'v3.0.0', isNew: false, isHot: false,
+          desc: '构建疾病-症状-药物-基因关联知识图谱，支持医学推理问答与知识驱动的临床辅助决策', tags: ['知识图谱', '医学推理', '知识问答', 'KG'] },
+        { id: 30, icon: '📉', name: '队列研究分析工具', vendor: '优智医疗', rating: 4.6, installs: '650+', version: 'v1.7.0', isNew: true, isHot: false,
+          desc: '大规模队列数据分析、生存分析与因果推断，助力流行病学与真实世界研究（RWS）', tags: ['队列研究', '生存分析', '因果推断', 'RWE'] },
       ],
       pharma: [
-        { id: 31, icon: '🎯', name: 'AI药物靶点预测',     vendor: '晶泰科技',         rating: 4.8, installs: '1.1k+', version: 'v3.5.0', isNew: false, isHot: true,
-          desc: '基于结构生物学与AI深度学习的药物靶点识别与结合位点预测，加速先导化合物发现',
-          tags: ['靶点预测', 'AI药学', '结构生物学', '先导化合物'] },
-        { id: 32, icon: '🐭', name: '临床前研究平台',     vendor: '药明生物',         rating: 4.7, installs: '780+',  version: 'v2.1.0', isNew: false, isHot: false,
-          desc: '整合动物实验数据管理、药效评价与毒理分析，符合GLP规范的临床前研究全流程数字化平台',
-          tags: ['临床前研究', 'GLP', '毒理', '药效评价'] },
-        { id: 33, icon: '⚗️', name: '药效分析与优化',     vendor: '英矽智能',         rating: 4.9, installs: '920+',  version: 'v4.0.0', isNew: false, isHot: true,
-          desc: '多维度药效数据建模分析，QSAR活性预测与化合物优化，提高先导化合物命中率',
-          tags: ['药效分析', 'QSAR', '化合物优化', '命中率'] },
-        { id: 34, icon: '⚠️', name: '不良反应信号监测',   vendor: '赛德盛',           rating: 4.6, installs: '640+',  version: 'v2.3.0', isNew: false, isHot: false,
-          desc: '真实世界自发报告系统数据挖掘，药物不良反应信号智能检测与优先级排序，支持上市后安全性评价',
-          tags: ['药物安全', 'ADR', '信号挖掘', 'FAERS'] },
-        { id: 35, icon: '🔭', name: 'AI辅助药物设计',     vendor: 'Insilico Medicine', rating: 4.8, installs: '1.4k+', version: 'v3.2.0', isNew: true,  isHot: true,
-          desc: '生成式AI药物分子设计，从靶点到候选药物全流程智能加速，支持多参数同步优化',
-          tags: ['生成式AI', '分子设计', '全流程', '多参数'] },
-        { id: 36, icon: '📐', name: '药代动力学建模',     vendor: '非线性医学',       rating: 4.5, installs: '510+',  version: 'v1.9.0', isNew: false, isHot: false,
-          desc: 'PK/PD参数自动化建模与仿真，群体药代动力学分析与个体化给药方案优化',
-          tags: ['PK/PD', '群体药代', '仿真', '给药优化'] },
+        { id: 31, icon: '🎯', name: 'AI药物靶点预测', vendor: '晶泰科技', rating: 4.8, installs: '1.1k+', version: 'v3.5.0', isNew: false, isHot: true,
+          desc: '基于结构生物学与AI深度学习的药物靶点识别与结合位点预测，加速先导化合物发现', tags: ['靶点预测', 'AI药学', '结构生物学', '先导化合物'] },
+        { id: 32, icon: '🐭', name: '临床前研究平台', vendor: '药明生物', rating: 4.7, installs: '780+', version: 'v2.1.0', isNew: false, isHot: false,
+          desc: '整合动物实验数据管理、药效评价与毒理分析，符合GLP规范的临床前研究全流程数字化平台', tags: ['临床前研究', 'GLP', '毒理', '药效评价'] },
+        { id: 33, icon: '⚗️', name: '药效分析与优化', vendor: '英矽智能', rating: 4.9, installs: '920+', version: 'v4.0.0', isNew: false, isHot: true,
+          desc: '多维度药效数据建模分析，QSAR活性预测与化合物优化，提高先导化合物命中率', tags: ['药效分析', 'QSAR', '化合物优化', '命中率'] },
+        { id: 34, icon: '⚠️', name: '不良反应信号监测', vendor: '赛德盛', rating: 4.6, installs: '640+', version: 'v2.3.0', isNew: false, isHot: false,
+          desc: '真实世界自发报告系统数据挖掘，药物不良反应信号智能检测与优先级排序，支持上市后安全性评价', tags: ['药物安全', 'ADR', '信号挖掘', 'FAERS'] },
+        { id: 35, icon: '🔭', name: 'AI辅助药物设计', vendor: 'Insilico Medicine', rating: 4.8, installs: '1.4k+', version: 'v3.2.0', isNew: true, isHot: true,
+          desc: '生成式AI药物分子设计，从靶点到候选药物全流程智能加速，支持多参数同步优化', tags: ['生成式AI', '分子设计', '全流程', '多参数'] },
+        { id: 36, icon: '📐', name: '药代动力学建模', vendor: '非线性医学', rating: 4.5, installs: '510+', version: 'v1.9.0', isNew: false, isHot: false,
+          desc: 'PK/PD参数自动化建模与仿真，群体药代动力学分析与个体化给药方案优化', tags: ['PK/PD', '群体药代', '仿真', '给药优化'] },
       ],
     };
 
-    /* ── Plugins Data ── */
+    /* ── Plugins Data (keyed by pluginCategory id) ── */
     const pluginsData = {
-      clinical: [
-        { id: 101, icon: '🔤', type: 'MCP',   name: '医学NLP实体识别',   vendor: '医疗NLP研究院', rating: 4.8, installs: '3.2k+', version: 'v2.1.0',
-          desc: '领域预训练模型驱动的医学命名实体识别，支持疾病、药物、症状、检验指标等精准抽取',
-          tags: ['NLP', '实体识别', '结构化', '预训练'] },
-        { id: 102, icon: '🖼️', type: 'MCP',   name: 'DICOM影像处理工具', vendor: '医影科技',     rating: 4.7, installs: '4.1k+', version: 'v3.0.1',
-          desc: '标准DICOM格式解析与处理，窗宽窗位调整、三维重建、多平面重组与影像标注功能',
-          tags: ['DICOM', '影像处理', '三维重建', '标注'] },
-        { id: 103, icon: '📄', type: 'Skill', name: '病历结构化提取',     vendor: '智慧医疗实验室', rating: 4.6, installs: '2.5k+', version: 'v2.3.0',
-          desc: '自由文本病历自动结构化，提取主诉、现病史、诊断、用药等关键信息，输出标准化数据',
-          tags: ['病历', '结构化', '信息提取', '主诉'] },
-        { id: 104, icon: '🔍', type: 'MCP',   name: '临床指南检索接口',   vendor: '上医云',       rating: 4.5, installs: '1.8k+', version: 'v1.5.0',
-          desc: '对接国内外主流临床指南数据库，支持语义检索与指南推荐，实时返回循证依据与推荐级别',
-          tags: ['临床指南', '语义检索', '循证', '推荐'] },
-        { id: 105, icon: '✔️', type: 'Skill', name: '处方合规性校验',     vendor: '药智网',       rating: 4.7, installs: '2.9k+', version: 'v2.0.0',
-          desc: '实时校验处方合规性，检测超剂量、配伍禁忌、适应症外用药等问题，返回结构化审核结果',
-          tags: ['处方', '合规', '用药安全', '配伍禁忌'] },
-        { id: 106, icon: '🏷️', type: 'Skill', name: '医学术语标准化',     vendor: '医渡云',       rating: 4.8, installs: '3.5k+', version: 'v1.9.0',
-          desc: '将自由文本术语映射至ICD-10、SNOMED CT、LOINC等标准术语体系，支持多编码体系转换',
-          tags: ['术语标准化', 'ICD-10', 'SNOMED', 'LOINC'] },
+      'general': [
+        { id: 201, icon: '🔄', type: 'MCP', subcat: '通用工具', name: '任务调度与队列管理', vendor: '基础云平台', rating: 4.6, installs: '4.2k+', version: 'v2.0.0', isNew: false, isHot: true,
+          desc: '医疗AI任务的分布式调度与优先级队列管理，支持异步执行、超时重试与资源隔离', tags: ['任务调度', '队列', '异步', '分布式'] },
+        { id: 202, icon: '🔀', type: 'MCP', subcat: '通用工具', name: '数据格式转换工具', vendor: '数据中台', rating: 4.5, installs: '3.8k+', version: 'v1.5.0', isNew: false, isHot: false,
+          desc: '支持JSON、XML、CSV、HL7、FHIR等医疗数据格式的自动转换与映射，实现异构系统对接', tags: ['格式转换', 'HL7', 'FHIR', 'ETL'] },
+        { id: 203, icon: '🔑', type: 'MCP', subcat: '通用工具', name: 'API网关与认证', vendor: '安全中台', rating: 4.7, installs: '2.9k+', version: 'v3.1.0', isNew: false, isHot: true,
+          desc: '统一API入口管理，支持OAuth2、JWT、API Key等认证方式，内置限流熔断与审计日志', tags: ['API网关', 'OAuth2', '限流', '审计'] },
+        { id: 204, icon: '📊', type: 'Skill', subcat: '通用工具', name: '日志与监控集成', vendor: '运维云', rating: 4.4, installs: '2.1k+', version: 'v2.2.0', isNew: false, isHot: false,
+          desc: '医疗AI应用日志采集、指标上报与告警集成，支持Prometheus、Grafana、ELK等主流监控栈', tags: ['日志', '监控', 'Prometheus', '告警'] },
+        { id: 205, icon: '⚡', type: 'MCP', subcat: '通用工具', name: '缓存与性能优化', vendor: '性能云', rating: 4.5, installs: '1.7k+', version: 'v1.8.0', isNew: true, isHot: false,
+          desc: '智能缓存策略配置，支持Redis/Memcached集成，自动识别热点数据与缓存失效策略', tags: ['缓存', 'Redis', '性能', '热点'] },
+        { id: 206, icon: '📡', type: 'MCP', subcat: '通用工具', name: '消息总线连接器', vendor: '集成平台', rating: 4.6, installs: '2.3k+', version: 'v2.5.0', isNew: false, isHot: false,
+          desc: '医疗系统消息总线连接，支持Kafka、RabbitMQ、RocketMQ，实现跨系统事件驱动集成', tags: ['消息总线', 'Kafka', '事件驱动', '集成'] },
       ],
-      patient: [
-        { id: 107, icon: '🌐', type: 'Skill', name: '医疗多语言翻译',     vendor: '医疗AI翻译',   rating: 4.6, installs: '1.5k+', version: 'v3.1.0',
-          desc: '面向医疗场景优化的多语言实时翻译，覆盖30+语种，医学术语专业处理，支持同声传译',
-          tags: ['翻译', '多语言', '国际化', '医学术语'] },
-        { id: 108, icon: '📱', type: 'MCP',   name: '随访消息推送服务',   vendor: '医信互联',     rating: 4.5, installs: '2.1k+', version: 'v2.4.0',
-          desc: '多渠道随访消息触达（短信/微信/APP推送），支持模板自定义、定时发送与状态追踪',
-          tags: ['随访', '消息推送', '多渠道', '触达'] },
-        { id: 109, icon: '😊', type: 'Skill', name: '患者情绪分析',       vendor: '心理健康AI',   rating: 4.4, installs: '880+',  version: 'v1.6.0',
-          desc: '分析患者文字与语音反馈中的情绪状态，识别焦虑、抑郁等倾向，辅助心理评估与干预',
-          tags: ['情绪分析', '心理健康', 'NLP', '焦虑'] },
-        { id: 110, icon: '❓', type: 'MCP',   name: '健康知识问答引擎',   vendor: '丁香园',       rating: 4.8, installs: '5.6k+', version: 'v4.0.0',
-          desc: '基于权威医学知识库的健康问答，支持疾病科普、用药咨询、健康管理等多场景精准回答',
-          tags: ['知识问答', '健康科普', '用药咨询', '问答引擎'] },
-        { id: 111, icon: '⏰', type: 'Skill', name: '预约提醒自动化',     vendor: '医疗运营云',   rating: 4.5, installs: '1.7k+', version: 'v2.0.0',
-          desc: '智能预约提醒任务编排，支持复诊、检查、手术等多类型提醒场景，有效降低患者爽约率',
-          tags: ['预约管理', '提醒', '自动化', '爽约率'] },
-        { id: 112, icon: '👤', type: 'MCP',   name: '患者画像构建',       vendor: '医疗大数据',   rating: 4.6, installs: '1.2k+', version: 'v2.2.0',
-          desc: '多维数据融合构建患者健康画像，支持风险分层、疾病预测与个性化服务精准推荐',
-          tags: ['患者画像', '风险分层', '个性化', '预测'] },
+      'medical-clinical': [
+        { id: 210, icon: '🔤', type: 'MCP', subcat: '医疗专用工具', name: '医学NLP实体识别', vendor: '医疗NLP研究院', rating: 4.8, installs: '3.2k+', version: 'v2.1.0', isNew: false, isHot: true,
+          desc: '领域预训练模型驱动的医学命名实体识别，支持疾病、药物、症状、检验指标等精准抽取', tags: ['NLP', '实体识别', '结构化', '预训练'] },
+        { id: 211, icon: '🔌', type: 'MCP', subcat: '医疗专用工具', name: 'HL7/FHIR接口适配', vendor: '互联互通云', rating: 4.7, installs: '1.9k+', version: 'v2.0.0', isNew: false, isHot: false,
+          desc: '标准HL7/FHIR接口适配与格式转换，简化医院信息系统间互联互通与医疗数据标准化交换', tags: ['FHIR', 'HL7', '互联互通', '数据交换'] },
+        { id: 212, icon: '🧪', type: 'Skill', subcat: '药物安全与化学生物学', name: '药物相互作用检测', vendor: '药智网', rating: 4.7, installs: '2.9k+', version: 'v2.0.0', isNew: false, isHot: true,
+          desc: '实时校验处方合规性，检测超剂量、配伍禁忌、适应症外用药等问题，返回结构化审核结果', tags: ['药物安全', 'ADR', '配伍禁忌', '处方'] },
+        { id: 213, icon: '⚗️', type: 'MCP', subcat: '药物安全与化学生物学', name: 'ADMET性质预测', vendor: 'AI药物设计', rating: 4.9, installs: '1.4k+', version: 'v3.1.0', isNew: false, isHot: true,
+          desc: '候选化合物ADMET性质快速预测与多参数优化建议，加速候选药物筛选流程', tags: ['ADMET', '毒性预测', '药物设计', 'QSAR'] },
+        { id: 214, icon: '🖼️', type: 'MCP', subcat: '医学影像与病理学', name: 'DICOM影像处理工具', vendor: '医影科技', rating: 4.7, installs: '4.1k+', version: 'v3.0.1', isNew: false, isHot: false,
+          desc: '标准DICOM格式解析与处理，窗宽窗位调整、三维重建、多平面重组与影像标注功能', tags: ['DICOM', '影像处理', '三维重建', '标注'] },
+        { id: 215, icon: '🔬', type: 'Skill', subcat: '医学影像与病理学', name: '病理图像识别', vendor: '病理AI', rating: 4.9, installs: '1.4k+', version: 'v4.1.0', isNew: false, isHot: true,
+          desc: '数字病理切片深度学习分析，支持细胞计数、肿瘤分级及免疫组化定量分析', tags: ['数字病理', '切片分析', '肿瘤分级', '免疫组化'] },
+        { id: 216, icon: '🧠', type: 'Skill', subcat: '医疗机器学习与临床人工智能', name: '临床决策支持模型', vendor: '惠每科技', rating: 4.8, installs: '2.6k+', version: 'v3.2.0', isNew: false, isHot: true,
+          desc: '基于多模态临床数据训练的疾病预测与诊断辅助模型，支持在线学习与持续迭代', tags: ['CDSS', '预测模型', '多模态', '在线学习'] },
+        { id: 217, icon: '😌', type: 'Skill', subcat: '心理健康与危机干预', name: '患者情绪分析', vendor: '心理健康AI', rating: 4.4, installs: '880+', version: 'v1.6.0', isNew: false, isHot: false,
+          desc: '分析患者文字与语音反馈中的情绪状态，识别焦虑、抑郁等倾向，辅助心理评估与干预', tags: ['情绪分析', '心理健康', 'NLP', '焦虑'] },
+        { id: 218, icon: '🆘', type: 'Skill', subcat: '心理健康与危机干预', name: '自杀风险智能筛查', vendor: '危机干预AI', rating: 4.6, installs: '560+', version: 'v1.3.0', isNew: true, isHot: false,
+          desc: '融合多维度评估量表与自然语言分析，对高风险患者进行主动识别与分级干预推送', tags: ['危机干预', '自杀风险', '早期识别', '分级'] },
+        { id: 219, icon: '❤️', type: 'MCP', subcat: '健康与健康管理分析', name: '健康风险综合评估', vendor: '健康管理云', rating: 4.6, installs: '1.8k+', version: 'v2.0.0', isNew: false, isHot: false,
+          desc: '多维健康指标采集与综合风险评分，输出个性化健康管理建议与随访计划', tags: ['健康风险', '评估', '个性化', '随访'] },
+        { id: 220, icon: '🏭', type: 'MCP', subcat: '医疗器械与监管', name: '医疗器械合规检查', vendor: '医械合规云', rating: 4.5, installs: '720+', version: 'v1.4.0', isNew: true, isHot: false,
+          desc: '对接FDA/NMPA法规数据库，自动核查医疗器械注册证有效期、适用范围与使用合规性', tags: ['医疗器械', '合规', 'NMPA', 'FDA'] },
+        { id: 221, icon: '💻', type: 'Skill', subcat: '医疗器械软件', name: '器械软件安全分析', vendor: 'meddev-agent-skills', rating: 4.7, installs: '630+', version: 'v2.1.0', isNew: false, isHot: false,
+          desc: '基于IEC 62304标准的医疗器械软件生命周期管理，自动扫描软件安全隐患与合规缺陷', tags: ['医械软件', 'IEC62304', '安全分析', '生命周期'] },
       ],
-      specialty: [
-        { id: 113, icon: '✏️', type: 'MCP',   name: '放射影像标注工具',   vendor: '标注云医疗', rating: 4.7, installs: '2.3k+', version: 'v3.2.0',
-          desc: '专业医学影像标注环境，支持病灶框选、分割、关键点标注及多用户协同标注审核流程',
-          tags: ['影像标注', '病灶分割', '协同标注', 'AI训练'] },
-        { id: 114, icon: '💓', type: 'Skill', name: '心电图分析插件',     vendor: '心脑血管AI', rating: 4.8, installs: '3.8k+', version: 'v2.5.0',
-          desc: '12导联心电图自动判读，支持心律失常、ST段改变、心肌梗死等异常识别，输出结构化报告',
-          tags: ['心电图', 'ECG', '心律失常', 'ST段'] },
-        { id: 115, icon: '🔬', type: 'MCP',   name: '病理图像识别',       vendor: '病理AI',     rating: 4.9, installs: '1.4k+', version: 'v4.1.0',
-          desc: '数字病理切片深度学习分析，支持细胞计数、肿瘤分级及免疫组化定量分析，精度媲美病理医生',
-          tags: ['数字病理', '切片分析', '肿瘤分级', '免疫组化'] },
-        { id: 116, icon: '🧬', type: 'MCP',   name: '基因序列分析接口',   vendor: '基因云',     rating: 4.7, installs: '980+',  version: 'v2.8.0',
-          desc: '变异注释、临床意义解读与遗传咨询辅助，支持全基因组、外显子组测序数据标准化分析',
-          tags: ['基因组', '变异注释', '精准医学', '外显子'] },
-        { id: 117, icon: '🗄️', type: 'MCP',   name: '专病数据库接口',     vendor: '医联科技',   rating: 4.5, installs: '740+',  version: 'v1.4.0',
-          desc: '对接国内外肿瘤、罕见病等专病数据库，支持患者纳入排除标准筛选与数据查询统计',
-          tags: ['专病数据库', '罕见病', '肿瘤登记', '数据查询'] },
-        { id: 118, icon: '📡', type: 'Skill', name: '超声图像智能分析',   vendor: '声诺医疗AI', rating: 4.6, installs: '1.6k+', version: 'v2.0.0',
-          desc: '甲状腺、乳腺、腹部等多部位超声图像AI分析，自动测量与TIRADS/BI-RADS分类',
-          tags: ['超声', '甲状腺', 'BI-RADS', '自动测量'] },
+      'sci-database': [
+        { id: 230, icon: '🔍', type: 'MCP', subcat: '科学数据库（基因组与变异）', name: 'ClinVar变异数据库查询', vendor: 'NCBI官方', rating: 4.9, installs: '5.6k+', version: 'v3.0.0', isNew: false, isHot: true,
+          desc: '对接NCBI ClinVar，查询临床变异与致病性分级，支持批量VCF注释与API流式输出', tags: ['ClinVar', '变异注释', 'VCF', 'NCBI'] },
+        { id: 231, icon: '👥', type: 'MCP', subcat: '科学数据库（基因组与变异）', name: 'gnomAD人群频率查询', vendor: '宽泰医学', rating: 4.8, installs: '3.2k+', version: 'v2.5.0', isNew: false, isHot: true,
+          desc: '查询gnomAD数据库中变异的人群等位基因频率，辅助罕见变异致病性判断', tags: ['gnomAD', '人群频率', '罕见变异', 'AF'] },
+        { id: 232, icon: '🧬', type: 'MCP', subcat: '科学数据库（蛋白质、通路与药物）', name: 'UniProt蛋白质数据库', vendor: 'UniProt联盟', rating: 4.9, installs: '4.8k+', version: 'v4.0.0', isNew: false, isHot: true,
+          desc: '查询UniProt/Swiss-Prot蛋白质序列、功能注释、结构域与疾病关联，支持批量ID转换', tags: ['UniProt', '蛋白质', '功能注释', '结构域'] },
+        { id: 233, icon: '🗺️', type: 'Skill', subcat: '科学数据库（蛋白质、通路与药物）', name: 'KEGG通路分析', vendor: '京都大学', rating: 4.8, installs: '3.7k+', version: 'v3.1.0', isNew: false, isHot: true,
+          desc: '对接KEGG数据库，实现基因集通路富集分析与代谢网络可视化，支持多物种比较', tags: ['KEGG', '通路分析', '富集', '代谢网络'] },
+        { id: 234, icon: '🎯', type: 'MCP', subcat: '癌症基因组数据库', name: 'TCGA癌症数据集', vendor: 'NCI GDC', rating: 4.9, installs: '2.8k+', version: 'v5.0.0', isNew: false, isHot: true,
+          desc: '访问TCGA/GDC癌症基因组数据集，支持多组学数据下载、队列筛选与生存分析', tags: ['TCGA', '癌症基因组', '多组学', 'GDC'] },
+        { id: 235, icon: '🏗️', type: 'MCP', subcat: '结构生物学与药物发现', name: 'PDB结构数据库', vendor: 'RCSB PDB', rating: 4.9, installs: '3.5k+', version: 'v4.2.0', isNew: false, isHot: false,
+          desc: '查询蛋白质三维结构、配体信息与结合口袋，支持结构文件下载与可视化集成', tags: ['PDB', '蛋白质结构', '配体', '3D'] },
+        { id: 236, icon: '💊', type: 'Skill', subcat: '结构生物学与药物发现', name: 'ChEMBL药物化学数据库', vendor: 'EMBL-EBI', rating: 4.8, installs: '2.6k+', version: 'v3.3.0', isNew: false, isHot: false,
+          desc: '查询ChEMBL中化合物生物活性数据、靶点活性与药物-靶点相互作用，支持结构搜索', tags: ['ChEMBL', '化合物', '生物活性', '靶点'] },
+        { id: 237, icon: '🧮', type: 'MCP', subcat: '生物信息学', name: '生物信息学基础工具集', vendor: 'Bioconductor', rating: 4.7, installs: '4.1k+', version: 'v2.0.0', isNew: false, isHot: false,
+          desc: '常用生物信息学工具集成接口，覆盖BLAST序列比对、GO注释、ID转换等基础功能', tags: ['BLAST', 'GO注释', 'ID转换', '序列比对'] },
       ],
-      management: [
-        { id: 119, icon: '📊', type: 'Skill', name: '报表自动生成器',   vendor: '报表云',     rating: 4.5, installs: '2.4k+', version: 'v3.0.0',
-          desc: '支持自定义报表模板配置，自动汇聚多系统数据生成日/月/年运营统计报表，支持多格式导出',
-          tags: ['报表', '自动化', '模板', '数据汇聚'] },
-        { id: 120, icon: '🖊️', type: 'MCP',   name: '电子签章插件',     vendor: '签章云',     rating: 4.7, installs: '3.1k+', version: 'v2.1.0',
-          desc: '符合电子签名法的数字签章能力，支持病历、处方、知情同意书等医疗文档合规电子化签署',
-          tags: ['电子签章', '合规', '数字签名', '知情同意'] },
-        { id: 121, icon: '🏷️', type: 'MCP',   name: '医保编码映射服务', vendor: '医保智能',   rating: 4.6, installs: '2.8k+', version: 'v4.0.0',
-          desc: '疾病诊断、手术操作、药品及医用耗材等医保编码自动映射与合规性校验，支持DRG/DIP分组',
-          tags: ['医保编码', 'DRG/DIP', '合规校验', '分组'] },
-        { id: 122, icon: '⚙️', type: 'MCP',   name: '工作流自动化引擎', vendor: '流程云医疗', rating: 4.5, installs: '1.3k+', version: 'v2.5.0',
-          desc: '医院业务流程自动化编排，支持条件触发、多系统对接与异常处理，降低人工操作成本',
-          tags: ['流程自动化', 'RPA', '工作流', '多系统'] },
-        { id: 123, icon: '🔒', type: 'Skill', name: '数据脱敏处理',     vendor: '数据安全云', rating: 4.8, installs: '4.2k+', version: 'v3.3.0',
-          desc: '基于规则与AI的医疗数据自动脱敏，PHI识别与替换，满足数据安全法规与科研数据合规要求',
-          tags: ['数据安全', '脱敏', 'PHI', '合规'] },
-        { id: 124, icon: '🔌', type: 'MCP',   name: 'HL7/FHIR接口适配', vendor: '互联互通云', rating: 4.7, installs: '1.9k+', version: 'v2.0.0',
-          desc: '标准HL7/FHIR接口适配与格式转换，简化医院信息系统间互联互通与医疗数据标准化交换',
-          tags: ['FHIR', 'HL7', '互联互通', '数据交换'] },
+      'bioinformatics': [
+        { id: 240, icon: '🔬', type: 'MCP', subcat: '生物信息 — 临床数据库与变异分析', name: 'ClinVar/OMIM变异注释', vendor: '遗传诊断AI', rating: 4.8, installs: '2.9k+', version: 'v2.4.0', isNew: false, isHot: true,
+          desc: '融合ClinVar、OMIM、HGMD等数据库对变异进行临床意义解读与遗传模式分析', tags: ['变异注释', 'OMIM', 'HGMD', '遗传'] },
+        { id: 241, icon: '📏', type: 'Skill', subcat: '生物信息 — 测序与读长质控', name: 'FastQC读长质控分析', vendor: 'Babraham生物信息', rating: 4.7, installs: '3.8k+', version: 'v0.12.0', isNew: false, isHot: false,
+          desc: '对高通量测序原始数据进行质量评估，生成多维质控报告，识别测序错误与偏差', tags: ['FastQC', '质控', 'NGS', '测序质量'] },
+        { id: 242, icon: '📊', type: 'Skill', subcat: '生物信息 — 差异表达与转录组学', name: 'DESeq2差异表达分析', vendor: 'Bioconductor', rating: 4.9, installs: '5.2k+', version: 'v1.42.0', isNew: false, isHot: true,
+          desc: '基于负二项分布的RNA-seq差异表达基因分析，支持多组比较、批次校正与火山图可视化', tags: ['DESeq2', 'RNA-seq', '差异表达', '转录组'] },
+        { id: 243, icon: '🕸️', type: 'MCP', subcat: '生物信息学——通路与网络分析', name: 'STRING蛋白互作网络', vendor: 'STRING DB', rating: 4.8, installs: '3.1k+', version: 'v12.0.0', isNew: false, isHot: true,
+          desc: '查询STRING数据库中蛋白质互作网络，支持功能富集分析与网络模块识别', tags: ['STRING', '蛋白互作', 'PPI', '网络分析'] },
+        { id: 244, icon: '🔭', type: 'Skill', subcat: '生物信息 — 单细胞与空间组学', name: 'Seurat单细胞分析流程', vendor: 'Satija Lab', rating: 4.9, installs: '4.4k+', version: 'v5.0.0', isNew: false, isHot: true,
+          desc: '单细胞RNA-seq数据完整分析流程：QC过滤、降维聚类、细胞类型注释与可视化', tags: ['Seurat', '单细胞', 'scRNA-seq', '聚类'] },
+        { id: 245, icon: '🧩', type: 'Skill', subcat: '生物信息学——表观基因组学与染色质', name: 'ATAC-seq染色质分析', vendor: '表观AI', rating: 4.7, installs: '1.6k+', version: 'v2.0.0', isNew: true, isHot: false,
+          desc: 'ATAC-seq数据峰值调用、差异峰分析与转录因子结合位点预测，揭示染色质开放区域', tags: ['ATAC-seq', '表观基因组', '染色质', 'TF结合'] },
+        { id: 246, icon: '🦠', type: 'Skill', subcat: '生物信息 — 宏基因组学与微生物组', name: 'MetaPhlAn宏基因组分析', vendor: '宏基因组AI', rating: 4.7, installs: '1.9k+', version: 'v4.0.0', isNew: false, isHot: false,
+          desc: '宏基因组数据中微生物分类谱估算，支持多样性分析、差异微生物鉴定与功能预测', tags: ['MetaPhlAn', '宏基因组', '微生物组', '分类谱'] },
+        { id: 247, icon: '🛡️', type: 'MCP', subcat: '生物信息 — 免疫信息学与流式细胞术', name: 'VDJdb免疫受体数据库', vendor: '免疫组学研究院', rating: 4.6, installs: '1.1k+', version: 'v2.1.0', isNew: false, isHot: false,
+          desc: '查询VDJdb/IMGT免疫受体数据库，TCR/BCR序列克隆型分析与抗原特异性预测', tags: ['VDJdb', 'TCR', 'BCR', '免疫信息学'] },
+        { id: 248, icon: '🧲', type: 'Skill', subcat: '生物信息学——多组学整合', name: 'MOFA多组学因子分析', vendor: '多组学平台', rating: 4.8, installs: '1.4k+', version: 'v2.6.0', isNew: false, isHot: true,
+          desc: '多组学数据联合因子分析，识别跨组学的潜在变异来源，揭示分子亚型与生物学过程', tags: ['MOFA', '多组学', '因子分析', '整合'] },
+        { id: 249, icon: '⚗️', type: 'MCP', subcat: '生物信息 — 蛋白质组学与代谢组学', name: 'MaxQuant蛋白质定量', vendor: 'Max Planck', rating: 4.8, installs: '2.2k+', version: 'v2.4.0', isNew: false, isHot: false,
+          desc: '基于MaxQuant的质谱蛋白质组学数据定量分析，支持标记/非标记定量与翻译后修饰鉴定', tags: ['MaxQuant', '蛋白质组', '质谱', 'PTM'] },
+        { id: 250, icon: '🔩', type: 'MCP', subcat: '生物信息 — 结构生物学与化学信息学', name: 'AutoDock分子对接', vendor: 'Scripps研究院', rating: 4.7, installs: '1.8k+', version: 'v4.2.6', isNew: false, isHot: false,
+          desc: '药物-靶点分子对接计算，预测结合位点、对接姿态与结合亲和力，辅助虚拟筛选', tags: ['AutoDock', '分子对接', '虚拟筛选', '结合亲和力'] },
+        { id: 251, icon: '📈', type: 'Skill', subcat: '生物信息学 — 流行病学、基因组学与因果基因组学', name: 'Mendelian随机化因果分析', vendor: '因果基因组AI', rating: 4.8, installs: '1.3k+', version: 'v2.0.0', isNew: true, isHot: true,
+          desc: '利用遗传变异作为工具变量进行Mendelian随机化分析，推断暴露与疾病的因果关系', tags: ['孟德尔随机化', '因果推断', 'GWAS', '流行病学'] },
       ],
-      research: [
-        { id: 125, icon: '🔍', type: 'MCP',   name: 'PubMed文献检索',     vendor: '文献AI',       rating: 4.7, installs: '5.8k+', version: 'v3.0.0',
-          desc: '智能检索PubMed/万方/知网等文献数据库，支持语义扩展关键词与相关性排序，一键导出引用',
-          tags: ['文献检索', 'PubMed', '语义搜索', '引用'] },
-        { id: 126, icon: '📉', type: 'Skill', name: '统计分析工具包',     vendor: '医学统计云',   rating: 4.8, installs: '4.2k+', version: 'v2.4.0',
-          desc: '覆盖描述统计、假设检验、回归分析、生存分析等医学统计方法，结果自动可视化输出',
-          tags: ['统计分析', '生存分析', 'Logistic回归', '可视化'] },
-        { id: 127, icon: '🕸️', type: 'MCP',   name: '医学知识图谱构建',   vendor: '知识云',       rating: 4.6, installs: '1.3k+', version: 'v2.1.0',
-          desc: '从文献、病历等非结构化数据中自动抽取医学实体与关系，构建领域知识图谱并支持图查询',
-          tags: ['知识图谱', '信息抽取', '图数据库', 'Neo4j'] },
-        { id: 128, icon: '📝', type: 'Skill', name: '文献引用管理',       vendor: '学术AI',       rating: 4.5, installs: '2.7k+', version: 'v1.8.0',
-          desc: '智能管理参考文献，支持APA/MLA/Vancouver等多种引用格式导出，自动检测引用重复率',
-          tags: ['引用管理', '参考文献', '格式导出', '去重'] },
-        { id: 129, icon: '🎓', type: 'Skill', name: '科研教学案例生成',   vendor: '医学教育AI',   rating: 4.4, installs: '890+',  version: 'v1.5.0',
-          desc: '基于脱敏真实病历自动生成教学案例，支持病例讨论、PBL教学与临床考核题目生成',
-          tags: ['教学案例', 'PBL', '病例讨论', '考核'] },
-        { id: 130, icon: '🌍', type: 'MCP',   name: '真实世界数据分析',   vendor: '真实世界云',   rating: 4.7, installs: '1.1k+', version: 'v2.3.0',
-          desc: 'HIS/EMR等真实世界数据汇聚分析，支持倾向评分匹配、工具变量等因果推断统计方法',
-          tags: ['RWD', '因果推断', '倾向评分', 'PSM'] },
+      'omics': [
+        { id: 260, icon: '🌌', type: 'Skill', subcat: '单细胞与空间组学', name: 'STARsolo空间转录组分析', vendor: '空间组学AI', rating: 4.8, installs: '1.7k+', version: 'v2.7.0', isNew: false, isHot: true,
+          desc: '10x Visium/MERFISH等空间转录组数据处理，细胞位置与基因表达空间联合分析', tags: ['空间转录组', '10x Visium', '空间模式', '配准'] },
+        { id: 261, icon: '🛤️', type: 'Skill', subcat: '单细胞与轨迹分析', name: 'Monocle细胞轨迹推断', vendor: 'Trapnell Lab', rating: 4.9, installs: '2.4k+', version: 'v3.1.0', isNew: false, isHot: true,
+          desc: '单细胞数据中细胞发育轨迹推断与伪时间分析，揭示细胞分化动态过程', tags: ['Monocle', '轨迹分析', '伪时间', '细胞分化'] },
+        { id: 262, icon: '📡', type: 'MCP', subcat: '蛋白质组学与质谱', name: 'MaxQuant质谱分析管道', vendor: '蛋白质组学平台', rating: 4.7, installs: '1.5k+', version: 'v2.5.0', isNew: false, isHot: false,
+          desc: '蛋白质组学数据完整分析管道，从原始质谱文件到差异蛋白质鉴定与功能注释', tags: ['质谱', '蛋白质定量', '数据管道', '注释'] },
+        { id: 263, icon: '🧪', type: 'MCP', subcat: '化学信息学与药物发现', name: 'RDKit化学信息学工具', vendor: 'RDKit开源社区', rating: 4.8, installs: '3.2k+', version: 'v2024.03', isNew: false, isHot: true,
+          desc: '化合物SMILES解析、分子指纹计算、相似性搜索与QSAR建模，开源化学信息学核心工具', tags: ['RDKit', 'SMILES', '分子指纹', 'QSAR'] },
+        { id: 264, icon: '🏗️', type: 'Skill', subcat: '蛋白质结构与设计', name: 'AlphaFold结构预测', vendor: 'DeepMind', rating: 5.0, installs: '8.1k+', version: 'v2.3.0', isNew: false, isHot: true,
+          desc: '基于AlphaFold2的蛋白质三维结构预测，支持单体/复合体结构预测与置信度评估', tags: ['AlphaFold', '蛋白质结构', 'AI预测', '复合体'] },
+        { id: 265, icon: '🌳', type: 'Skill', subcat: '系统发育与网络分析', name: 'IQ-TREE系统发育树构建', vendor: '系统发育AI', rating: 4.7, installs: '1.4k+', version: 'v2.3.0', isNew: false, isHot: false,
+          desc: '基于最大似然法的系统发育树快速构建，支持自举检验、模型选择与进化速率估算', tags: ['IQ-TREE', '系统发育', '最大似然', '进化'] },
       ],
-      pharma: [
-        { id: 131, icon: '⚗️', type: 'MCP',   name: '分子结构可视化',       vendor: '分子云',     rating: 4.7, installs: '1.6k+', version: 'v2.5.0',
-          desc: '药物分子2D/3D结构交互可视化，支持SMILES/SDF/MOL2格式解析，蛋白质-配体对接展示',
-          tags: ['分子可视化', 'SMILES', '3D结构', '对接'] },
-        { id: 132, icon: '📐', type: 'Skill', name: '药代动力学仿真',       vendor: '药代AI',     rating: 4.8, installs: '980+',  version: 'v3.0.0',
-          desc: 'PK/PD参数建模仿真，房室模型拟合，个体化给药方案优化，支持虚拟临床试验设计',
-          tags: ['PK/PD', '房室模型', '仿真', '给药优化'] },
-        { id: 133, icon: '⚠️', type: 'MCP',   name: '不良反应信号挖掘',     vendor: '药物安全AI', rating: 4.6, installs: '720+',  version: 'v2.0.0',
-          desc: '自发报告系统（FAERS/LAERS）数据挖掘，ADR信号检测与优先级评估，支持PRR/ROR等指标',
-          tags: ['ADR', '信号挖掘', 'FAERS', 'PRR/ROR'] },
-        { id: 134, icon: '🔄', type: 'MCP',   name: '临床数据ETL工具',       vendor: '临床数据云', rating: 4.7, installs: '1.1k+', version: 'v2.2.0',
-          desc: '临床数据库标准化ETL流水线，支持CDASH/SDTM/ADaM格式转换与数据质量校验，加速申报准备',
-          tags: ['ETL', 'CDISC', 'SDTM', 'ADaM'] },
-        { id: 135, icon: '🧬', type: 'Skill', name: '药物基因组学分析',     vendor: '基因组AI',   rating: 4.5, installs: '630+',  version: 'v1.7.0',
-          desc: 'SNP/单倍型分析与药物反应预测，个性化用药方案建议，覆盖主流PGx数据库与指南推荐',
-          tags: ['药物基因组', 'PGx', 'SNP', '个性化用药'] },
-        { id: 136, icon: '🔭', type: 'Skill', name: 'ADMET性质预测',         vendor: 'AI药物设计', rating: 4.9, installs: '1.4k+', version: 'v3.1.0',
-          desc: '候选化合物吸收、分布、代谢、排泄、毒性（ADMET）性质快速预测与多参数优化建议',
-          tags: ['ADMET', '毒性预测', '药物设计', 'QSAR'] },
+      'clawbio': [
+        { id: 270, icon: '🔧', type: 'MCP', subcat: '生物信息学编排与管道 (ClawBio)', name: 'Nextflow流程编排引擎', vendor: 'ClawBio', rating: 4.8, installs: '2.1k+', version: 'v23.10.0', isNew: false, isHot: true,
+          desc: 'ClawBio封装的Nextflow生物信息学工作流编排，支持容器化执行、断点续跑与云原生调度', tags: ['Nextflow', '工作流', '容器', '云原生'] },
+        { id: 271, icon: '🐍', type: 'MCP', subcat: '生物信息学编排与管道 (ClawBio)', name: 'Snakemake工作流管理', vendor: 'ClawBio', rating: 4.7, installs: '1.8k+', version: 'v8.0.0', isNew: false, isHot: false,
+          desc: 'ClawBio集成的Snakemake工作流管理器，基于规则的DAG调度，支持HPC/云环境一键部署', tags: ['Snakemake', 'DAG', 'HPC', '自动化'] },
+        { id: 272, icon: '🌍', type: 'Skill', subcat: '基因组学、祖先分析与药物基因组学 (ClawBio)', name: 'ADMIXTURE祖先成分分析', vendor: 'ClawBio', rating: 4.6, installs: '870+', version: 'v1.3.0', isNew: false, isHot: false,
+          desc: 'ClawBio封装的ADMIXTURE工具，估算个体基因组中不同祖先成分比例，支持群体遗传学分析', tags: ['ADMIXTURE', '祖先分析', '群体遗传', '结构'] },
+        { id: 273, icon: '💊', type: 'MCP', subcat: '基因组学、祖先分析与药物基因组学 (ClawBio)', name: 'PharmGKB药物基因组查询', vendor: 'ClawBio', rating: 4.8, installs: '1.2k+', version: 'v2.0.0', isNew: true, isHot: true,
+          desc: '对接PharmGKB数据库查询药物-基因-表型关联，支持PGx临床注释与个性化用药决策', tags: ['PharmGKB', '药物基因组', 'PGx', '个性化用药'] },
+        { id: 274, icon: '🧩', type: 'Skill', subcat: '结构生物学与文献综合 (ClawBio)', name: 'Rosetta蛋白结构设计', vendor: 'ClawBio', rating: 4.7, installs: '760+', version: 'v3.13.0', isNew: false, isHot: false,
+          desc: 'ClawBio集成的Rosetta蛋白质设计套件，支持结构预测、蛋白质-蛋白质对接与突变效果预测', tags: ['Rosetta', '蛋白质设计', '突变预测', '对接'] },
+        { id: 275, icon: '📚', type: 'Skill', subcat: '结构生物学与文献综合 (ClawBio)', name: '结构生物学文献综合提取', vendor: 'ClawBio', rating: 4.6, installs: '630+', version: 'v1.5.0', isNew: true, isHot: false,
+          desc: '从PubMed文献中自动提取结构生物学实验数据、结合常数与突变信息，支持知识图谱构建', tags: ['文献提取', '结构生物学', 'NLP', '知识图谱'] },
+      ],
+      'bioos': [
+        { id: 280, icon: '🧬', type: 'MCP', subcat: 'BioOS扩展生物信息工具套件', name: 'BioOS核心工具套件', vendor: 'BioOS平台', rating: 4.8, installs: '3.6k+', version: 'v2.0.0', isNew: false, isHot: true,
+          desc: 'BioOS平台核心生物信息工具集成，统一环境管理与依赖解析，支持100+生物信息学工具一键调用', tags: ['BioOS', '工具集成', '环境管理', '一键调用'] },
+        { id: 281, icon: '🎯', type: 'Skill', subcat: '肿瘤学与精准医学智能体 (BioOS)', name: '肿瘤突变负荷（TMB）分析', vendor: 'BioOS Oncology', rating: 4.8, installs: '1.4k+', version: 'v2.2.0', isNew: false, isHot: true,
+          desc: '全外显子组/靶向测序数据TMB精准计算，MSI检测，辅助免疫治疗响应预测', tags: ['TMB', 'MSI', '肿瘤基因组', '免疫治疗'] },
+        { id: 282, icon: '🩸', type: 'Skill', subcat: '血液学与血液病 (BioOS)', name: '微小残留病（MRD）检测分析', vendor: 'BioOS Hematology', rating: 4.7, installs: '820+', version: 'v1.8.0', isNew: true, isHot: false,
+          desc: '基于NGS的微小残留病灵敏检测，克隆追踪与疾病复发早期预警，覆盖白血病、淋巴瘤', tags: ['MRD', '微小残留病', '克隆追踪', 'NGS'] },
+        { id: 283, icon: '🛡️', type: 'Skill', subcat: '免疫学与细胞治疗 (BioOS)', name: 'CAR-T细胞治疗分析', vendor: 'BioOS Immunology', rating: 4.8, installs: '940+', version: 'v2.0.0', isNew: false, isHot: true,
+          desc: 'CAR-T细胞构建设计、体内扩增动态追踪与治疗响应预测，支持细胞治疗全流程分析', tags: ['CAR-T', '细胞治疗', '免疫学', '响应预测'] },
+        { id: 284, icon: '🌌', type: 'MCP', subcat: '单细胞与空间组学智能体 (BioOS)', name: '空间转录组智能解析', vendor: 'BioOS SpatialOmics', rating: 4.9, installs: '1.1k+', version: 'v1.5.0', isNew: true, isHot: true,
+          desc: 'BioOS空间转录组智能体，自动完成空间基因表达分析、细胞解卷积与组织微环境重建', tags: ['空间转录组', '解卷积', '微环境', '智能体'] },
+        { id: 285, icon: '💡', type: 'Skill', subcat: '药物发现与分子设计 (BioOS)', name: '生成式分子设计', vendor: 'BioOS DrugDiscovery', rating: 4.8, installs: '1.3k+', version: 'v2.5.0', isNew: false, isHot: true,
+          desc: '基于图神经网络与强化学习的药物分子生成优化，满足多参数约束的先导化合物快速设计', tags: ['分子生成', 'GNN', '强化学习', '先导化合物'] },
+        { id: 286, icon: '🏥', type: 'MCP', subcat: '临床AI与医疗 (BioOS)', name: '临床NLP结构化智能体', vendor: 'BioOS Clinical', rating: 4.8, installs: '2.2k+', version: 'v2.0.0', isNew: false, isHot: true,
+          desc: 'BioOS临床AI智能体，实现病历、报告等非结构化医疗文本的自动结构化与术语标准化', tags: ['临床NLP', '结构化', '术语标准化', '智能体'] },
+        { id: 287, icon: '⚙️', type: 'MCP', subcat: '研究基础设施与智能体框架（BioOS）', name: 'BioOS智能体框架基础设施', vendor: 'BioOS Platform', rating: 4.7, installs: '1.8k+', version: 'v3.0.0', isNew: false, isHot: false,
+          desc: 'BioOS研究智能体编排框架，提供工具注册、上下文管理、多智能体协作与实验追踪基础设施', tags: ['智能体框架', '编排', 'MLOps', '实验追踪'] },
+      ],
+      'datascience': [
+        { id: 290, icon: '📊', type: 'Skill', subcat: '统计与数据分析', name: 'R语言生物统计分析', vendor: 'R统计生态', rating: 4.8, installs: '4.5k+', version: 'v4.3.0', isNew: false, isHot: true,
+          desc: '医学统计全套R语言工具集，覆盖假设检验、回归分析、生存分析与随机效应模型', tags: ['R语言', '生物统计', '生存分析', '线性模型'] },
+        { id: 291, icon: '🐍', type: 'MCP', subcat: '数据处理与科学计算', name: 'Python科学计算套件', vendor: 'PyData生态', rating: 4.7, installs: '5.8k+', version: 'v3.11', isNew: false, isHot: true,
+          desc: 'NumPy/Pandas/SciPy科学计算管道，医疗数据清洗、特征工程与批量处理自动化', tags: ['NumPy', 'Pandas', 'SciPy', '科学计算'] },
+        { id: 292, icon: '📉', type: 'Skill', subcat: '科学可视化与科研传播', name: '科研图表可视化', vendor: '数据可视化云', rating: 4.7, installs: '3.9k+', version: 'v2.0.0', isNew: false, isHot: false,
+          desc: '基于Matplotlib/Seaborn/Plotly的科研图表生成，支持出版级图形渲染与交互式可视化', tags: ['可视化', 'Matplotlib', 'Seaborn', '科研图表'] },
+        { id: 293, icon: '🌡️', type: 'Skill', subcat: '公共卫生与时序分析', name: '疾病传播时序预测', vendor: '公共卫生AI', rating: 4.6, installs: '1.2k+', version: 'v2.1.0', isNew: false, isHot: false,
+          desc: '流行病时序数据ARIMA/Prophet/深度学习预测，支持R0估算、干预效果评估与趋势预报', tags: ['时序分析', 'ARIMA', '流行病', '趋势预测'] },
+        { id: 294, icon: '🖥️', type: 'MCP', subcat: '计算模拟与本体论', name: 'GROMACS分子动力学模拟', vendor: '计算化学AI', rating: 4.7, installs: '980+', version: 'v2024.1', isNew: false, isHot: false,
+          desc: '药物-靶点相互作用的分子动力学模拟，GROMACS全流程接口，支持GPU加速计算', tags: ['GROMACS', '分子动力学', 'MD模拟', 'GPU'] },
+        { id: 295, icon: '🤖', type: 'Skill', subcat: '分析师人格', name: '医疗数据分析师智能体', vendor: '分析师AI', rating: 4.5, installs: '1.6k+', version: 'v1.5.0', isNew: true, isHot: false,
+          desc: '具备医疗背景知识的AI数据分析师，自动生成数据洞察报告与可行性建议，支持自然语言交互', tags: ['AI分析师', '数据洞察', '自动报告', 'NLP'] },
+        { id: 296, icon: '🔬', type: 'MCP', subcat: '实验室自动化与集成', name: '实验室自动化协议', vendor: 'Lab自动化云', rating: 4.6, installs: '740+', version: 'v2.2.0', isNew: false, isHot: false,
+          desc: '液体处理机器人指令生成与协议管理，支持Opentrons/Hamilton等主流实验室自动化设备集成', tags: ['实验室自动化', 'Opentrons', 'LHS', '协议'] },
+      ],
+      'research-writing': [
+        { id: 300, icon: '🔍', type: 'MCP', subcat: '科学文献与参考管理', name: 'PubMed智能文献检索', vendor: '文献AI', rating: 4.7, installs: '5.8k+', version: 'v3.0.0', isNew: false, isHot: true,
+          desc: '智能检索PubMed/万方/知网等文献数据库，支持语义扩展关键词与相关性排序，一键导出引用', tags: ['文献检索', 'PubMed', '语义搜索', '引用'] },
+        { id: 301, icon: '📝', type: 'Skill', subcat: '科学文献与参考管理', name: 'Zotero引用管理集成', vendor: '学术AI', rating: 4.5, installs: '2.7k+', version: 'v7.0.0', isNew: false, isHot: false,
+          desc: '智能管理参考文献，支持APA/MLA/Vancouver等多种引用格式导出，自动检测引用重复率', tags: ['引用管理', 'Zotero', '参考文献', '格式导出'] },
+        { id: 302, icon: '✍️', type: 'Skill', subcat: '补充科学工具', name: '科研论文辅助写作', vendor: '学术写作AI', rating: 4.6, installs: '3.4k+', version: 'v2.0.0', isNew: false, isHot: true,
+          desc: '基于大语言模型的科研论文语言润色、摘要生成与结构优化，支持多语言学术写作', tags: ['论文写作', '语言润色', '摘要生成', '学术'] },
+        { id: 303, icon: '📋', type: 'MCP', subcat: '补充科学工具', name: '研究伦理审查辅助', vendor: '伦理合规AI', rating: 4.4, installs: '820+', version: 'v1.3.0', isNew: true, isHot: false,
+          desc: '科研伦理审查材料智能生成与合规性预检，对接IRB要求，辅助知情同意书与伦理申报', tags: ['伦理审查', 'IRB', '合规', '知情同意'] },
+      ],
+      'devworkflow': [
+        { id: 310, icon: '🐙', type: 'MCP', subcat: '开发工作流技能', name: 'Git代码版本管理', vendor: '开发工具云', rating: 4.8, installs: '6.5k+', version: 'v2.43.0', isNew: false, isHot: true,
+          desc: '医疗AI项目Git版本控制集成，支持分支管理、代码审查、PR自动化与合规审计日志', tags: ['Git', '版本控制', 'CI/CD', '代码审查'] },
+        { id: 311, icon: '🐳', type: 'MCP', subcat: '开发工作流技能', name: 'Docker容器化工具', vendor: '容器云', rating: 4.7, installs: '5.2k+', version: 'v24.0.0', isNew: false, isHot: true,
+          desc: '生物信息学/医疗AI应用容器化构建与发布，提供标准化环境隔离与一致性部署', tags: ['Docker', '容器化', '镜像', '环境隔离'] },
+        { id: 312, icon: '🔄', type: 'Skill', subcat: '开发工作流技能', name: 'CI/CD流水线集成', vendor: 'DevOps云', rating: 4.6, installs: '2.8k+', version: 'v3.0.0', isNew: false, isHot: false,
+          desc: '医疗AI模型持续集成与持续交付流水线，自动化测试、模型验证与合规检查', tags: ['CI/CD', '持续集成', '自动化测试', 'MLOps'] },
+        { id: 313, icon: '🧪', type: 'Skill', subcat: '开发工作流技能', name: 'API接口测试工具', vendor: '测试云', rating: 4.5, installs: '2.1k+', version: 'v2.1.0', isNew: false, isHot: false,
+          desc: '医疗AI服务API自动化测试，覆盖功能测试、性能压测与回归测试，生成合规测试报告', tags: ['API测试', '自动化测试', '性能压测', '回归'] },
       ],
     };
 
     /* ── Computed ── */
     const totalApps    = computed(() => categories.reduce((s, c) => s + c.appCount, 0));
-    const totalPlugins = computed(() => categories.reduce((s, c) => s + c.pluginCount, 0));
+    const totalPlugins = computed(() => pluginCategories.reduce((s, c) => s + c.pluginCount, 0));
 
     const filteredItems = computed(() => {
       if (!view.value.category) return [];
-      const data = view.value.type === 'apps' ? appsData : pluginsData;
-      let items = data[view.value.category.id] || [];
-      if (activeFilter.value !== 'all' && view.value.type === 'plugins') {
-        items = items.filter(i => i.type === activeFilter.value);
+      if (view.value.type === 'apps') {
+        let items = appsData[view.value.category.id] || [];
+        if (search.value.trim()) {
+          const q = search.value.trim().toLowerCase();
+          items = items.filter(i =>
+            i.name.toLowerCase().includes(q) ||
+            i.desc.toLowerCase().includes(q) ||
+            i.tags.some(t => t.toLowerCase().includes(q))
+          );
+        }
+        return items;
+      } else {
+        let items = pluginsData[view.value.category.id] || [];
+        if (activeSubcat.value && activeSubcat.value !== '全部') {
+          items = items.filter(i => i.subcat === activeSubcat.value);
+        }
+        if (activeFilter.value !== 'all') {
+          items = items.filter(i => i.type === activeFilter.value);
+        }
+        if (search.value.trim()) {
+          const q = search.value.trim().toLowerCase();
+          items = items.filter(i =>
+            i.name.toLowerCase().includes(q) ||
+            i.desc.toLowerCase().includes(q) ||
+            i.tags.some(t => t.toLowerCase().includes(q)) ||
+            (i.subcat && i.subcat.toLowerCase().includes(q))
+          );
+        }
+        return items;
       }
-      if (search.value.trim()) {
-        const q = search.value.trim().toLowerCase();
-        items = items.filter(i =>
-          i.name.toLowerCase().includes(q) ||
-          i.desc.toLowerCase().includes(q) ||
-          i.tags.some(t => t.toLowerCase().includes(q))
-        );
-      }
-      return items;
     });
 
     /* ── Actions ── */
@@ -939,6 +1050,7 @@ createApp({
       view.value = { category: cat, type };
       search.value = '';
       activeFilter.value = 'all';
+      activeSubcat.value = '全部';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function goBack() {
@@ -946,8 +1058,8 @@ createApp({
     }
 
     return {
-      view, search, activeFilter, pluginFilters,
-      categories, filteredItems,
+      view, search, activeFilter, activeSubcat, pluginFilters,
+      categories, pluginCategories, filteredItems,
       totalApps, totalPlugins,
       enterCategory, goBack,
     };
